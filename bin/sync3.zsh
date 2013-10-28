@@ -13,6 +13,8 @@ GO_USER="wozniak"
 GO=cli.globusonline.org
 ACCT=${GO_USER}@${GO}
 
+DELAY=60
+
 # Sync on file size:
 XFER_ARGS=( -r --preserve-mtime -s 1 )
 
