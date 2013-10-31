@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <hdf5.h>
 #include <tiffio.h>
@@ -77,9 +78,9 @@ init_output(int x, int y, int z, char* filename,
                        H5P_DEFAULT, H5P_DEFAULT);
 
   hsize_t dims[3];
-  dims[0] = x;
+  dims[0] = z;
   dims[1] = y;
-  dims[2] = z;
+  dims[2] = x;
   *dataspace_id = H5Screate_simple(3, dims, NULL);
   check_msg(dataspace_id > 0, "H5Screate_simple failed.")
 
@@ -90,25 +91,23 @@ init_output(int x, int y, int z, char* filename,
   return true;
 }
 
+static inline void
+chomp(char* s)
+{
+  char* c = strchr(s, '\n');
+  if (c != NULL)
+    *c = '\0';
+}
+
 static bool
 next_file(char* filename)
 {
   char* result = fgets(filename, MAX_FILENAME, stdin);
   if (result == NULL)
     return false;
+  chomp(filename);
   return true;
 }
-
-/*
-static bool
-read_tiff(char* filename, int x, int y, int k, uint16_t* data)
-{
-  for (int i = 0; i < x; i++)
-    for (int j = 0; j < y; j++)
-      data[i*x+j] = k;
-  return true;
-}
-*/
 
 static bool
 read_tiff(char* filename, int x, int y, int k, uint16_t* data)
@@ -141,20 +140,20 @@ write_hdf(int x, int y, int k,
           hid_t dataset_id, hid_t dataspace_id, uint16_t* data)
 {
   hsize_t count[3];
-  count[0] = x;
+  count[0] = 1;
   count[1] = y;
-  count[2] = 1;
+  count[2] = x;
   hsize_t offset[3];
-  offset[0] = 0;
+  offset[0] = k;
   offset[1] = 0;
-  offset[2] = k;
+  offset[2] = 0;
   hsize_t* stride = NULL;
   hsize_t* block = NULL;
 
   hsize_t dimsm[3];
-  dimsm[0] = x;
+  dimsm[0] = 1;
   dimsm[1] = y;
-  dimsm[2] = 1;
+  dimsm[2] = x;
   hid_t memspace_id = H5Screate_simple(3, dimsm, NULL);
 
   herr_t status;
