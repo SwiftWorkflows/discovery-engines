@@ -3,5 +3,13 @@ DIR := src/mt2
 
 BINS += bin/mt2
 
+LIBS := -L $(HDF)/lib
+
+RPATHS := -Wl,-rpath $(HDF)/lib
+
 bin/mt2: $(DIR)/mt2.o
-	gcc -o $(@) $(<) -l hdf5
+	gcc -o $(@) $(<) $(LIBS) -l hdf5 \
+	    $(RPATHS)
+
+clean::
+	rm -fv $(DIR)/*.o

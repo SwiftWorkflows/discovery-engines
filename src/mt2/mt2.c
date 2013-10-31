@@ -14,15 +14,6 @@ usage(void)
   printf("usage: mt2 x y z output_file < input_file\n");
 }
 
-void check(int condition, char* msg)
-{
-  if (!condition)
-  {
-    printf("mt2: %s\n", msg);
-    exit(1);
-  }
-}
-
 static void
 check_msg_impl(const char* format, ...)
 {
@@ -32,8 +23,9 @@ check_msg_impl(const char* format, ...)
   char* p = &buffer[0];
   va_list ap;
   va_start(ap, format);
-  count += sprintf(p, "error: ");
-  count += vsnprintf(buffer+count, (size_t)(buffer_size-count), format, ap);
+  count += sprintf(p, "mt2: error: ");
+  count += vsnprintf(buffer+count, (size_t)(buffer_size-count),
+                     format, ap);
   va_end(ap);
   printf("%s\n", buffer);
   fflush(NULL);
@@ -88,11 +80,12 @@ init_output(int x, int y, int z, char* filename,
   dims[1] = y;
   dims[2] = z;
   *dataspace_id = H5Screate_simple(3, dims, NULL);
+  check_msg(dataspace_id > 0, "H5Screate_simple failed.")
 
-  *dataset_id = H5Dcreate2(*file_id, "/entry", H5T_IEEE_F64BE,
+  *dataset_id = H5Dcreate2(*file_id, "/entry", H5T_STD_U16LE,
                            *dataspace_id,
                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
+  check_msg(dataspace_id > 0, "H5Screate2 failed.")
   return true;
 }
 
@@ -106,18 +99,61 @@ next_file(char* filename)
 }
 
 static bool
-rw_loop(int z)
+read_tiff(char* filename, int x, int y, int k, uint16_t* data)
 {
-  int count = 0;
+  for (int i = 0; i < x; i++)
+    for (int j = 0; j < y; j++)
+      data[i*x+j] = k;
+  return true;
+}
+
+static bool
+write_hdf(int x, int y, int k,
+          hid_t dataset_id, hid_t dataspace_id, uint16_t* data)
+{
+  hsize_t count[3];
+  count[0] = x;
+  count[1] = y;
+  count[2] = 1;
+  hsize_t offset[3];
+  offset[0] = 0;
+  offset[1] = 0;
+  offset[2] = k;
+  hsize_t* stride = NULL;
+  hsize_t* block = NULL;
+
+  hsize_t dimsm[3];
+  dimsm[0] = x;
+  dimsm[1] = y;
+  dimsm[2] = 1;
+  hid_t memspace_id = H5Screate_simple(3, dimsm, NULL);
+
+  herr_t status;
+  status = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET,
+                               offset, stride, count, block);
+  check_msg(status >= 0, "H5Sselect_hyperslab() failed.")
+  status = H5Dwrite(dataset_id, H5T_STD_U16LE, memspace_id,
+                    dataspace_id, H5P_DEFAULT, data);
+  check_msg(status >= 0, "H5Dwrite() failed.")
+  return true;
+}
+
+static bool
+rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
+{
   char current_nxs[MAX_FILENAME];
-  printf("z: %d\n", z);
+  uint16_t data[x*y];
+  int k = 0;
   while (true)
   {
-    check_msg(count <= z, "input file count exceeds z!")
+    printf("k: %d\n", k);
+    check_msg(k <= z, "input file count exceeds z!")
     bool rc = next_file(current_nxs);
     if (!rc) break;
     printf("reading: %s ...\n", current_nxs);
-    count++;
+    read_tiff(current_nxs, x, y, k, data);
+    write_hdf(x, y, k, dataset_id, dataspace_id, data);
+    k++;
   }
   return true;
 }
@@ -145,13 +181,13 @@ main(int argc, char* argv[])
   bool rc;
 
   rc = scan_args(argc, argv, &x, &y, &z, &output_filename);
-  check(rc, "error in arguments!");
+  check_msg(rc, "error in arguments!");
 
   rc = init_output(x, y, z, output_filename,
                    &file_id, &dataset_id, &dataspace_id);
   check_msg(rc, "could not write to: %s\n", output_filename);
 
-  rc = rw_loop(z);
+  rc = rw_loop(x, y, z, dataset_id, dataspace_id);
 
   close_all(file_id, dataset_id, dataspace_id);
 
