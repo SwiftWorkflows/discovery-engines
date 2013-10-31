@@ -40,9 +40,6 @@ check_msg_impl(const char* format, ...)
   exit(1);
 }
 
-/** Called when the check_msg() condition fails */
-static void check_msg_impl(const char* format, ...);
-
 /** Nice vargs error check and message */
 #define check_msg(condition, format, args...)  \
     { if (!(condition))                          \
@@ -79,10 +76,22 @@ scan_args(int argc, char** argv,
 }
 
 static bool
-init_output(char* filename, hid_t* file_id)
+init_output(int x, int y, int z, char* filename,
+            hid_t* file_id, hid_t* dataset_id, hid_t* dataspace_id)
 {
   printf("opening: %s ...\n", filename);
-  *file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  *file_id = H5Fcreate(filename, H5F_ACC_TRUNC,
+                       H5P_DEFAULT, H5P_DEFAULT);
+
+  hsize_t dims[3];
+  dims[0] = x;
+  dims[1] = y;
+  dims[2] = z;
+  *dataspace_id = H5Screate_simple(3, dims, NULL);
+
+  *dataset_id = H5Dcreate2(*file_id, "/entry", H5T_IEEE_F64BE,
+                           *dataspace_id,
+                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   return true;
 }
@@ -113,23 +122,38 @@ rw_loop(int z)
   return true;
 }
 
+static void
+close_all(hid_t file_id, hid_t dataset_id, hid_t dataspace_id)
+{
+  herr_t status;
+  status = H5Dclose(dataset_id);
+  check_msg(status >= 0, "could not H5Dclose() dataset");
+  status = H5Sclose(dataspace_id);
+  check_msg(status >= 0, "could not H5Dclose() dataspace");
+  status = H5Fclose(file_id);
+  check_msg(status >= 0, "could not H5Dclose() file");
+}
+
 int
 main(int argc, char* argv[])
 {
   char input_filename[MAX_FILENAME];
   char* output_filename;
   int x, y, z;
-  hid_t file_id;
+  hid_t file_id, dataset_id, dataspace_id;
 
   bool rc;
 
   rc = scan_args(argc, argv, &x, &y, &z, &output_filename);
   check(rc, "error in arguments!");
 
-  rc = init_output(output_filename, &file_id);
+  rc = init_output(x, y, z, output_filename,
+                   &file_id, &dataset_id, &dataspace_id);
   check_msg(rc, "could not write to: %s\n", output_filename);
 
   rc = rw_loop(z);
+
+  close_all(file_id, dataset_id, dataspace_id);
 
   return EXIT_SUCCESS;
 }
