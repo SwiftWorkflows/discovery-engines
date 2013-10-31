@@ -127,9 +127,7 @@ read_tiff(char* filename, int x, int y, int k, uint16_t* data)
 
   uint16_t* p = data;
   for (int j = 0; j < y; j++, p += y)
-  {
     TIFFReadScanline(tiff, p, j, 0);
-  }
 
   TIFFClose(tiff);
   return true;
