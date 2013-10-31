@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include <hdf5.h>
+#include <tiffio.h>
 
 #define MAX_FILENAME (64*1024)
 
@@ -98,12 +99,35 @@ next_file(char* filename)
   return true;
 }
 
+/*
 static bool
 read_tiff(char* filename, int x, int y, int k, uint16_t* data)
 {
   for (int i = 0; i < x; i++)
     for (int j = 0; j < y; j++)
       data[i*x+j] = k;
+  return true;
+}
+*/
+
+static bool
+read_tiff(char* filename, int x, int y, int k, uint16_t* data)
+{
+  TIFF* tiff = TIFFOpen("pznpt4_0070.tif", "r");
+  check_msg(tiff != NULL, "could not open: %s", filename);
+
+  int width, height;
+
+  TIFFGetField(tiff, TIFFTAG_IMAGEWIDTH, &width);
+  TIFFGetField(tiff, TIFFTAG_IMAGELENGTH, &height);
+  check_msg(width == x, "TIFF width(%d) != x(%d)", width, x);
+  check_msg(width == x, "TIFF height(%d) != y(%d)", height, y);
+
+  for (int i = 0; i < x; i++)
+    for (int j = 0; j < y; j++)
+      data[i*x+j] = k;
+
+  TIFFClose(tiff);
   return true;
 }
 
@@ -146,7 +170,8 @@ rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
   int k = 0;
   while (true)
   {
-    printf("k: %d\n", k);
+
+    // printf("k: \n");
     check_msg(k <= z, "input file count exceeds z!")
     bool rc = next_file(current_nxs);
     if (!rc) break;

@@ -8,7 +8,7 @@ LIBS := -L $(HDF)/lib
 RPATHS := -Wl,-rpath $(HDF)/lib
 
 bin/mt2: $(DIR)/mt2.o
-	gcc -o $(@) $(<) $(LIBS) -l hdf5 \
+	gcc -o $(@) $(<) $(LIBS) -l hdf5 -l tiff \
 	    $(RPATHS)
 
 clean::
