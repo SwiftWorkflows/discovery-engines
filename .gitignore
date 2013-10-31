@@ -1,2 +1,6 @@
 *~
+*.o
+*.hdf
+*project
 logs
+bin/mt2
