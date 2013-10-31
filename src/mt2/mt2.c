@@ -123,9 +123,14 @@ read_tiff(char* filename, int x, int y, int k, uint16_t* data)
   check_msg(width == x, "TIFF width(%d) != x(%d)", width, x);
   check_msg(width == x, "TIFF height(%d) != y(%d)", height, y);
 
-  for (int i = 0; i < x; i++)
-    for (int j = 0; j < y; j++)
-      data[i*x+j] = k;
+  int size = TIFFScanlineSize(tiff);
+  check_msg(size == y*sizeof(uint16_t), "scanlize size error!");
+
+  uint16_t* p = data;
+  for (int j = 0; j < y; j++, p += y)
+  {
+    TIFFReadScanline(tiff, p, j, 0);
+  }
 
   TIFFClose(tiff);
   return true;
@@ -166,12 +171,11 @@ static bool
 rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
 {
   char current_nxs[MAX_FILENAME];
-  uint16_t data[x*y];
+  uint16_t* data = malloc(x*y * sizeof(uint16_t));
   int k = 0;
   while (true)
   {
-
-    // printf("k: \n");
+    printf("k: \n");
     check_msg(k <= z, "input file count exceeds z!")
     bool rc = next_file(current_nxs);
     if (!rc) break;
@@ -180,6 +184,7 @@ rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
     write_hdf(x, y, k, dataset_id, dataspace_id, data);
     k++;
   }
+  free(data);
   return true;
 }
 
