@@ -5,15 +5,15 @@ LOG=~wozniak/proj/d-e/logs/sync3.log
 
 mkdir -p $( dirname ${LOG} )
 
-SITE1="wozniak#wozniak-laptop-u"
-SITE2="lcrc#fusion"
-SITE3="wozniak#pads-c10"
+SITE1="wozniak#aps-detector:/~/F/"
+SITE2="lcrc#fusion:d-e.d"
+SITE3="wozniak#pads-c10:d-e.d"
 
 GO_USER="wozniak"
 GO=cli.globusonline.org
 ACCT=${GO_USER}@${GO}
 
-DELAY=60
+DELAY=600
 
 # Sync on file size:
 XFER_ARGS=( -r --preserve-mtime -s 1 )
@@ -29,7 +29,7 @@ do
   print
   LABEL=( --label $( date_word ) )
   print "Starting sync: ${LABEL}"
-  ssh ${ACCT} scp ${XFER_ARGS} ${LABEL} ${SITE1}:d-e.d ${SITE2}:d-e.d
-  ssh ${ACCT} scp ${XFER_ARGS} ${LABEL} ${SITE2}:d-e.d ${SITE3}:d-e.d
+  ssh ${ACCT} scp ${XFER_ARGS} ${LABEL} ${SITE1} ${SITE2}
+  ssh ${ACCT} scp ${XFER_ARGS} ${LABEL} ${SITE2} ${SITE3}
   sleep ${DELAY}
 done < /dev/null >> ${LOG}
