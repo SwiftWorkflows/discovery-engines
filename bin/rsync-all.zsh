@@ -14,11 +14,9 @@ DIR=$1
 ENTRIES=$2
 PADS_LIST=( $( < ~wozniak/pads.list ) ) 
 
-[[ -d ${DIR} ]] 
-exitcode "directory does not exist: ${DIR}"
+[[ -d ${DIR} ]] || crash 1 "directory does not exist: ${DIR}"
 
-[[ -f ${ENTRIES} ]] 
-exitcode "entries file does not exist: ${ENTRIES}"
+[[ -f ${ENTRIES} ]] || crash 1 "entries file does not exist: ${ENTRIES}"
 
 PADS_COUNT=${#PADS_LIST}
 print "PADS nodes: ${PADS_COUNT}"
