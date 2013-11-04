@@ -1,7 +1,7 @@
 
 line()
 # Nth line in file
-{ 
+{
   local N=$1
   local FILE=$2
   sed -n ${N}p ${FILE}
@@ -61,4 +61,9 @@ line_count()
 {
   wc -l ${*} | read -A R
   print ${R[1]}
+}
+
+timestamp()
+{
+  print "TIMESTAMP: $( date +%s )"
 }

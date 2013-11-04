@@ -2,17 +2,17 @@
 
 DE_HOME=$( cd $( dirname $0 )/.. ; /bin/pwd )
 source ${DE_HOME}/lib/helpers.zsh
-if [[ ${?} != 0 ]] 
+if [[ ${?} != 0 ]]
 then
     print "Could not find discovery engines directory."
     exit 1
 fi
 
-[[ ${#*} == 2 ]] || crash 1 "rsync-all.zsh: requires 2 arguments".
+[[ ${#*} == 2 ]] || crash 1 "rsync-all.zsh: requires 2 arguments."
 
 DIR=$1
 ENTRIES=$2
-PADS_LIST=( $( < ~wozniak/pads.list ) ) 
+PADS_LIST=( $( < ~wozniak/pads.list ) )
 
 [[ -d ${DIR} ]] || crash 1 "directory does not exist: ${DIR}"
 
@@ -33,11 +33,10 @@ declare PWD
 
 declare ENTRIES
 
-while true  
-do 
-  print ok1
+while true
+do
+  timestamp
   read ENTRY
-  print ok
   declare ENTRY
   HASH=$( ${DE_BIN}/hash.pl ${ENTRY} )
   INDEX=$(( HASH % PADS_COUNT + 1 ))
@@ -46,3 +45,7 @@ do
   declare NODE
   rsync --size-only -av ${ENTRY} ${NODE}:/scratch/local/aps-rsync
 done < ${ENTRIES} |& tee -a ${LOG}
+
+print "DONE."
+
+timestamp
