@@ -1,4 +1,14 @@
 
+push()
+{
+  pushd ${*} > /dev/null
+}
+
+pop()
+{
+  popd ${*} > /dev/null
+}
+
 line()
 # Nth line in file
 {
