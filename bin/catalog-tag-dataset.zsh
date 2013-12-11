@@ -20,6 +20,22 @@ fi
 ENDPOINT=$1
 DIR=$2
 
+DE_HOME=$( cd $( dirname $0 )/.. && /bin/pwd )
+if [[ ${?} != 0 || ${DE_HOME} == "" ]]
+then
+  print "Could not find DE_HOME!"
+  exit 1
+fi
+
+source ${DE_HOME}/lib/helpers.zsh
+if [[ ${?} != 0 ]]
+then
+  print "Could not use DE_HOME!"
+  exit 1
+fi
+
+source ${DE_HOME}/lib/catalog.zsh
+
 cd ${DIR}
 
 # Get absolute path
@@ -44,7 +60,8 @@ catalog-annotate-dataset ${DATASET_ID} "host" "mira"
 catalog-annotate-dataset ${DATASET_ID} "path" ${DIR}
 
 print "Getting size..."
-SIZE=$( du -s . )
+# SIZE=$( du -s . )
+SIZE=0
 declare SIZE
 catalog-annotate-dataset ${DATASET_ID} "size" ${SIZE}
 
