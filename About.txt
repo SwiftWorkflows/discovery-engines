@@ -1,4 +1,6 @@
 
+:toc:
+
 Discovery Engines
 =================
 
@@ -46,9 +48,11 @@ Usage: +catalog-tag-dataset.zsh <catalog ID> <dataset ID>+
 
 +catalog-dataset-ids.zsh+:: List all dataset IDs within the catalog.
 
+=== Transfer
+
 +sync3.zsh+:: Script to transfer data from APS to ALCF over GO.
 
-=== Misc.
+=== Applications
 
 +merge-tiffs.py+:: The original +merge-tiffs+ from Ray.
 
