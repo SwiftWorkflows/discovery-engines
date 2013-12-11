@@ -15,7 +15,7 @@ Scripts for the discovery engines project
 
 == Directories
 
-+src+:: Compiled sources.  Currently contains the source for +mt2+
++src+:: Compiled sources.  Currently just contains the source for +mt2+
 
 +bin+:: User programs
 
@@ -57,6 +57,9 @@ Usage: +catalog-tag-dataset.zsh <catalog ID> <dataset ID>+
 === Applications
 
 +merge-tiffs.py+:: The original +merge-tiffs+ from Ray.
+
++mt2+:: _merge-tiffs-2_.  Fast C program for TIFF &rarr; HDF
+conversion.  Compile this with the +Makefile+.
 
 === Helpers
 
