@@ -30,10 +30,21 @@ All of these scripts rely on +DEFAULT_CATALOG_ID+.
 +catalog-tag-all.zsh+:: Tags multiple directories for GC, creating a
 dataset for each directory.
 
-+catalog-tag-dataset+:: Tags a single directory/dataset.  Used by
+Usage: +catalog-tag-all.zsh <endpoint> <directories>...+
+----
+> catalog-tag-dataset.zsh "alcf#dtn_mira" lsmo34_130k lsmo34_140k
+----
+
++catalog-tag-dataset.zsh+:: Tags a single directory/dataset.  Used by
 +catalog-tag-all.zsh+.
 
-+catalog-tag-dataset+:: Deletes a dataset.
+Usage: +catalog-tag-dataset.zsh <endpoint> <directory>+
+
++catalog-delete-dataset.zsh+:: Deletes a dataset.
+
+Usage: +catalog-tag-dataset.zsh <catalog ID> <dataset ID>+
+
++catalog-dataset-ids.zsh+:: List all dataset IDs within the catalog.
 
 +sync3.zsh+:: Script to transfer data from APS to ALCF over GO.
 
