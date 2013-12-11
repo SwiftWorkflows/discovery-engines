@@ -1,13 +1,15 @@
 
+////
+This is an asciidoc file.  The HTML may be viewed at:
+https://rawgithub.com/jmjwozniak/discovery-engines/master/About.html
+////
+
 :toc:
 
 Discovery Engines
 =================
-
-////
-This is an asciidoc file.  The HTML may be viewed at:
-http://github.com/
-////
+Justin M. Wozniak <wozniak@mcs.anl.gov>
+December 2013
 
 Scripts for the discovery engines project
 
