@@ -1,4 +1,52 @@
-discovery-engines
+
+Discovery Engines
 =================
 
+////
+This is an asciidoc file.  The HTML may be viewed at:
+http://github.com/
+////
+
 Scripts for the discovery engines project
+
+== Directories
+
++src+:: Compiled sources.  Currently contains the source for +mt2+
+
++bin+:: User programs
+
++lib+:: Contains shell script functions
+
++plots+:: Contains tools for data manipulation for plotting
+
+== Programs
+
+In +bin/+:
+
+=== Catalog tagging
+
+All of these scripts rely on +DEFAULT_CATALOG_ID+.
+
++catalog-tag-all.zsh+:: Tags multiple directories for GC, creating a
+dataset for each directory.
+
++catalog-tag-dataset+:: Tags a single directory/dataset.  Used by
++catalog-tag-all.zsh+.
+
++catalog-tag-dataset+:: Deletes a dataset.
+
++sync3.zsh+:: Script to transfer data from APS to ALCF over GO.
+
+=== Misc.
+
++merge-tiffs.py+:: The original +merge-tiffs+ from Ray.
+
+=== Helpers
+
++hash.pl+:: Does an MD5 hash of the given argument
+
+== Internals
+
++lib/catalog.zsh+:: Shell functions for catalog CLI functionality
+
++lib/helpers.zsh+:: ZSH helper functions
