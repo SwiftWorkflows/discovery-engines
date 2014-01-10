@@ -1,8 +1,14 @@
 
 # User may have to set these to correct locations:
-MPI_HOME = $(HOME)/sfw/mpich-master
-SWIG = $(HOME)/sfw/swig-2.0.4/bin/swig
-TCL_HOME = $(HOME)/sfw/tcl-8.6.0
+WOZNIAK = /homes/wozniak/Public
+# MCS Public:
+MPI_HOME = $(WOZNIAK)/mpich-master
+SWIG = $(WOZNIAK)/swig-2.0.4-x86_64/bin/swig
+TCL_HOME = $(WOZNIAK)/tcl-8.6.1-x86_64
+# Wozniak's laptop:
+# MPI_HOME = $(HOME)/sfw/mpich-master
+# SWIG = $(HOME)/sfw/swig-2.0.4/bin/swig
+# TCL_HOME = $(HOME)/sfw/tcl-8.6.0
 
 OBJS = user_wrap.o user.o
 
