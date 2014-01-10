@@ -1,0 +1,26 @@
+
+Swift MPI demo
+
+Usage:
+
+make
+./run.sh
+
+File index:
+
+Makefile: Modify the paths at the top here to make this work on your
+          system
+
+demo.swift: The main Swift script
+
+user.c: Contains the user C code, with 2 functions:
+        mpi_merge(): Does an MPI collective read of the given
+                     data file, then does an MPI_Reduce to get the
+                     average
+        f(): A simple math function
+
+user.h: User header file
+
+user.tcl: User Tcl glue code
+
+sample.data: A simple file containing 4 doubles: 1,2,3,4
