@@ -6,6 +6,7 @@ import sys;
 @par (float t) mpi_merge(string filename) "user" "0.0" "mpi_merge_tcl";
 
 // Define external C function
+@dispatch=WORKER
 (float t) f(float x, float y) "user" "0.0"
 [ "set <<t>> [ f <<x>> <<y>> ]" ];
 

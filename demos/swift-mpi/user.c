@@ -40,5 +40,6 @@ mpi_merge(long long int task_comm_int, char* filename)
 double
 f(double x, double y)
 {
+  sleep(1);
   return 2*x + 3*y;
 }
