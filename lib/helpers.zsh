@@ -77,3 +77,25 @@ timestamp()
 {
   print "TIMESTAMP: $( date +%s )"
 }
+
+zclm()
+# Select columns from input without awk
+{
+  local L
+  local -Z c
+  local A C i
+  C=( ${*} )
+  while read L
+  do
+    A=( $( print -- ${L} ) )
+    N=${#C}
+    for (( i=1 ; i<=N ; i++ ))
+    do
+      c=${C[i]}
+      print -n "${A[c]}"
+      (( i < N )) && print -n " "
+    done
+    printf "\n"
+  done
+  return 0
+}

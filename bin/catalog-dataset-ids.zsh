@@ -6,4 +6,4 @@ then
   exit 1
 fi
 
-catalog get_datasets -text | clm 1 | grep -E "[[:digit:]]+" | sed "s/)//"
+catalog get_datasets ${DEFAULT_CATALOG_ID} -text | clm 1 | grep -E "[[:digit:]]+" | sed "s/)//"

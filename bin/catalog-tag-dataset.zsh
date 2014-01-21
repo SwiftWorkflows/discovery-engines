@@ -49,20 +49,21 @@ DATASET_ID=$( catalog-create-dataset ${NAME} )
 
 declare DATASET_ID
 
-KEYS=( "host" "path" "size" )
-for KEY in ${KEYS}
-do
-  # This fails if the annotation exists
-  catalog create_annotation_def ${KEY} "text" || true
-done
+NEWEST_FILE=$( print *(om[1]) )
+DATE=$( stat ${NEWEST_FILE} | awk '$1 == "Modify:" { print $2 $3 }' )
+TEMPERATURE=${NAME#*_}
+declare DATE TEMPERATURE
+print "Getting size..."
+SIZE=$( du -s . | zclm 1 )
 
+catalog-annotate-dataset ${DATASET_ID} "name" ${NAME}
 catalog-annotate-dataset ${DATASET_ID} "host" "mira"
 catalog-annotate-dataset ${DATASET_ID} "path" ${DIR}
-
-print "Getting size..."
-# SIZE=$( du -s . )
-SIZE=0
-declare SIZE
+catalog-annotate-dataset ${DATASET_ID} "date" ${DATE}
+catalog-annotate-dataset ${DATASET_ID} "temperature" ${TEMPERATURE}
+catalog-annotate-dataset ${DATASET_ID} "sample" "LSMO"
+catalog-annotate-dataset ${DATASET_ID} "PI" "Ray Osborn"
+catalog-annotate-dataset ${DATASET_ID} "beamline" "ANL APS Sector 6"
 catalog-annotate-dataset ${DATASET_ID} "size" ${SIZE}
 
-print "DONE."
+catalog-acl-add ${DATASET_ID} "*" "r"

@@ -1,10 +1,16 @@
 
 alias catalog='python ~/.local/lib/python2.6/site-packages/globusonline/catalog/client/examples/catalog.py -default_catalog'
 
+id-column()
+{
+  zclm 1 | grep -E "[[:digit:]]+" | sed "s/)//"
+}
+
 catalog-create-dataset()
 {
   local NAME=$1
-  catalog create_dataset '{'"\"name\":\"${NAME}\""'}' | read OUTPUT
+  catalog create_dataset ${DEFAULT_CATALOG_ID} \
+    '{'"\"name\":\"${NAME}\""'}' | read OUTPUT
   print ${OUTPUT#*,}
 }
 
@@ -18,7 +24,63 @@ catalog-annotate-dataset()
   JSON+='{'
   JSON+="\"${KEY}\":\"${VALUE}\""
   JSON+='}'
-  catalog add_dataset_annotation ${DATASET_ID} ${JSON}
+  catalog add_dataset_annotation ${DEFAULT_CATALOG_ID} ${DATASET_ID} ${JSON}
+}
+
+catalog-acl-add()
+{
+  if [[ ${#*} != 3 ]]
+  then
+    print "usage: catalog-acl-add <DATASET_ID> <PRINCIPAL> <PERMS>"
+    return 1
+  fi
+  set -x
+  local DATASET_ID=$1
+  local PRINCIPAL=$2
+  local PERMS=$3
+  local JSON=""
+  JSON+='{"principal":"'${PRINCIPAL}'","principal_type":"user",'
+  JSON+='"permission":"'${PERMS}'"}'
+  catalog add_dataset_acl ${DEFAULT_CATALOG_ID} ${DATASET_ID} ${JSON}
+}
+
+catalog-acl-get()
+{
+  if [[ ${#*} == 1 ]]
+  then
+    print "usage: catalog-acl-get <DATASET_ID>"
+    return 1
+  fi
+
+  local DATASET_ID=$1
+  catalog get_dataset_acl ${DEFAULT_CATALOG_ID} ${DATASET_ID}
+}
+
+catalog-dataset-exists()
+{
+  if [[ ${#*} != 1 ]]
+  then
+    print "usage: catalog-dataset-exists <DATASET_ID>"
+    return 1
+  fi
+
+  local DATASET_ID=$1
+  catalog get_dataset_acl ${DEFAULT_CATALOG_ID} ${DATASET_ID} >& /dev/null
+  # Return exit code
+}
+
+catalog-query()
+{
+  if [[ ${#*} != 2 ]]
+  then
+    print "usage: catalog-query <KEY> <VALUE>"
+    return 1
+  fi
+
+  local KEY=$1
+  local VALUE=$2
+  catalog query_datasets ${DEFAULT_CATALOG_ID} \
+    ${KEY} LIKE "%"${VALUE}"%" -text | id-column
 }
 
 catalog-create-member()
