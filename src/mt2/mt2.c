@@ -112,7 +112,7 @@ next_file(char* filename)
 static bool
 read_tiff(char* filename, int x, int y, int k, uint16_t* data)
 {
-  TIFF* tiff = TIFFOpen("pznpt4_0070.tif", "r");
+  TIFF* tiff = TIFFOpen(filename, "r");
   check_msg(tiff != NULL, "could not open: %s", filename);
 
   int width, height;
