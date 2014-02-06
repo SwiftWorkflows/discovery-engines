@@ -174,7 +174,6 @@ rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
   int k = 0;
   while (true)
   {
-    printf("k: \n");
     check_msg(k <= z, "input file count exceeds z!")
     bool rc = next_file(current_nxs);
     if (!rc) break;
