@@ -202,7 +202,6 @@ close_all(hid_t file_id, hid_t dataset_id, hid_t dataspace_id)
 int
 main(int argc, char* argv[])
 {
-  char input_filename[MAX_FILENAME];
   char* output_filename;
   int x, y, z;
   hid_t file_id, dataset_id, dataspace_id;
