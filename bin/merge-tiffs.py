@@ -40,6 +40,7 @@ def get_metadata(metafile):
            parser.getint('metadata', 'summedExposures')
 
 def initialize_nexus_file(directory, prefix, filenames, omega, step):
+    assert(len(filenames) >= 1)
     v0 = TIFF.imread(filenames[0])
     x = NXfield(range(v0.shape[1]), dtype=np.uint16, name='x_pixel')
     y = NXfield(range(v0.shape[0]), dtype=np.uint16, name='y_pixel')
@@ -136,6 +137,7 @@ if __name__=="__main__":
     except getopt.GetoptError:
         print help
         sys.exit(2)
+
     directory = './'
     extension = 'tif'
     prefix = None
@@ -172,6 +174,10 @@ if __name__=="__main__":
     for prefix in prefixes:
         tic=timeit.default_timer()
         data_files = get_files(directory, prefix, extension, reverse)
+        if (len(data_files) == 0):
+            print "No data files matched pattern!"
+            print "os.getcwd()=%s" % os.getcwd()
+            exit(1)
         root = initialize_nexus_file(directory, prefix, data_files, omega, step)
         if prefix == background:
             write_data(root, data_files)
