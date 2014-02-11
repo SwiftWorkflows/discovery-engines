@@ -1,4 +1,4 @@
-#!/Users/rosborn/Library/Enthought/Canopy_64bit/User/bin/python
+#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Copyright (c) 2013, NeXpy Development Team.
 #
@@ -30,6 +30,9 @@ def get_files(directory, prefix, extension, reverse=False):
 
 def get_metadata(metafile):
     parser = ConfigParser()
+    if not os.path.exists(metafile):
+        print "get_metadata: file does not exist: " + metafile
+        exit(1)
     parser.read(metafile)
     return parser.getfloat('metadata','timeStamp'), \
            parser.get('metadata','dateString').replace(' : ','T').replace('.','-',2), \
@@ -54,11 +57,25 @@ def initialize_nexus_file(directory, prefix, filenames, omega, step):
     root = NXroot(NXentry(data,NXsample(),NXinstrument(NXdetector())))
     root.entry.instrument.detector.frame_start = \
         NXfield(shape=(len(filenames),), maxshape=(5000,), units='s', dtype=np.float64)
-    root.save(os.path.join(directory, prefix+'.nxs'),'w')
+    filename = os.path.join(directory, prefix+'.nxs')
+    try:
+        root.save(filename, 'w')
+    except IOError:
+        print "Could not write to: " + filename
+        print "PWD is: " + os.getcwd()
+        exit(1)
     return root
 
 def write_data(root, filenames, bkgd_root=None):
-    time, date, exposure, sum = get_metadata(filenames[0]+'.metadata')
+    metadata_file = filenames[0]+'.metadata'
+    try:
+        time, date, exposure, sum = get_metadata(metadata_file)
+    except Exception as e:
+        print e
+        print "Caught error in: " + metadata_file
+        print ""
+        raise e
+
     root.entry.start_time = date
     root.entry.instrument.detector.frame_time = sum * exposure
     if bkgd_root:
@@ -108,7 +125,7 @@ def write_metadata(root, directory, prefix):
 
 def natural_sort(key):
     import re
-    return [int(t) if t.isdigit() else t for t in re.split(r'(\d+)', key)]    
+    return [int(t) if t.isdigit() else t for t in re.split(r'(\d+)', key)]
 
 if __name__=="__main__":
     help = "merge_tiffs -d <directory> -e <extension> -p <prefix> -b <background> -o <omega> -s <step> -r"
@@ -155,7 +172,7 @@ if __name__=="__main__":
     for prefix in prefixes:
         tic=timeit.default_timer()
         data_files = get_files(directory, prefix, extension, reverse)
-        root = initialize_nexus_file(directory, prefix, data_files, omega, step)       
+        root = initialize_nexus_file(directory, prefix, data_files, omega, step)
         if prefix == background:
             write_data(root, data_files)
             bkgd_root = root
@@ -165,4 +182,6 @@ if __name__=="__main__":
             write_data(root, data_files)
         write_metadata(root, directory, prefix)
         toc=timeit.default_timer()
-        print toc-tic, 'seconds for', '%s.nxs' % prefix 
+        print toc-tic, 'seconds for', '%s.nxs' % prefix
+
+
