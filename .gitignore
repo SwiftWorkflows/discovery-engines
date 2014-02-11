@@ -3,4 +3,4 @@
 *.hdf
 *project
 logs
-bin/mt2
+turbine-directory.txt
