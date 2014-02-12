@@ -9,10 +9,10 @@ export ADLB_PRINT_TIME=1
 
 usage()
 {
-  print "merge-all-swift-tukey.zsh <PROCS> <DATA>"
+  print "merge-all-swift-tukey.zsh <PROCS> <DATA> <LIST>"
 }
 
-if [[ ${#*} != 2 ]]
+if [[ ${#*} != 3 ]]
 then
   usage
   exit 1
@@ -20,6 +20,7 @@ fi
 
 PROCS=$1
 DATA=$2
+LIST=$3
 
 # Construct Discovery Engines directories:
 DE_SWIFT=$( cd $( dirname $0 ) ; /bin/pwd )
@@ -35,5 +36,5 @@ stc -u ${DE_SWIFT}/merge-all.swift
 cd ${DATA}
 cd -
 
-turbine-cobalt-run.zsh -t 7 -n ${PROCS} -C ${DATA} \
-  ${DE_SWIFT}/merge-all.tcl --data=${DATA}
+turbine-cobalt-run.zsh -t 12:00:00 -n ${PROCS} -C ${DATA} \
+  ${DE_SWIFT}/merge-all.tcl --data=${DATA} --list=${LIST}
