@@ -170,7 +170,12 @@ if __name__=="__main__":
     if background in prefixes:
         prefixes.insert(0,prefixes.pop(prefixes.index(background)))
     elif background:
-        bkgd_root = nxload(os.path.join(directory,background+'.nxs'))
+        bg_nxs = os.path.join(directory,background+'.nxs')
+        try:
+            bkgd_root = nxload(bg_nxs)
+        except IOError as e:
+            print "unable to open background file: " + bg_nxs
+            exit(1)
     for prefix in prefixes:
         tic=timeit.default_timer()
         data_files = get_files(directory, prefix, extension, reverse)
