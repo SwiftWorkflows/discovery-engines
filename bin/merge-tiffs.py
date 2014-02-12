@@ -58,13 +58,14 @@ def initialize_nexus_file(directory, prefix, filenames, omega, step):
     root = NXroot(NXentry(data,NXsample(),NXinstrument(NXdetector())))
     root.entry.instrument.detector.frame_start = \
         NXfield(shape=(len(filenames),), maxshape=(5000,), units='s', dtype=np.float64)
-    filename = os.path.join(directory, prefix+'.nxs')
+    file_nxs = os.path.join(directory, prefix+'.nxs')
     try:
-        root.save(filename, 'w')
+        root.save(file_nxs, 'w')
     except IOError:
-        print "Could not write to: " + filename
+        print "Could not write to: " + file_nxs
         print "PWD is: " + os.getcwd()
         exit(1)
+    print "NEXUS_CREATE: " + file_nxs
     return root
 
 def write_data(root, filenames, bkgd_root=None):
@@ -131,7 +132,7 @@ def natural_sort(key):
 if __name__=="__main__":
     help = "merge_tiffs -d <directory> -e <extension> -p <prefix> -b <background> -o <omega> -s <step> -r"
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hd:e:p:b:o:s:r",["directory=",
+        opts, args = getopt.getopt(sys.argv[1:],"hcd:e:p:b:o:s:r",["directory=",
                                                 "ext=","prefix=","background=",
                                                 "omega=","step=","reversed"])
     except getopt.GetoptError:
@@ -145,12 +146,16 @@ if __name__=="__main__":
     omega = 0.0
     step = 0.1
     reverse = False
+    # If true, use *.complete files to mark progress
+    use_complete_files = False
     for opt, arg in opts:
         if opt == '-h':
             print help
             sys.exit()
         elif opt in ('-b', '--background'):
             background = arg
+        elif opt in ('-c', '--complete-files'):
+            use_complete_files = True
         elif opt in ('-p', '--prefix'):
             prefix = arg
         elif opt in ('-d', '--directory'):
@@ -173,7 +178,7 @@ if __name__=="__main__":
         bg_nxs = os.path.join(directory,background+'.nxs')
         try:
             bkgd_root = nxload(bg_nxs)
-        except IOError as e:
+        except IOError:
             print "unable to open background file: " + bg_nxs
             exit(1)
     for prefix in prefixes:
@@ -183,6 +188,13 @@ if __name__=="__main__":
             print "No data files matched pattern!"
             print "os.getcwd()=%s" % os.getcwd()
             exit(1)
+        if use_complete_files:
+            # Check completion file to prevent duplicate work
+            nxs_complete = os.path.join(directory, prefix) + ".complete"
+            if os.path.exists(nxs_complete):
+                print "NEXUS_WARNING: complete file already exists: " + nxs_complete
+                print "NEXUS_EXIT"
+                exit(0)
         root = initialize_nexus_file(directory, prefix, data_files, omega, step)
         if prefix == background:
             write_data(root, data_files)
@@ -194,5 +206,8 @@ if __name__=="__main__":
         write_metadata(root, directory, prefix)
         toc=timeit.default_timer()
         print toc-tic, 'seconds for', '%s.nxs' % prefix
-
+        if use_complete_files:
+            # Touch completion file to indicate success:
+            with file(nxs_complete, 'w'):
+                print "NEXUS_COMPLETE: " + nxs_complete
 
