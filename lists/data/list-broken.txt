@@ -1,0 +1,12 @@
+lsmo34_130k # no ubbscan, fb2scan, fb2scan, ff2scan, sfscan, ff1scan
+lsmo39_100k # no darkbeg
+lsmo39_130k # no darkbeg
+lsmo39_140k # no darkbeg
+lsmo39_150k # no darkbeg
+lsmo39_160k # no darkbeg
+lsmo39_180k # no darkbeg
+lsmo39_200k # no darkbeg
+lsmo39_220k # no darkbeg
+lsmo42_400k # no sbscan, sfscan, fb2scan
+
+

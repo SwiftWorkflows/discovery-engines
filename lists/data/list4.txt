@@ -1,0 +1,8 @@
+lsmo34_400k
+lsmo42_090k
+lsmo42_100k
+lsmo42_110k
+lsmo42_120k
+lsmo42_130k
+lsmo42_140k
+lsmo42_150k
