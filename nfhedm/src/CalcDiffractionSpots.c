@@ -14,12 +14,12 @@
 #include <ctype.h>
 #include <stdint.h>
 
+#include "CalcDiffractionSpots.h"
 
 #define deg2rad 0.0174532925199433
 #define rad2deg 57.2957795130823
 #define RealType double
 #define MAX_N_HKLS 1000
-#define MAX_N_OMEGA_RANGES 20
 
 #define crossProduct(a,b,c) \
 (a)[0] = (b)[1] * (c)[2] - (c)[1] * (b)[2]; \
@@ -53,7 +53,7 @@ MatrixMult(
 
 void
 GenerateHKLsFCC(
-                int ringnos[],
+                const int ringnos[],
                 int nrings,
                 int hkls[][4],
                 int *nhkls)
@@ -359,7 +359,7 @@ void
 CalcRingRadii(
               RealType Distance,
               RealType Ttheta[],
-              int RingNrs[],
+              const int RingNrs[],
               int NrRings,
               RealType RingRadii[])
 {
@@ -463,7 +463,7 @@ CalcDiffractionSpots(double LatticeConstant,
 	double Distance, 
 	int nRings, 
 	double ExcludePoleAngle, 
-	int RingNumbers[MAX_N_OMEGA_RANGES], 
+	const int RingNumbers[MAX_N_OMEGA_RANGES],
 	double OmegaRanges[MAX_N_OMEGA_RANGES][2], 
 	int NoOfOmegaRanges, 
 	double BoxSizes[MAX_N_OMEGA_RANGES][4], 

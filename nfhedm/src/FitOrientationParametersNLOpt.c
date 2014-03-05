@@ -11,6 +11,8 @@
 
 #include "checks.h"
 
+#include "CalcDiffractionSpots.h"
+
 #define RealType double
 #define float32_t float
 #define SetBit(A,k)   (A[(k/32)] |=  (1 << (k%32)))
