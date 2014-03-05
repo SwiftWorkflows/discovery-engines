@@ -204,6 +204,7 @@ ReadBinFiles(
     free(zs);
     free(peakID);
     free(intensity);
+    return 1;
 }
 
 double sin_cos_to_angle (double s, double c)
