@@ -23,9 +23,14 @@ lib:
 
 FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o src/CalcDiffractionSpots.o
 
+HEADERS = src/checks.h
+
+src/CalcDiffractionSpots.o: src/CalcDiffractionSpots.o $(HEADERS)
+
 src/FitOrientationParametersNLOpt-main.o:        \
 	src/FitOrientationParametersNLOpt-main.c \
-	src/FitOrientationParametersNLOpt.c
+	src/FitOrientationParametersNLOpt.c      \
+	$(HEADERS)
 	gcc -c $(CFLAGS) -o $(@) $(<)
 
 bin/fop-nlopt:  src/CalcDiffractionSpots.o               \
