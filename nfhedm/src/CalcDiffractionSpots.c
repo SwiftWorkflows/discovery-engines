@@ -14,11 +14,10 @@
 #include <ctype.h>
 #include <stdint.h>
 
+#include "nfhedm-math.h"
+
 #include "CalcDiffractionSpots.h"
 
-#define deg2rad 0.0174532925199433
-#define rad2deg 57.2957795130823
-#define RealType double
 #define MAX_N_HKLS 1000
 
 #define crossProduct(a,b,c) \

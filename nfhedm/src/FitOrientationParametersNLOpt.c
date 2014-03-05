@@ -263,18 +263,6 @@ void Euler2OrientMat(
 }
 
 void
-MatrixMultF(
-    RealType m[3][3],
-    RealType v[3],
-    RealType r[3])
-{
-    int i;
-    for (i=0; i<3; i++) {
-        r[i] = m[i][0]*v[0] + m[i][1]*v[1] + m[i][2]*v[2];
-    }
-}
-
-void
 MatrixMultF33(
     RealType m[3][3],
     RealType n[3][3],
@@ -331,20 +319,6 @@ RotationTilts(
     r3[2][2] = cos(tx);
     MatrixMultF33(r1,r2,r1r2);
     MatrixMultF33(r1r2,r3,RotMatOut);
-}
-
-void
-RotateAroundZ(
-    RealType v1[3],
-    RealType alpha,
-    RealType v2[3])
-{
-    RealType cosa = cos(alpha*deg2rad);
-    RealType sina = sin(alpha*deg2rad);
-    RealType mat[3][3] = {{ cosa, -sina, 0 },
-        { sina,  cosa, 0 },
-        { 0, 0, 1}};
-    MatrixMultF(mat, v1, v2);
 }
 
 void
