@@ -25,7 +25,7 @@ FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o src/CalcDiffractionSpots.o
 
 HEADERS = src/checks.h
 
-src/CalcDiffractionSpots.o: src/CalcDiffractionSpots.o $(HEADERS)
+src/CalcDiffractionSpots.o: src/CalcDiffractionSpots.c $(HEADERS)
 
 src/FitOrientationParametersNLOpt-main.o:        \
 	src/FitOrientationParametersNLOpt-main.c \
@@ -42,5 +42,8 @@ lib/libfop.so: $(FOP_NLOPT_OBJS) lib
 	gcc -shared -o $(@) $(FOP_NLOPT_OBJS) $(LIBS) $(RPATHS)
 
 clean:
+	@echo CLEAN
 	rm -fv bin/fop-nlopt
 	rm -fv src/*.o
+	@echo
+
