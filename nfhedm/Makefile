@@ -3,7 +3,7 @@ NLOPT = $(HOME)/sfw/nlopt-2.4.1
 
 INCLUDES = -I $(NLOPT)/include
 
-CFLAGS += $(INCLUDES) -g -fPIC -std=gnu99
+CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
 
 LDFLAGS =
 
