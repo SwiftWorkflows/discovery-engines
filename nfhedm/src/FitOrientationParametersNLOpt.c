@@ -131,8 +131,8 @@ ReadBinFiles(
     int i,j,k,nElements,nCheck,ythis,zthis,NrOfFiles,NrOfPixels;
     long long int BinNr;
     long long int TempCntr;
-    float32_t dummy;
-    uint32_t dummy2;
+    float32_t dummy_float;
+    uint32_t dummy_int;
     FILE *fp;
     char FileName[1024];
     struct Theader Header1;
@@ -150,7 +150,7 @@ ReadBinFiles(
             printf("Reading file : %s\n",FileName);
             fp = fopen(FileName,"r");
             if (fp == NULL) file_not_found(FileName);
-            fread(&dummy,sizeof(float32_t),1,fp);
+            fread(&dummy_float,sizeof(float32_t),1,fp);
             ReadHeader(fp,&Header1);
             fseek(fp,5*sizeof(uint32_t),SEEK_CUR);
             ReadHeader(fp,&Header1);
