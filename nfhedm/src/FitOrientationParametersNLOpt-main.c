@@ -9,9 +9,19 @@
 #include "CalcDiffractionSpots.h"
 #include "FitOrientationParametersNLOpt.h"
 
+static void
+usage(char *argv[])
+{
+    printf("%s: usage: %s <PARAMETERS> <ROWS>\n", argv[0], argv[0]);
+}
+
 int
 main(int argc, char *argv[])
 {
+    if (argc != 3){
+        usage(argv);
+        exit(EXIT_FAILURE);
+    }
     clock_t start, end;
     double diftotal;
     start = clock();
@@ -219,6 +229,7 @@ main(int argc, char *argv[])
 
     //Read position.
     char *fnG="grid.txt";
+    /** Grid point number */
     int rown=atoi(argv[2]);
     FILE *fp;
     fp = fopen(fnG,"r");
