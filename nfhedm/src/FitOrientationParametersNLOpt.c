@@ -12,6 +12,7 @@
 #include "checks.h"
 
 #include "CalcDiffractionSpots.h"
+#include "FitOrientationParametersNLOpt.h"
 
 #define RealType double
 #define float32_t float
@@ -21,9 +22,6 @@
 #define deg2rad 0.0174532925199433
 #define rad2deg 57.2957795130823
 #define EPS 1e-5
-#define MAX_N_SPOTS 200
-#define MAX_N_OMEGA_RANGES 20
-#define MAX_POINTS_GRID_GOOD 300000
 
 double**
 allocMatrix(int nrows, int ncols)

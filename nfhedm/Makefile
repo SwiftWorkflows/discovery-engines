@@ -21,6 +21,8 @@ bin:
 lib:
 	mkdir -pv lib
 
+libfop: lib/libfop.so
+
 FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o src/CalcDiffractionSpots.o src/nfhedm-math.o
 
 HEADERS = src/checks.h src/nfhedm-math.h
@@ -31,7 +33,6 @@ src/nfhedm-math.o: src/nfhedm-math.c src/nfhedm-math.h
 
 src/FitOrientationParametersNLOpt-main.o:        \
 	src/FitOrientationParametersNLOpt-main.c \
-	src/FitOrientationParametersNLOpt.c      \
 	$(HEADERS)
 	gcc -c $(CFLAGS) -o $(@) $(<)
 
@@ -39,7 +40,12 @@ bin/fop-nlopt:  src/CalcDiffractionSpots.o               \
                 src/FitOrientationParametersNLOpt-main.o \
 		src/nfhedm-math.o                        \
 		bin
-	gcc $(LDFLAGS) -o $(@) src/FitOrientationParametersNLOpt-main.o src/CalcDiffractionSpots.o src/nfhedm-math.o $(LIBS) $(RPATHS)
+	gcc $(LDFLAGS)                                           \
+		-o $(@) src/FitOrientationParametersNLOpt-main.o \
+		-L lib -l fop                                    \
+		$(LIBS)                                          \
+		$(RPATHS)                                        \
+		-Wl,-rpath -Wl,$(PWD)/lib
 
 lib/libfop.so: $(FOP_NLOPT_OBJS) lib
 	gcc -shared -o $(@) $(FOP_NLOPT_OBJS) $(LIBS) $(RPATHS)

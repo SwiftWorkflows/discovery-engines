@@ -9,6 +9,8 @@
 #define CALCDIFFRACTIONSPOTS_H
 
 #define MAX_N_OMEGA_RANGES 20
+#define MAX_POINTS_GRID_GOOD 300000
+#define MAX_N_SPOTS 200
 
 int
 CalcDiffractionSpots(double LatticeConstant,

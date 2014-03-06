@@ -1,7 +1,13 @@
 
+#include <math.h>
+#include <string.h>
+#include <time.h>
+
 #include "checks.h"
 
-#include "FitOrientationParametersNLOpt.c"
+#include "nfhedm-math.h"
+#include "CalcDiffractionSpots.h"
+#include "FitOrientationParametersNLOpt.h"
 
 int
 main(int argc, char *argv[])
