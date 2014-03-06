@@ -132,7 +132,6 @@ ReadBinFiles(
     long long int BinNr;
     long long int TempCntr;
     float32_t dummy_float;
-    uint32_t dummy_int;
     FILE *fp;
     char FileName[1024];
     struct Theader Header1;
@@ -628,7 +627,7 @@ double problem_function(
 	void* f_data_trial)
 {
 	struct my_func_data *f_data = (struct my_func_data *) f_data_trial;
-	int i, j, count = 1;
+	int i, j;
 	const int NrOfFiles = f_data->NrOfFiles;
     const int nLayers = f_data->nLayers;
     const double LatticeConstant = f_data->LatticeConstant;
@@ -811,7 +810,6 @@ FitOrientation(
 	struct my_func_data *f_datat;
 	f_datat = &f_data;
 	void* trp = (struct my_func_data *) f_datat;
-	double tole = 1e-3;
 	nlopt_opt opt;
 	opt = nlopt_create(NLOPT_LN_NELDERMEAD, n);
 	nlopt_set_lower_bounds(opt, xl);
@@ -890,7 +888,7 @@ optimizeOrientation(double *OrientMatrixRow,
                     double tol, double lsdtol, double lsdtolrel,
                     double tiltstol,double bctol, double *output, int outputMax)
 {
-  double EulerIn[3],OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,BestFrac,BestEuler[3],XG[3],YG[3],OMTemp[9];
+  double EulerIn[3],OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,BestFrac,XG[3],YG[3],OMTemp[9];
   double *LsdFit, *TiltsFit, **BCsFit;
   double TiltsOrig[3];
   TiltsOrig[0] = tx;

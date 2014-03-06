@@ -96,7 +96,6 @@ main(int argc, char *argv[])
         XY[2][0] =xs + gs;
         XY[2][1] =ys - y1;
     }
-    double GridSize=2*gs;
 
     //Read Orientations
     clock_t startthis;

@@ -21,7 +21,6 @@ parameters_read(const char *filename, struct parameters *params)
     if (fileParam == NULL) file_not_found(filename);
     char *str, dummy[1000];
     int LowNr;
-    double tx,ty,tz;
     while (fgets(aline,1000,fileParam)!=NULL){
         str = "nDistances ";
         LowNr = strncmp(aline,str,strlen(str));
@@ -38,8 +37,7 @@ parameters_read(const char *filename, struct parameters *params)
     params->ybc = ybc;
     double *zbc = malloc(params->nLayers*sizeof(double));
     params->zbc = zbc;
-    double doubledummy;
-    int cntr=0,countr=0,conter=0,intdummy;
+    int cntr=0,countr=0,conter=0;
 
     params->nRings = 0;
     params->NoOfOmegaRanges = 0;
