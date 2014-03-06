@@ -199,6 +199,7 @@ ReadBinFiles(
         counter = 0;
     }
     return 1;
+    // TODO: This will not free all the instances of ys that have been malloc'd
     //    free(ys);
     //    free(zs);
     //    free(peakID);
