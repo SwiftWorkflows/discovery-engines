@@ -8,6 +8,8 @@
 #ifndef FITORIENTATIONPARAMETERSNLOPT_H
 #define FITORIENTATIONPARAMETERSNLOPT_H
 
+#include "nfhedm-math.h"
+
 double**
 allocMatrix(int nrows, int ncols);
 

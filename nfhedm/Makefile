@@ -23,7 +23,10 @@ lib:
 
 libfop: lib/libfop.so
 
-FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o src/CalcDiffractionSpots.o src/nfhedm-math.o
+FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
+	         src/CalcDiffractionSpots.o          \
+	         src/nfhedm-math.o                   \
+		 src/parameters.o
 
 HEADERS = src/checks.h src/nfhedm-math.h
 
@@ -36,10 +39,8 @@ src/FitOrientationParametersNLOpt-main.o:        \
 	$(HEADERS)
 	gcc -c $(CFLAGS) -o $(@) $(<)
 
-bin/fop-nlopt:  src/CalcDiffractionSpots.o               \
-                src/FitOrientationParametersNLOpt-main.o \
-		src/nfhedm-math.o                        \
-		bin
+bin/fop-nlopt:  bin libfop                                       \
+                src/FitOrientationParametersNLOpt-main.o
 	gcc $(LDFLAGS)                                           \
 		-o $(@) src/FitOrientationParametersNLOpt-main.o \
 		-L lib -l fop                                    \

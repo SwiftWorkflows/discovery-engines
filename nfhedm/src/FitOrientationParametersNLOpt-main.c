@@ -6,6 +6,7 @@
 #include "checks.h"
 
 #include "nfhedm-math.h"
+#include "parameters.h"
 #include "CalcDiffractionSpots.h"
 #include "FitOrientationParametersNLOpt.h"
 
@@ -27,192 +28,18 @@ main(int argc, char *argv[])
     start = clock();
 
     // Read params file.
-    char *ParamFN;
-    FILE *fileParam;
-    ParamFN = argv[1];
-    char aline[1000];
-//    struct TParam * Param1;
-    fileParam = fopen(ParamFN,"r");
-    if (fileParam == NULL) file_not_found(ParamFN);
-    char *str, dummy[1000];
-    int LowNr,nLayers;
-    double tx,ty,tz;
-    while (fgets(aline,1000,fileParam)!=NULL){
-        str = "nDistances ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %d", dummy, &nLayers);
-            break;
-        }
-    }
-    rewind(fileParam);
-    double Lsd[nLayers],ybc[nLayers],zbc[nLayers],ExcludePoleAngle,LatticeConstant,Wavelength, minFracOverlap,doubledummy;
-    double px, OmegaStart,OmegaStep,tol,lsdtol,tiltstol,bctol,lsdtolrel;
-    int RingNumbers[20];
-    char fn[1000],ext[1024];
-    double OmegaRanges[MAX_N_OMEGA_RANGES][2], BoxSizes[MAX_N_OMEGA_RANGES][4];
-    int cntr=0,countr=0,conter=0,nRings=0,StartNr,EndNr,intdummy;
-    int NoOfOmegaRanges=0;
-    while (fgets(aline,1000,fileParam)!=NULL){
-		str = "ReducedFileName ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %s", dummy, fn);
-            continue;
-        }
-		str = "extReduced ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %s", dummy, ext);
-            continue;
-        }
-        str = "Lsd ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &Lsd[cntr]);
-            cntr++;
-            continue;
-        }
-        str = "RingNr ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %d", dummy, &RingNumbers[nRings]);
-            nRings++;
-            continue;
-        }
-        str = "StartNr ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %d", dummy, &StartNr);
-            continue;
-        }
-        str = "EndNr ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %d", dummy, &EndNr);
-            continue;
-        }
-        str = "ExcludePoleAngle ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &ExcludePoleAngle);
-            continue;
-        }
-        str = "LatticeParameter ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &LatticeConstant);
-            continue;
-        }
-        str = "tx ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &tx);
-            continue;
-        }
-        str = "ty ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &ty);
-            continue;
-        }
-        str = "BC ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf %lf", dummy, &ybc[conter], &zbc[conter]);
-            conter++;
-            continue;
-        }
-        str = "tz ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &tz);
-            continue;
-        }
-        str = "OrientTol ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &tol);
-            continue;
-        }
-        str = "MinFracAccept ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &minFracOverlap);
-            continue;
-        }
-        str = "OmegaStart ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &OmegaStart);
-            continue;
-        }
-        str = "OmegaStep ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &OmegaStep);
-            continue;
-        }
-        str = "Wavelength ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &Wavelength);
-            continue;
-        }
-        str = "px ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &px);
-            continue;
-        }
-        str = "LsdTol ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &lsdtol);
-            continue;
-        }
-        str = "LsdRelativeTol ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &lsdtolrel);
-            continue;
-        }
-        str = "BCTol ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &bctol);
-            continue;
-        }
-        str = "TiltsTol ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &tiltstol);
-            continue;
-        }
-        str = "OmegaRange ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf %lf", dummy, &OmegaRanges[NoOfOmegaRanges][0],&OmegaRanges[NoOfOmegaRanges][1]);
-            NoOfOmegaRanges++;
-            continue;
-        }
-        str = "BoxSize ";
-        LowNr = strncmp(aline,str,strlen(str));
-        if (LowNr==0){
-            sscanf(aline,"%s %lf %lf %lf %lf", dummy, &BoxSizes[countr][0], &BoxSizes[countr][1], &BoxSizes[countr][2], &BoxSizes[countr][3]);
-            countr++;
-            continue;
-        }
-    }
-    fclose(fileParam);
+    char *ParamFN = argv[1];
+    struct parameters params;
+    parameters_read(ParamFN, &params);
+
     //Read bin files
     int i,j,m,nrFiles,nrPixels;
     int *ObsSpotsInfo;
     int ReadCode;
-    nrFiles = EndNr - StartNr + 1;
+    nrFiles = params.EndNr - params.StartNr + 1;
     nrPixels = 2048*2048;
     long long int SizeObsSpots;
-    SizeObsSpots = (nLayers);
+    SizeObsSpots = (params.nLayers);
     SizeObsSpots*=nrPixels;
     SizeObsSpots*=nrFiles;
     SizeObsSpots/=32;
@@ -221,7 +48,8 @@ main(int argc, char *argv[])
         printf("Could not allocate ObsSpotsInfo.\n");
         return 0;
     }
-    ReadCode = ReadBinFiles(fn,ext,StartNr,EndNr,ObsSpotsInfo,nLayers,SizeObsSpots);
+    ReadCode = ReadBinFiles(params.fn,params.ext,params.StartNr,params.EndNr,ObsSpotsInfo,
+                            params.nLayers,SizeObsSpots);
     if (ReadCode == 0){
         printf("Reading bin files did not go well. Please check.\n");
         return 0;
@@ -312,22 +140,22 @@ main(int argc, char *argv[])
     // Go through each orientation and compare with observed spots.
     clock_t startthis2;
     startthis2 = clock();
-    int NrPixelsGrid=2*(ceil((gs*2)/px))*(ceil((gs*2)/px));
+    int NrPixelsGrid=2*(ceil((gs*2)/params.px))*(ceil((gs*2)/params.px));
     int NrSpotsThis,StartingRowNr;
     double FracOverT;
     double RotMatTilts[3][3], OrientationMatThis[9], OrientationMatThisUnNorm[9];
-    RotationTilts(tx,ty,tz,RotMatTilts);
+    RotationTilts(params.tx,params.ty,params.tz,RotMatTilts);
     double **OrientMatrix;
     OrientMatrix = allocMatrix(MAX_POINTS_GRID_GOOD,10);
     int OrientationGoodID=0;
-    double MatIn[3],P0[nLayers][3],P0T[3];
+    double MatIn[3],P0[params.nLayers][3],P0T[3];
     double OrientMatIn[3][3],XG[3],YG[3];
     double ThrSps[MAX_N_SPOTS][3];
     MatIn[0]=0;
     MatIn[1]=0;
     MatIn[2]=0;
-    for (i=0;i<nLayers;i++){
-        MatIn[0] = -Lsd[i];
+    for (i=0;i<params.nLayers;i++){
+        MatIn[0] = -params.Lsd[i];
         MatrixMultF(RotMatTilts,MatIn,P0T);
         for (j=0;j<3;j++){
             P0[i][j] = P0T[j];
@@ -355,9 +183,11 @@ main(int argc, char *argv[])
             m++;
         }
         Convert9To3x3(OrientationMatThis,OrientMatIn);
-        CalcFracOverlap(nrFiles,nLayers,NrSpotsThis,ThrSps,OmegaStart,OmegaStep,XG,YG,Lsd,SizeObsSpots,RotMatTilts,px,ybc,zbc,
+        CalcFracOverlap(nrFiles,params.nLayers,NrSpotsThis,ThrSps,
+                        params.OmegaStart,params.OmegaStep,XG,YG,
+                        params.Lsd,SizeObsSpots,RotMatTilts,params.px,params.ybc,params.zbc,
 			gs,P0,NrPixelsGrid,ObsSpotsInfo,OrientMatIn,&FracOverT);
-        if (FracOverT >= minFracOverlap){
+        if (FracOverT >= params.minFracOverlap){
             for (j=0;j<9;j++){
                 OrientMatrix[OrientationGoodID][j] = OrientationMatThis[j];
             }
@@ -366,21 +196,21 @@ main(int argc, char *argv[])
         }
     }
 
-    int resultMax = 6+nLayers*3;
+    int resultMax = 6+params.nLayers*3;
     double result[resultMax];
 
     for (int i = 0; i < OrientationGoodID; i++)
       optimizeOrientation(OrientMatrix[i],
-                          tx, ty, tz, nLayers,
+                          params.tx, params.ty, params.tz, params.nLayers,
                           nrFiles, ObsSpotsInfo,
-                          LatticeConstant, Wavelength, nRings,
-                          ExcludePoleAngle, Lsd, SizeObsSpots,
-                          OmegaStart, OmegaStep, px, ybc,  zbc,
-                          gs, RingNumbers, OmegaRanges, NoOfOmegaRanges,
-                          BoxSizes, P0, NrPixelsGrid,
-                          tol, lsdtol, lsdtolrel,
-                          tiltstol,
-                          bctol,
+                          params.LatticeConstant, params.Wavelength, params.nRings,
+                          params.ExcludePoleAngle, params.Lsd, SizeObsSpots,
+                          params.OmegaStart, params.OmegaStep, params.px, params.ybc, params.zbc,
+                          gs, params.RingNumbers, params.OmegaRanges, params.NoOfOmegaRanges,
+                          params.BoxSizes, P0, NrPixelsGrid,
+                          params.tol, params.lsdtol, params.lsdtolrel,
+                          params.tiltstol,
+                          params.bctol,
                           result,
                           resultMax);
 
