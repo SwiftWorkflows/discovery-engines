@@ -201,10 +201,10 @@ ReadBinFiles(
         counter = 0;
     }
     return 1;
-    free(ys);
-    free(zs);
-    free(peakID);
-    free(intensity);
+//    free(ys);
+//    free(zs);
+//    free(peakID);
+//    free(intensity);
 }
 
 double sin_cos_to_angle (double s, double c)
