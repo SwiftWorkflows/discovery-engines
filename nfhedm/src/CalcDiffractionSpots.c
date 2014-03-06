@@ -456,6 +456,9 @@ CalcDiffrSpots_Furnace(
     *nspots = spotnr;
 }
 
+/**
+   @return 0 on success, 1 on error.
+ */
 int
 CalcDiffractionSpots(double LatticeConstant, 
 	double Wavelength, 
@@ -486,4 +489,5 @@ CalcDiffractionSpots(double LatticeConstant,
     }
     CalcDiffrSpots_Furnace(OrientMatr, LatticeConstant, Wavelength, Distance, RingRadii, OmegaRanges, BoxSizes, NoOfOmegaRanges, ExcludePoleAngle, TheorSpots, &nTsps);
     *nTspots = nTsps;
+    return 0;
 }
