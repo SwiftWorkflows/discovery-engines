@@ -152,11 +152,7 @@ ReadBinFiles(
             if (fp == NULL) file_not_found(FileName);
             fread(&dummy,sizeof(float32_t),1,fp);
             ReadHeader(fp,&Header1);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
+            fseek(fp,5*sizeof(uint32_t),SEEK_CUR);
             ReadHeader(fp,&Header1);
             nElements = (Header1.DataSize - Header1.NameSize)/2;
             ys = malloc(nElements*sizeof(*ys));
