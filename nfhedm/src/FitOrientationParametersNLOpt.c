@@ -118,6 +118,19 @@ void ReadHeader(
     fread(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
 }
 
+static inline void
+realloc_buffers(int nElements, int nElements_previous,
+                uint16_t **ys, uint16_t **zs, uint16_t **peakID,
+                float32_t **intensity)
+{
+    if (nElements > nElements_previous) {
+        *ys = realloc(*ys, nElements*sizeof(**ys));
+        *zs = realloc(*zs, nElements*sizeof(**zs));
+        *peakID = realloc(*peakID, nElements*sizeof(**peakID));
+        *intensity = realloc(*intensity, nElements*sizeof(**intensity));
+    }
+}
+
 int
 ReadBinFiles(
     char FileStem[1000],
@@ -128,15 +141,15 @@ ReadBinFiles(
     int nLayers,
     long long int ObsSpotsSize)
 {
-    int i,j,k,nElements,nCheck,ythis,zthis,NrOfFiles,NrOfPixels;
+    int i,j,k,nElements=0,nElements_previous,nCheck,ythis,zthis,NrOfFiles,NrOfPixels;
     long long int BinNr;
     long long int TempCntr;
     float32_t dummy_float;
     FILE *fp;
     char FileName[1024];
     struct Theader Header1;
-    uint16_t *ys, *zs, *peakID;
-    float32_t *intensity;
+    uint16_t *ys=NULL, *zs=NULL, *peakID=NULL;
+    float32_t *intensity=NULL;
     int counter=0;
     NrOfFiles = EndNr - StartNr + 1;
     NrOfPixels = 2048*2048;
@@ -153,11 +166,9 @@ ReadBinFiles(
             ReadHeader(fp,&Header1);
             fseek(fp,5*sizeof(uint32_t),SEEK_CUR);
             ReadHeader(fp,&Header1);
+            nElements_previous = nElements;
             nElements = (Header1.DataSize - Header1.NameSize)/2;
-            ys = malloc(nElements*sizeof(*ys));
-            zs = malloc(nElements*sizeof(*zs));
-            peakID = malloc(nElements*sizeof(*peakID));
-            intensity = malloc(nElements*sizeof(*intensity));
+            realloc_buffers(nElements,nElements_previous,&ys,&zs,&peakID,&intensity);
             fread(ys,sizeof(uint16_t)*nElements,1,fp);
             ReadHeader(fp,&Header1);
             nCheck = (Header1.DataSize - Header1.NameSize)/2;
@@ -197,12 +208,11 @@ ReadBinFiles(
         }
         counter = 0;
     }
+    free(ys);
+    free(zs);
+    free(peakID);
+    free(intensity);
     return 1;
-    // TODO: This will not free all the instances of ys that have been malloc'd
-    //    free(ys);
-    //    free(zs);
-    //    free(peakID);
-    //    free(intensity);
 }
 
 double sin_cos_to_angle (double s, double c)
