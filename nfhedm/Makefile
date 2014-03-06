@@ -21,7 +21,7 @@ bin:
 lib:
 	mkdir -pv lib
 
-libfop: lib/libfop.so
+LIBFOP = lib/libfop.so
 
 FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
 	         src/CalcDiffractionSpots.o          \
@@ -39,7 +39,7 @@ src/FitOrientationParametersNLOpt-main.o:        \
 	$(HEADERS)
 	gcc -c $(CFLAGS) -o $(@) $(<)
 
-bin/fop-nlopt:  bin libfop                                       \
+bin/fop-nlopt:  $(LIBFOP)                                           \
                 src/FitOrientationParametersNLOpt-main.o
 	gcc $(LDFLAGS)                                           \
 		-o $(@) src/FitOrientationParametersNLOpt-main.o \
@@ -56,4 +56,6 @@ clean:
 	rm -fv bin/fop-nlopt
 	rm -fv src/*.o
 	@echo
+
+.PHONY: clean all
 
