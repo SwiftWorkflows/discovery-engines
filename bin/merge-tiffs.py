@@ -7,11 +7,17 @@
 # The full license is in the file COPYING, distributed with this software.
 #-----------------------------------------------------------------------------
 
-import os, getopt, glob, re, sys, timeit
+import os, getopt, glob, re, socket, sys, timeit
+from datetime import datetime
 import numpy as np
 from ConfigParser import ConfigParser
 from nexpy.api.nexus import *
 from nexpy.readers.tifffile import tifffile as TIFF
+
+def nxs_msg(msg):
+    d = datetime.now()
+    t = d.strftime("%m/%d %H:%M:%S")
+    print t + " " + "NEXUS: " + msg
 
 def get_prefixes(directory):
     prefixes = []
@@ -65,7 +71,7 @@ def initialize_nexus_file(directory, prefix, filenames, omega, step):
         print "Could not write to: " + file_nxs
         print "PWD is: " + os.getcwd()
         exit(1)
-    print "NEXUS_CREATE: " + file_nxs
+    nxs_msg("CREATE: " + file_nxs)
     return root
 
 def write_data(root, filenames, bkgd_root=None):
@@ -94,9 +100,9 @@ def write_data(root, filenames, bkgd_root=None):
         chunk_size = root.nxfile['/entry/data/v'].chunks[0]
         for i in range(0, len(filenames), chunk_size):
             files = []
+            nxs_msg('Processing: %i - %i' % (i, i+chunk_size))
             try:
                 for j in range(i,i+chunk_size):
-                    print 'Processing', filenames[j]
                     files.append(filenames[j])
                     try:
                         time, date, exposure, sum = get_metadata(filenames[j]+'.metadata')
@@ -139,6 +145,9 @@ if __name__=="__main__":
         print help
         sys.exit(2)
 
+    nxs_msg("MERGE-TIFFS")
+    nxs_msg("HOSTNAME: " + socket.gethostname())
+
     directory = './'
     extension = 'tif'
     prefix = None
@@ -176,6 +185,7 @@ if __name__=="__main__":
         prefixes.insert(0,prefixes.pop(prefixes.index(background)))
     elif background:
         bg_nxs = os.path.join(directory,background+'.nxs')
+        nxs_msg("BACKGROUND: " + bg_nxs)
         try:
             bkgd_root = nxload(bg_nxs)
         except IOError:
@@ -192,8 +202,8 @@ if __name__=="__main__":
             # Check completion file to prevent duplicate work
             nxs_complete = os.path.join(directory, prefix) + ".complete"
             if os.path.exists(nxs_complete):
-                print "NEXUS_WARNING: complete file already exists: " + nxs_complete
-                print "NEXUS_EXIT"
+                nxs_msg("WARNING: complete file already exists: " + nxs_complete)
+                nxs_msg("EXIT")
                 exit(0)
         root = initialize_nexus_file(directory, prefix, data_files, omega, step)
         if prefix == background:
@@ -205,9 +215,10 @@ if __name__=="__main__":
             write_data(root, data_files)
         write_metadata(root, directory, prefix)
         toc=timeit.default_timer()
-        print toc-tic, 'seconds for', '%s.nxs' % prefix
+        nxs_msg('DURATION: %0.3f seconds for %s.nxs' \
+                    % (toc-tic, prefix))
         if use_complete_files:
             # Touch completion file to indicate success:
             with file(nxs_complete, 'w'):
-                print "NEXUS_COMPLETE: " + nxs_complete
+                nxs_msg("COMPLETE: " + nxs_complete)
 
