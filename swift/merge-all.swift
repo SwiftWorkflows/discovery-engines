@@ -47,7 +47,7 @@ main
     if (directory != "")
     {
       file background<data/directory/"darkbeg.nxs"> =
-      merge_tiffs_background(directory, split("-p darkbeg", " "));
+      merge_tiffs_background(directory, split("-p darkbeg -c", " "));
       merge_tiffs(directory, background,
                   split("-p fb1scan -b darkbeg -o 0 -s 0.1 -r -c", " "));
       merge_tiffs(directory, background,
