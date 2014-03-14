@@ -12,6 +12,8 @@ shift
 ${MERGE_TIFFS_PY} ${*}
 CODE=${?}
 
+echo "CODE: ${CODE}"
+
 if [[ ${CODE} != 0 ]]
 then
   echo "NEXUS_ERROR: command failed: $0 $*"
