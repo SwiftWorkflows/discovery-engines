@@ -14,6 +14,12 @@ from ConfigParser import ConfigParser
 from nexpy.api.nexus import *
 from nexpy.readers.tifffile import tifffile as TIFF
 
+profiles = dict()
+profiles["TIFF.imread"] = []
+profiles["TIFF.asarray"] = []
+profiles["subtract"] = []
+profiles["insert"] = []
+
 def nxs_msg(msg):
     d = datetime.now()
     t = d.strftime("%m/%d %H:%M:%S")
@@ -95,7 +101,10 @@ def write_data(root, filenames, bkgd_root=None):
     else:
         bkgd = 0.0
     if len(root.entry.data.v.shape) == 2:
+        t0 = timeit.default_timer()
         root.entry.data.v[:,:] = TIFF.imread(filenames[0])
+        t1 = timeit.default_timer()
+        profiles["TIFF.imread"].append(t1-t0)
     else:
         chunk_size = root.nxfile['/entry/data/v'].chunks[0]
         for i in range(0, len(filenames), chunk_size):
@@ -104,6 +113,7 @@ def write_data(root, filenames, bkgd_root=None):
             try:
                 for j in range(i,i+chunk_size):
                     files.append(filenames[j])
+                    # print "files " + str(files)
                     try:
                         time, date, exposure, sum = get_metadata(filenames[j]+'.metadata')
                         root.entry.instrument.detector.frame_start[j] = time
@@ -111,7 +121,18 @@ def write_data(root, filenames, bkgd_root=None):
                         print filenames[j], error
             except IndexError:
                 pass
-            root.entry.data.v[i:i+len(files),:,:] = TIFF.TiffSequence(files).asarray() - bkgd
+            t0 = timeit.default_timer()
+            A = TIFF.TiffSequence(files).asarray()
+            t1 = timeit.default_timer()
+            profiles["TIFF.asarray"].append(t1-t0)
+            t0 = timeit.default_timer()
+            d = A - bkgd
+            t1 = timeit.default_timer()
+            profiles["subtract"].append(t1-t0)
+            t0 = timeit.default_timer()
+            root.entry.data.v[i:i+len(files),:,:] = d
+            t1 = timeit.default_timer()
+            profiles["insert"].append(t1-t0)
 
 def write_metadata(root, directory, prefix):
     if 'dark' not in prefix:
@@ -130,6 +151,19 @@ def write_metadata(root, directory, prefix):
         root.entry.sample.name = 'dark'
         root.entry.title = 'Dark Field'
     root.entry.filename = root.nxfilename
+
+def report_profiles():
+    for profile in profiles:
+        print("profile: " + profile)
+        # for t in profiles[profile]:
+        #    print("time: %0.4f" % t)
+        s = sum(profiles[profile])
+        print("sum: %0.4f" % s)
+        if len(profiles[profile]) > 0:
+            a = s / len(profiles[profile])
+            print("avg: %0.4f" % a)
+        else:
+            print("EMPTY")
 
 def natural_sort(key):
     import re
@@ -213,7 +247,10 @@ if __name__=="__main__":
             write_data(root, data_files, bkgd_root)
         else:
             write_data(root, data_files)
+        t0 = timeit.default_timer()
         write_metadata(root, directory, prefix)
+        t1 = timeit.default_timer()
+        nxs_msg('METADATA: %0.3f' % (t1-t0))
         toc=timeit.default_timer()
         nxs_msg('DURATION: %0.3f seconds for %s.nxs' \
                     % (toc-tic, prefix))
@@ -222,3 +259,4 @@ if __name__=="__main__":
             with file(nxs_complete, 'w'):
                 nxs_msg("COMPLETE: " + nxs_complete)
 
+        report_profiles()
