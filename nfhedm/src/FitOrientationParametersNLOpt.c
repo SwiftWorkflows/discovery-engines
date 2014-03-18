@@ -9,8 +9,6 @@
 #include <nlopt.h>
 #include <stdint.h>
 
-#include "checks.h"
-
 #include "SharedFuncsFit.h"
 #include "CalcDiffractionSpots.h"
 #include "FitOrientationParametersNLOpt.h"

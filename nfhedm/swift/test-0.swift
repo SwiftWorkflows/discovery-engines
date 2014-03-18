@@ -1,8 +1,9 @@
 
 import io;
+import sys;
 
 main
 {
-  printf("HI");
+  printf("HI: %s %s %s", getenv("PWD"), argv("a"), argp(2));
 }
 

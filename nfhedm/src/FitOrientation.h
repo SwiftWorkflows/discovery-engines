@@ -10,7 +10,12 @@
 
 #include "SharedFuncsFit.h"
 
-int FitOrientationAll(int rown, double gs, double px, double tx, double ty, double tz,
+/**
+   @return 1 on success, 0 on failure
+ */
+int FitOrientationAll(const char *ParameterFileName, int rown);
+
+int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, double tz,
                        int nLayers, double *Lsd, double **XY, int NrOrientations,
                        int **NrSpots, double **OrientationMatrix, double **SpotsMat,
                        int nrFiles, double OmegaStart, double OmegaStep, long long int SizeObsSpots,

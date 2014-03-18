@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 static void file_not_found(const char* filename)
 {
     printf("Could not find file: %s\n", filename);
