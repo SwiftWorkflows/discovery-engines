@@ -21,7 +21,6 @@
 #define rad2deg 57.2957795130823
 #define EPS 1E-5
 #define MAX_N_SPOTS 200
-#define MAX_N_OMEGA_RANGES 20
 
 double**
 allocMatrix(int nrows, int ncols)

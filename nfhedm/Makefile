@@ -42,6 +42,7 @@ LIBFOP = lib/libfop.so
 LIBTCLFOP = lib/libtclfop.so
 
 FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
+                 src/FitOrientation.o                \
                  src/SharedFuncsFit.o                \
                  src/CalcDiffractionSpots.o          \
                  src/placebo.o                       \
@@ -64,6 +65,15 @@ bin/fop-nlopt:  $(LIBFOP)                                           \
 		-L lib -l fop                                    \
 		$(LIBS)                                          \
 		$(RPATHS)                                        \
+
+bin/fo-nlopt:  $(LIBFOP)                                           \
+                src/FitOrientation-main.o
+	@mkdir -pv bin
+	gcc $(LDFLAGS)                                           \
+		-o $(@) src/FitOrientation-main.o \
+		-L lib -l fop                                    \
+		$(LIBS)                                          \
+		$(RPATHS) 
 
 $(LIBFOP): sanity $(FOP_NLOPT_OBJS) lib
 	gcc -shared -o $(@)       \

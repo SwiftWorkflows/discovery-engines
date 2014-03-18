@@ -47,6 +47,7 @@ struct my_func_data{
     int *ObsSpotsInfo;
 };
 
+static
 double problem_function(
     unsigned n,
 	const double *x,
@@ -116,7 +117,7 @@ double problem_function(
 }
 
 void
-FitOrientation(
+FitOrientationP(
     const int NrOfFiles,
     const int nLayers,
     const double LatticeConstant,
@@ -315,7 +316,7 @@ optimizeOrientation(double *OrientMatrixRow,
   }
   Convert9To3x3(OMTemp,OrientIn);
   OrientMat2Euler(OrientIn,EulerIn);
-  FitOrientation(nrFiles,nLayers,LatticeConstant,Wavelength,nRings,ExcludePoleAngle,Lsd,SizeObsSpots,
+  FitOrientationP(nrFiles,nLayers,LatticeConstant,Wavelength,nRings,ExcludePoleAngle,Lsd,SizeObsSpots,
                  XG,YG,TiltsOrig,OmegaStart,OmegaStep,px,ybc,zbc,gs,RingNumbers,OmegaRanges,NoOfOmegaRanges,
                  BoxSizes,P0,NrPixelsGrid,ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,&EulerOutC,&FracOut,
                  LsdFit,

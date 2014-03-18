@@ -9,7 +9,6 @@
 #define CALCDIFFRACTIONSPOTS_H
 
 #define MAX_N_OMEGA_RANGES 20
-#define MAX_N_SPOTS 200
 
 /**
    @return 0 on success, 1 on error
