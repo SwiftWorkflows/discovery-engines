@@ -38,17 +38,19 @@ bin:
 lib:
 	mkdir -pv lib
 
-LIBFOP = lib/libfop.so
-LIBTCLFOP = lib/libtclfop.so
+LIBNFHEDM = lib/libnfhedm.so
+LIBTCLNFHEDM = lib/libtclnfhedm.so
 
-FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
+NFHEDM_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
                  src/FitOrientation.o                \
                  src/SharedFuncsFit.o                \
                  src/CalcDiffractionSpots.o          \
+                 src/swift-bindings.o                \
                  src/placebo.o                       \
                  src/parameters.o
 
-HEADERS = src/checks.h src/SharedFuncsFit.h src/CalcDiffractionSpots.h
+HEADERS = src/checks.h src/SharedFuncsFit.h src/CalcDiffractionSpots.h \
+           src/swift-bindings.h
 
 src/CalcDiffractionSpots.o: src/CalcDiffractionSpots.c $(HEADERS)
 
@@ -57,61 +59,61 @@ src/FitOrientationParametersNLOpt-main.o:        \
 	$(HEADERS)
 	gcc -c $(CFLAGS) -o $(@) $(<)
 
-bin/fop-nlopt:  $(LIBFOP)                                           \
+bin/fop-nlopt:  $(LIBNFHEDM)                                           \
                 src/FitOrientationParametersNLOpt-main.o
 	@mkdir -pv bin
 	gcc $(LDFLAGS)                                           \
 		-o $(@) src/FitOrientationParametersNLOpt-main.o \
-		-L lib -l fop                                    \
+		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
 		$(RPATHS)                                        \
 
-bin/fo-nlopt:  $(LIBFOP)                                           \
+bin/fo-nlopt:  $(LIBNFHEDM)                                           \
                 src/FitOrientation-main.o
 	@mkdir -pv bin
 	gcc $(LDFLAGS)                                           \
 		-o $(@) src/FitOrientation-main.o \
-		-L lib -l fop                                    \
+		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
 		$(RPATHS) 
 
-$(LIBFOP): sanity $(FOP_NLOPT_OBJS) lib
+$(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS) lib
 	gcc -shared -o $(@)       \
-		$(FOP_NLOPT_OBJS) \
+		$(NFHEDM_NLOPT_OBJS) \
 		$(LIBS)           \
 		$(RPATH_NLOPT)
 
-$(LIBTCLFOP): sanity src/placebo_wrap.o $(FOP_NLOPT_OBJS)
+$(LIBTCLNFHEDM): sanity src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
 	gcc -shared -o $(@)         \
-		src/placebo_wrap.o  \
-		$(FOP_NLOPT_OBJS)   \
+		src/nfhedm_wrap.o  \
+		$(NFHEDM_NLOPT_OBJS)   \
 		$(LIBS)             \
 		-L $(TCL)/lib -l tcl$(TCL_VERSION) \
 		$(RPATH_NLOPT) -Wl,-rpath -Wl,$(TCL)/lib
 
-src/placebo_wrap.c: src/placebo.i
+src/nfhedm_wrap.c: src/nfhedm.i
 	swig $(<)
 
-pkgIndex.tcl: $(LIBTCLFOP) make-package.tcl
-	LEAF_PKG=tclfop LEAF_VERSION=0.0  \
-	LEAF_SO=$(<) LEAF_TCL=tcl/fop.tcl \
+pkgIndex.tcl: $(LIBTCLNFHEDM) make-package.tcl
+	LEAF_PKG=tclnfhedm LEAF_VERSION=0.0  \
+	LEAF_SO=$(<) LEAF_TCL=tcl/nfhedm.tcl \
 	$(TCLSH) make-package.tcl > $(@)
 
 TESTS = tests/test-placebo.x
 
 tests: $(TESTS)
 
-%.x: %.o $(LIBFOP)
+%.x: %.o $(LIBNFHEDM)
 	gcc -o $(@) $(<)      \
-		-L lib -l fop \
+		-L lib -l nfhedm \
 		$(RPATHS)
 
 clean:
 	@echo CLEAN
-	rm -fv bin/fop-nlopt
+	rm -fv bin/fop-nlopt bin/fo-nlopt
 	rm -fv src/*.o
-	rm -fv src/placebo_wrap.c
-	rm -fv lib/libfop.so
+	rm -fv src/nfhedm_wrap.c
+	rm -fv lib/libtclnfhedm.so lib/libnfhedm.so
 	rm -fv $(TESTS)
 	@echo
 
