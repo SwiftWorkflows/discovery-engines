@@ -22,7 +22,13 @@ then
   exit 1
 fi
 
+NFHEDM_HOME=$( cd $(dirname $0)/.. ; /bin/pwd )
+
+cd ${NFHEDM_HOME}/data
+
+echo "PWD: $(pwd)"
+
 export TURBINE_LOG=0
-turbine swift/test-2.tcl -p=${PARAMETERS} ${START} ${END}
+turbine ${NFHEDM_HOME}/swift/test-2.tcl -p=${PARAMETERS} ${START} ${END}
 
 

@@ -2,13 +2,20 @@
 import io;
 import sys;
 
-(float z) placebo_1(float x, float y) "tclnfhedm" "0.0"
-[ "set <<z>> [ placebo_1 <<x>> <<y>> ]" ];
+/**
+ @param rown Integer in [1,270]
+*/
+(int o) FitOrientation_Swift(string ParameterFileName, int rown)
+"tclnfhedm" "0.0"
+[ "set <<o>> [ FitOrientation_Swift <<ParameterFileName>> <<rown>> ]" ];
 
 main
 {
+  ParameterFileName = argv("p");
   start = toint(argp(1));
   end   = toint(argp(2));
-  printf("HI: %s %i %i", argv("p"), start, end);
+  
+  printf("HI: %s %i %i", ParameterFileName, start, end);
+  int rown = 135;
+  FitOrientation_Swift(ParameterFileName, rown);
 }
-
