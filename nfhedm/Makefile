@@ -1,7 +1,10 @@
 
+# Set software locations here:
 NLOPT = $(HOME)/sfw/nlopt-2.4.1
+TCL = $(HOME)/sfw/tcl-8.6.1
+TCLSH = $(wildcard $(HOME)/sfw/tcl-8.6.1/bin/tclsh8.* )
 
-INCLUDES = -I $(NLOPT)/include -I src
+INCLUDES = -I $(NLOPT)/include -I $(TCL)/include -I src
 
 CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
 
@@ -28,12 +31,14 @@ lib:
 	mkdir -pv lib
 
 LIBFOP = lib/libfop.so
+LIBTCLFOP = lib/libtclfop.so
 
-FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
-	         src/CalcDiffractionSpots.o          \
-	         src/nfhedm-math.o                   \
-		 src/parameters.o                    \
-                 src/placebo.o
+FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o src/nfhedm-math.o src/CalcDiffractionSpots.o src/placebo.o src/parameters.o
+#
+#  \
+# 	                   \
+# 	                            \
+# 		                     \
 
 HEADERS = src/checks.h src/nfhedm-math.h
 
@@ -55,8 +60,27 @@ bin/fop-nlopt:  $(LIBFOP)                                           \
 		$(LIBS)                                          \
 		$(RPATHS)                                        \
 
-lib/libfop.so: $(FOP_NLOPT_OBJS) lib
-	gcc -shared -o $(@) $(FOP_NLOPT_OBJS) $(LIBS) $(RPATH_NLOPT)
+$(LIBFOP): $(FOP_NLOPT_OBJS) lib
+	gcc -shared -o $(@)       \
+		$(FOP_NLOPT_OBJS) \
+		$(LIBS)           \
+		$(RPATH_NLOPT)
+
+$(LIBTCLFOP): src/placebo_wrap.o $(FOP_NLOPT_OBJS)
+	gcc -shared -o $(@)         \
+		$(<)                \
+		$(FOP_NLOPT_OBJS)   \
+		$(LIBS)             \
+		-L $(TCL)/lib -l tcl8.6 \
+		$(RPATH_NLOPT) -Wl,-rpath -Wl,$(TCL)/lib
+
+src/placebo_wrap.c: src/placebo.i
+	swig $(<)
+
+pkgIndex.tcl: $(LIBTCLFOP) make-package.tcl
+	LEAF_PKG=tclfop LEAF_VERSION=0.0  \
+	LEAF_SO=$(<) LEAF_TCL=tcl/fop.tcl \
+	$(TCLSH) make-package.tcl > $(@)
 
 TESTS = tests/test-placebo.x
 
@@ -71,6 +95,7 @@ clean:
 	@echo CLEAN
 	rm -fv bin/fop-nlopt
 	rm -fv src/*.o
+	rm -fv src/placebo_wrap.c
 	rm -fv lib/libfop.so
 	rm -fv $(TESTS)
 	@echo
