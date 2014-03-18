@@ -210,6 +210,7 @@ FitOrientation(
 
 int FitOrientationAll(const char *ParamFN, int rown)
 {
+    printf("FitOrientationAll(%s,%i)...\n", ParamFN, rown);
     char aline[1000];
        // struct TParam * Param1;
        FILE *fileParam = fopen(ParamFN,"r");
