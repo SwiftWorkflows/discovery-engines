@@ -29,6 +29,4 @@ cd ${NFHEDM_HOME}/data
 echo "PWD: $(pwd)"
 
 export TURBINE_LOG=0
-turbine ${NFHEDM_HOME}/swift/test-2.tcl -p=${PARAMETERS} ${START} ${END}
-
-
+turbine -n 3 ${NFHEDM_HOME}/swift/test-2.tcl -p=${PARAMETERS} ${START} ${END}
