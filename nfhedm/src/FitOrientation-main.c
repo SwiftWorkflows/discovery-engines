@@ -11,6 +11,7 @@
 #include <nlopt.h>
 #include <stdint.h>
 
+#include "checks.h"
 #include "SharedFuncsFit.h"
 #include "FitOrientation.h"
 
@@ -25,9 +26,21 @@
 #define MAX_N_SPOTS 200
 #define MAX_N_OMEGA_RANGES 20
 
+static void
+usage()
+{
+    printf("usage: fo-nlopt <PARAMETERS> <GRID-POINT-NUMBER>\n");
+}
+
 int
 main(int argc, char *argv[])
 {
+    if (argc < 3)
+    {
+        usage();
+        return EXIT_FAILURE;
+    }
+
     // Read params file.
     char *ParamFN;
     FILE *fileParam;
@@ -35,6 +48,8 @@ main(int argc, char *argv[])
     char aline[1000];
     // struct TParam * Param1;
     fileParam = fopen(ParamFN,"r");
+    if (fileParam == NULL)
+        file_not_found(ParamFN);
     char *str, dummy[1000];
     int LowNr,nLayers;
     double tx,ty,tz;
@@ -221,6 +236,8 @@ main(int argc, char *argv[])
     int rown=atoi(argv[2]);
     FILE *fp;
     fp = fopen(fnG,"r");
+    if (fp == NULL)
+        file_not_found(fnG);
     char line[1024];
     fgets(line,1000,fp);
     int TotalNrSpots=0;

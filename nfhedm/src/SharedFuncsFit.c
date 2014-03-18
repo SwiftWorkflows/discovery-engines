@@ -9,6 +9,7 @@
 #include <nlopt.h>
 #include <stdint.h>
 
+#include "checks.h"
 #include "SharedFuncsFit.h"
 #include "CalcDiffractionSpots.h"
 
@@ -161,6 +162,8 @@ ReadBinFiles(
             sprintf(FileName,"%s_%06d.%s%d",FileStem,i,ext,k);
 			//printf("Reading file : %s\n",FileName);
             fp = fopen(FileName,"r");
+            if (fp == NULL)
+                file_not_found(FileName);
             fread(&dummy,sizeof(float32_t),1,fp);
             ReadHeader(fp,&Header1);
             fread(&dummy2,sizeof(uint32_t),1,fp);
