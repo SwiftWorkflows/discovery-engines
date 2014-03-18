@@ -1,8 +1,10 @@
 
 # Set software locations here:
-NLOPT = $(HOME)/sfw/nlopt-2.4.1
-TCL = $(HOME)/sfw/tcl-8.6.1
-TCLSH = $(wildcard $(HOME)/sfw/tcl-8.6.1/bin/tclsh8.* )
+# NLOPT = $(HOME)/sfw/nlopt-2.4.1
+NLOPT = $(HOME)/sfw/nlopt-2.4.1-x86_64
+# TCL = $(HOME)/sfw/tcl-8.6.1
+TCL = $(HOME)/sfw/tcl-8.5.9-x86_64
+TCLSH = $(wildcard $(TCL)/bin/tclsh8.* )
 
 INCLUDES = -I $(NLOPT)/include -I $(TCL)/include -I src
 
@@ -71,7 +73,7 @@ $(LIBTCLFOP): src/placebo_wrap.o $(FOP_NLOPT_OBJS)
 		$(<)                \
 		$(FOP_NLOPT_OBJS)   \
 		$(LIBS)             \
-		-L $(TCL)/lib -l tcl8.6 \
+		-L $(TCL)/lib -l tcl8.5 \
 		$(RPATH_NLOPT) -Wl,-rpath -Wl,$(TCL)/lib
 
 src/placebo_wrap.c: src/placebo.i
