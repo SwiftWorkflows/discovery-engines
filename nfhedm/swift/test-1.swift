@@ -7,5 +7,10 @@ import io;
 main
 {
   printf("HI");
+  float z;
+  x = 1.5;
+  y = 2.5;
+  z = placebo_1(x, y);
+  printf("swift: z=%0.2f", z);
 }
 

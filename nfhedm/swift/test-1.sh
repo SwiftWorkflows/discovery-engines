@@ -12,6 +12,7 @@ then
   exit 1
 fi
 
+export TURBINE_LOG=0
 turbine swift/test-1.tcl
 
 
