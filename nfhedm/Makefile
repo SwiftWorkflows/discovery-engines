@@ -1,10 +1,14 @@
 
 # Set software locations here:
-# NLOPT = $(HOME)/sfw/nlopt-2.4.1
-NLOPT = $(HOME)/sfw/nlopt-2.4.1-x86_64
+NLOPT = $(HOME)/sfw/nlopt-2.4.1
+# NLOPT = $(HOME)/sfw/nlopt-2.4.1-x86_64
 # TCL = $(HOME)/sfw/tcl-8.6.1
-TCL = $(HOME)/sfw/tcl-8.5.9-x86_64
+TCL = $(HOME)/sfw/tcl-8.6.0
+# TCL = $(HOME)/sfw/tcl-8.5.9-x86_64
 TCLSH = $(wildcard $(TCL)/bin/tclsh8.* )
+
+# TCL_VERSION = 8.5
+TCL_VERSION = 8.6
 
 INCLUDES = -I $(NLOPT)/include -I $(TCL)/include -I src
 
@@ -20,7 +24,9 @@ RPATH_NLOPT = -Wl,-rpath -Wl,$(NLOPT)/lib
 RPATHS = $(RPATH_NLOPT) \
          -Wl,-rpath -Wl,$(PWD)/lib
 
-all: sanity bin/fop-nlopt
+all: bin/fop-nlopt
+
+swift-pkg: pkgIndex.tcl
 
 sanity:
 #       Test that we have NLopt
@@ -35,12 +41,11 @@ lib:
 LIBFOP = lib/libfop.so
 LIBTCLFOP = lib/libtclfop.so
 
-FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o src/nfhedm-math.o src/CalcDiffractionSpots.o src/placebo.o src/parameters.o
-#
-#  \
-# 	                   \
-# 	                            \
-# 		                     \
+FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
+                 src/nfhedm-math.o                   \
+                 src/CalcDiffractionSpots.o          \
+                 src/placebo.o                       \
+                 src/parameters.o
 
 HEADERS = src/checks.h src/nfhedm-math.h
 
@@ -62,18 +67,18 @@ bin/fop-nlopt:  $(LIBFOP)                                           \
 		$(LIBS)                                          \
 		$(RPATHS)                                        \
 
-$(LIBFOP): $(FOP_NLOPT_OBJS) lib
+$(LIBFOP): sanity $(FOP_NLOPT_OBJS) lib
 	gcc -shared -o $(@)       \
 		$(FOP_NLOPT_OBJS) \
 		$(LIBS)           \
 		$(RPATH_NLOPT)
 
-$(LIBTCLFOP): src/placebo_wrap.o $(FOP_NLOPT_OBJS)
+$(LIBTCLFOP): sanity src/placebo_wrap.o $(FOP_NLOPT_OBJS)
 	gcc -shared -o $(@)         \
-		$(<)                \
+		src/placebo_wrap.o  \
 		$(FOP_NLOPT_OBJS)   \
 		$(LIBS)             \
-		-L $(TCL)/lib -l tcl8.5 \
+		-L $(TCL)/lib -l tcl$(TCL_VERSION) \
 		$(RPATH_NLOPT) -Wl,-rpath -Wl,$(TCL)/lib
 
 src/placebo_wrap.c: src/placebo.i
@@ -102,6 +107,4 @@ clean:
 	rm -fv $(TESTS)
 	@echo
 
-.PHONY: clean all
-
-
+.PHONY: sanity clean all
