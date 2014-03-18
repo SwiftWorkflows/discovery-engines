@@ -42,16 +42,14 @@ LIBFOP = lib/libfop.so
 LIBTCLFOP = lib/libtclfop.so
 
 FOP_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
-                 src/nfhedm-math.o                   \
+                 src/SharedFuncsFit.o                \
                  src/CalcDiffractionSpots.o          \
                  src/placebo.o                       \
                  src/parameters.o
 
-HEADERS = src/checks.h src/nfhedm-math.h
+HEADERS = src/checks.h src/SharedFuncsFit.h src/CalcDiffractionSpots.h
 
 src/CalcDiffractionSpots.o: src/CalcDiffractionSpots.c $(HEADERS)
-
-src/nfhedm-math.o: src/nfhedm-math.c src/nfhedm-math.h
 
 src/FitOrientationParametersNLOpt-main.o:        \
 	src/FitOrientationParametersNLOpt-main.c \

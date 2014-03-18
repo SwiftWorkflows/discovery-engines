@@ -420,17 +420,20 @@ void FindPeakPositions(
 	memset(Image4,0,NrPixels*NrPixels*sizeof(int));
 	int *FilledEdges; //Edges in LoG filtered image, but just binarized!
 	FilledEdges = malloc((NrPixels*NrPixels*sizeof(*FilledEdges))/32);
+	memset(FilledEdges,0,NrPixels*NrPixels*sizeof(int)/32);
 	printf("Filling peaks.\n");
 	int FoundInsidePx = 0;
 	int RowAbove = 1;
-	int InsidePxPos;
+	int InsidePxPos=0;
 	int FoundEdgePx = 0;
-	int PxPositionsToFlood[200];
+	int PxPositionsToFlood[900];
 	int NrPositionsToFlood;
 	int PosI, PosInter, LeftOutPxFound, EdgePxMet, PeakNumber, StartInsidePxPos, RightEdgeMet, PosFill, PosFillI;
 	PeakNumber = 1;
 	int Flip=0;
-	int DummyCntr = 1,OrigImagePeakID;
+	int PosNext = 0;
+	int PosTr = 0;
+	int DummyCntr = 1,OrigImagePeakID, PosF2=0;
 	int Flip2 = 0;
 	for (i=0;i<NrPixels*NrPixels;i++){
 		if (TestBit(ImageEdges,i) && !TestBit(FilledEdges,i)){ // We have found a pixel belonging to a peak eadge.
@@ -441,27 +444,30 @@ void FindPeakPositions(
 				if (TestBit(ImageEdges,Pos) && !TestBit(FilledEdges,i)){ // If the pixel above on the left is an edge, check for an inside pixel.
 					FoundEdgePx = 1;
 					PosInter = Pos;
-					if (!TestBit(ImageEdges,Pos+1)){ // If the next pixel is not an edge.
+					PosNext = Pos + 1;
+					if (!TestBit(ImageEdges,PosNext)){ // If the next pixel is not an edge.
 						FoundInsidePx = 1;
-						InsidePxPos = Pos + 1;
+						InsidePxPos = PosNext;
 					}
 				}
 				Pos = PosI + NrPixels;
 				if (TestBit(ImageEdges,Pos) && !TestBit(FilledEdges,i)){ // If the pixel above is an edge, check for an inside pixel.
 					FoundEdgePx = 1;
 					PosInter = Pos;
-					if (!TestBit(ImageEdges,Pos+1)){ // If the next pixel is not an edge.
+					PosNext = Pos + 1;
+					if (!TestBit(ImageEdges,PosNext)){ // If the next pixel is not an edge.
 						FoundInsidePx = 1;
-						InsidePxPos = Pos + 1;
+						InsidePxPos = PosNext;
 					}
 				}
 				Pos = PosI + NrPixels + 1;
 				if (TestBit(ImageEdges,Pos) && !TestBit(FilledEdges,i)){ // If the pixel above on the right is an edge, check for an inside pixel.
 					FoundEdgePx = 1;
 					PosInter = Pos;
-					if (!TestBit(ImageEdges,Pos+1)){ // If the next pixel is not an edge.
+					PosNext = Pos + 1;
+					if (!TestBit(ImageEdges,PosNext)){ // If the next pixel is not an edge.
 						FoundInsidePx = 1;
-						InsidePxPos = Pos + 1;
+						InsidePxPos = PosNext;
 					}
 				}
 				if (FoundEdgePx == 0){ // If no edge was found, do not continue.
@@ -471,10 +477,11 @@ void FindPeakPositions(
 						PosI = PosInter;
 						LeftOutPxFound = 0;
 						while(LeftOutPxFound ==0){
-							if (!TestBit(ImageEdges,PosI-1)){
-								LeftOutPxFound = 1;
-							}else{
+							PosTr = PosI-1;
+							if (TestBit(ImageEdges,PosTr)){
 								PosI--;
+							}else{
+								LeftOutPxFound = 1;
 							}
 						}
 					}
@@ -484,14 +491,14 @@ void FindPeakPositions(
 				continue;
 			}
 			// Run flood fill with the seed as InsidePxPos.
-			for (j=0;j<200;j++){PxPositionsToFlood[j]=0;}
+			for (j=0;j<900;j++){PxPositionsToFlood[j]=0;}
 			OrigImagePeakID = ImagePeakIDsCorrected[i];
 			PxPositionsToFlood[0] = InsidePxPos;
 			NrPositionsToFlood = 1;
 			while (NrPositionsToFlood > 0){
 				StartInsidePxPos = PxPositionsToFlood[0];
 				NrPositionsToFlood--;
-				for (j=1;j<200;j++){
+				for (j=1;j<900;j++){
 					if (PxPositionsToFlood[j] == 0){
 						break;
 					}else{
@@ -555,8 +562,9 @@ void FindPeakPositions(
 						SetBit(FilledEdges,Pos);
 						Image4[Pos]=PeakNumber;
 					}
-					if ((PosFill+1)%2048 == 0 || (PosFill+1)%2048 == 1 
-				     || (TestBit(ImageEdges,PosFill+1) && ImagePeakIDsCorrected[PosFill+1]!=OrigImagePeakID)){ // If we are filling the edges of the image, should not continue!
+					PosF2 = PosFill+1;
+					if ((PosFill+1)%2048 == 0 || (PosFill+1)%2048 == 1
+				     || (TestBit(ImageEdges,PosF2) && ImagePeakIDsCorrected[PosFill+1]!=OrigImagePeakID)){ // If we are filling the edges of the image, should not continue!
 						while (!TestBit(ImageEdges,PosFill) && (Image4[PosFill-NrPixels]==0) && (Image4[PosFill+NrPixels]==0)){
 							Image4[PosFill] = 0;
 							PosFill--;
@@ -573,6 +581,7 @@ void FindPeakPositions(
 					PosFill = PosFill+1;
 				}
 				while(TestBit(ImageEdges,PosFill)){
+		
 					Image4[PosFill] = PeakNumber;
 					SetBit(FilledEdges,PosFill);
 					PosFill++;
@@ -612,7 +621,7 @@ main(int argc, char *argv[])
     struct TParam * Param1;
     fileParam = fopen(ParamFN,"r");
     char *str, dummy[1000];
-    int LowNr,nLayers,StartNr,NrFilesPerLayer,NrPixels,BlnketSubtraction,MeanFiltRadius;
+    int LowNr,nLayers,StartNr,NrFilesPerLayer,NrPixels,BlnketSubtraction,MeanFiltRadius,WriteFinImage=0;
 	nLayers = atoi(argv[2]);
 	int ImageNr,LoGMaskRadius;
 	double sigma;
@@ -640,6 +649,12 @@ main(int argc, char *argv[])
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
             sscanf(aline,"%s %d", dummy, &NrPixels);
+            continue;
+        }
+        str = "WriteFinImage ";
+        LowNr = strncmp(aline,str,strlen(str));
+        if (LowNr==0){
+            sscanf(aline,"%s %d", dummy, &WriteFinImage);
             continue;
         }
         str = "NrFilesPerLayer ";
@@ -674,11 +689,18 @@ main(int argc, char *argv[])
         }
     }
     fclose(fileParam);
+    FILE *fk;
+	char OutFN[5024];
+	sprintf(OutFN,"%s_%06d.%s%d",ReducedFileName,ImageNr,extReduced,nLayers-1);
+	char OutFileName[5024];
+	strcpy(OutFileName,OutFN);
+	fk = fopen(OutFileName,"wb");
+
 	pixelvalue *Image, *Image2;
 	char FileName[1024];
 	Image = malloc(NrPixels*NrPixels*sizeof(*Image)); // Original image.
 	Image2 = malloc(NrPixels*NrPixels*sizeof(*Image2)); // Median filtered image.
-	sprintf(FileName,"%s_%06d.%s",fn,ImageNr + (NrFilesPerLayer * (nLayers-1)),extReduced);
+	sprintf(FileName,"%s_%06d.%s",fn,ImageNr + (NrFilesPerLayer * (nLayers-1)) + StartNr,extReduced);
 	printf("Reading file: %s\n",FileName);
 	FILE *fb;
 	int SizeFile = sizeof(pixelvalue) * NrPixels * NrPixels;
@@ -742,25 +764,38 @@ main(int argc, char *argv[])
 	int *Image5;
 	Image5 = malloc(NrPixels*NrPixels*sizeof(*Image5));
 	FindPeakPositions(LoGMaskRadius2,sigma2,Image3,NrPixels,Image5);
-	int *FinalImage;
+	free(Image2);
+	free(Image3);
+	pixelvalue *FinalImage;
 	FinalImage = malloc(NrPixels*NrPixels*sizeof(*FinalImage));
 	int TotPixelsInt=0;
 	for (i=0;i<NrPixels*NrPixels;i++){
 		if (Image4[i]!=0){
-			FinalImage[i] = Image4[i]*100;
+			FinalImage[i] = Image4[i]*10;
 			TotPixelsInt++;
 		}else if(Image5[i]!=0){
-			FinalImage[i] = Image5[i]*100;
+			FinalImage[i] = Image5[i]*10;
 			TotPixelsInt++;
 		}else{
 			FinalImage[i] = 0;
 		}
 	}
+	free(Image4);
+	free(Image5);
 	if (TotPixelsInt > 0){
 		TotPixelsInt--;
 	}else{
 		TotPixelsInt = 1;
 		FinalImage[2045] = 1;
+	}
+	int SizeOutFile = sizeof(pixelvalue)*NrPixels*NrPixels;
+	if (WriteFinImage == 1){
+		FILE *fw;
+		char OutFN2[1024];
+		sprintf(OutFN2,"%s_FullImage_%06d.%s%d",ReducedFileName,ImageNr,extReduced,nLayers-1);
+		fw = fopen(OutFN2,"wb");
+		fwrite(FinalImage,SizeOutFile,1,fw);
+		fclose(fw);
 	}
 	printf("Total number of pixels with intensity: %d\n",TotPixelsInt);
 	pixelvalue *ys, *zs, *peakID;
@@ -782,12 +817,10 @@ main(int argc, char *argv[])
 			PeaksFilledCounter++;
 		}
 	}
+	free(Image);
+	free(FinalImage);
 	// Write the result file.
-	FILE *fk;
-	char OutFileName[1024];
-	sprintf(OutFileName,"%s_%06d.%s%d",ReducedFileName,ImageNr,extReduced,nLayers-1);
 	printf("Now writing file: %s.\n",OutFileName);
-	fk = fopen(OutFileName,"wb");
 	float32_t dummy1 = 1;
 	uint32_t dummy2 = 1;
 	pixelvalue dummy3 = 1;
@@ -863,15 +896,21 @@ main(int argc, char *argv[])
 	//Finish writing header.
 	//Now write PeakIDs.
 	fwrite(peakID,TotPixelsInt*sizeof(pixelvalue),1,fk);
+	printf("File written, now closing.\n");
 	fclose(fk);
-	free(Image);
+	printf("File writing finished.\n");
+    end = clock();
+    diftotal = ((double)(end-start))/CLOCKS_PER_SEC;
+    printf("Time elapsed in correcting image for layer %d, image %d: %f [s]\n",nLayers,ImageNr,diftotal);
+    free(ys);
+    free(zs);
+    free(peakID);
+    free(intensity);
+	/*free(Image);
 	free(Image2);
 	free(Image3);
 	free(Image4);
 	free(Image5);
-	free(FinalImage);
-    end = clock();
-    diftotal = ((double)(end-start))/CLOCKS_PER_SEC;
-    printf("Time elapsed in correcting image for layer %d, image %d: %f [s]\n",nLayers,ImageNr,diftotal);
+	free(FinalImage);*/
     return 0;
 }

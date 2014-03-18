@@ -14,11 +14,13 @@
 #include <ctype.h>
 #include <stdint.h>
 
-#include "nfhedm-math.h"
+#include "SharedFuncsFit.h"
 
-#include "CalcDiffractionSpots.h"
-
+#define deg2rad 0.0174532925199433
+#define rad2deg 57.2957795130823
+#define RealType double
 #define MAX_N_HKLS 1000
+#define MAX_N_OMEGA_RANGES 20
 
 #define crossProduct(a,b,c) \
 (a)[0] = (b)[1] * (c)[2] - (c)[1] * (b)[2]; \
@@ -52,7 +54,7 @@ MatrixMult(
 
 void
 GenerateHKLsFCC(
-                const int ringnos[],
+                int ringnos[],
                 int nrings,
                 int hkls[][4],
                 int *nhkls)
@@ -358,7 +360,7 @@ void
 CalcRingRadii(
               RealType Distance,
               RealType Ttheta[],
-              const int RingNrs[],
+              int RingNrs[],
               int NrRings,
               RealType RingRadii[])
 {
@@ -456,16 +458,13 @@ CalcDiffrSpots_Furnace(
     *nspots = spotnr;
 }
 
-/**
-   @return 0 on success, 1 on error.
- */
 int
 CalcDiffractionSpots(double LatticeConstant, 
 	double Wavelength, 
 	double Distance, 
 	int nRings, 
 	double ExcludePoleAngle, 
-	const int RingNumbers[MAX_N_OMEGA_RANGES],
+	int RingNumbers[MAX_N_OMEGA_RANGES], 
 	double OmegaRanges[MAX_N_OMEGA_RANGES][2], 
 	int NoOfOmegaRanges, 
 	double BoxSizes[MAX_N_OMEGA_RANGES][4], 

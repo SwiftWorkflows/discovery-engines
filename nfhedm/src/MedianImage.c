@@ -121,7 +121,7 @@ int CalcMedian(char fn[1000],
 	pixelvalue **AllIntensities, *MedianArray, *DifferenceImage;
 	AllIntensities = allocMatrixInt(NrPixels*NrPixels,NrFilesPerLayer);
 	char MedianFileName[1024];
-	sprintf(MedianFileName,"%s_Median_Background_Distance_%d.%s",fn,LayerNr,extReduced);
+	sprintf(MedianFileName,"%s_Median_Background_Distance_%d.%s",fn,LayerNr-1,extReduced);
 	for (j=0;j<NrFilesPerLayer;j++){
 		FileNr = ((LayerNr - 1) * NrFilesPerLayer) + StartNr + j;
 		sprintf(FileName,"%s_%06d.%s",fn,FileNr,ext);

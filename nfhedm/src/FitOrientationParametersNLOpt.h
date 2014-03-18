@@ -8,27 +8,11 @@
 #ifndef FITORIENTATIONPARAMETERSNLOPT_H
 #define FITORIENTATIONPARAMETERSNLOPT_H
 
-#include "nfhedm-math.h"
-
-double**
-allocMatrix(int nrows, int ncols);
-
-int**
-allocMatrixInt(int nrows, int ncols);
-
-void
-FreeMemMatrix(RealType **mat,int nrows);
-
-void
-FreeMemMatrixInt(int **mat,int nrows);
 
 void
 NormalizeMat(
     double OMIn[9],
     double OMOut[9]);
-
-void
-Convert9To3x3(double MatIn[9],double MatOut[3][3]);
 
 void
 CalcFracOverlap(
@@ -65,16 +49,6 @@ optimizeOrientation(double *OrientMatrixRow,
                     /*21*/double BoxSizes[MAX_N_OMEGA_RANGES][4], double P0[nLayers][3], int NrPixelsGrid,
                     double tol, double lsdtol, double lsdtolrel,
                     double tiltstol,double bctol, double *output, int outputMax);
-
-int
-ReadBinFiles(
-    char FileStem[1000],
-    char *ext,
-    int StartNr,
-    int EndNr,
-    int *ObsSpotsMat,
-    int nLayers,
-    long long int ObsSpotsSize);
 
 void
 RotationTilts(

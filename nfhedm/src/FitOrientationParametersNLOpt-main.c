@@ -5,7 +5,7 @@
 
 #include "checks.h"
 
-#include "nfhedm-math.h"
+#include "SharedFuncsFit.h"
 #include "parameters.h"
 #include "CalcDiffractionSpots.h"
 #include "FitOrientationParametersNLOpt.h"
