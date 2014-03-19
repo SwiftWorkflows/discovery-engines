@@ -8,7 +8,7 @@ export TURBINE_USER_LIB=${PWD}
 
 if [[ ! -f pkgIndex.tcl ]]
 then
-  echo "Tcl FOP package does not exist!"
+  echo "Swift NFHEDM package does not exist!"
   exit 1
 fi
 
