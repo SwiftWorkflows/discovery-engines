@@ -7,6 +7,7 @@ TCL = $(HOME)/sfw/tcl-8.6.0
 # TCL = $(HOME)/sfw/tcl-8.5.9-x86_64
 TCLSH = $(wildcard $(TCL)/bin/tclsh8.* )
 
+# Set Tcl version here: 
 # TCL_VERSION = 8.5
 TCL_VERSION = 8.6
 
