@@ -3,15 +3,17 @@
 NLOPT = $(HOME)/sfw/nlopt-2.4.1
 # NLOPT = $(HOME)/sfw/nlopt-2.4.1-x86_64
 # TCL = $(HOME)/sfw/tcl-8.6.1
-TCL = $(HOME)/sfw/tcl-8.6.0
+TCL = /usr
 # TCL = $(HOME)/sfw/tcl-8.5.9-x86_64
 TCLSH = $(wildcard $(TCL)/bin/tclsh8.* )
+TCL_INCLUDE = /usr/include/tcl
+TCL_LIB =  /usr/lib/x86_64-linux-gnu
 
 # Set Tcl version here: 
-# TCL_VERSION = 8.5
-TCL_VERSION = 8.6
+TCL_VERSION = 8.5
+# TCL_VERSION = 8.6
 
-INCLUDES = -I $(NLOPT)/include -I $(TCL)/include -I src
+INCLUDES = -I $(NLOPT)/include -I $(TCL_INCLUDE) -I src
 
 CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
 
@@ -89,7 +91,7 @@ $(LIBTCLNFHEDM): sanity src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
 		src/nfhedm_wrap.o  \
 		$(NFHEDM_NLOPT_OBJS)   \
 		$(LIBS)             \
-		-L $(TCL)/lib -l tcl$(TCL_VERSION) \
+		-L $(TCL_LIB) -l tcl$(TCL_VERSION) \
 		$(RPATH_NLOPT) -Wl,-rpath -Wl,$(TCL)/lib
 
 src/nfhedm_wrap.c: src/nfhedm.i
