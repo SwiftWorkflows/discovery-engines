@@ -1,5 +1,6 @@
 
 # Set software locations here:
+DIP = $(HOME)/sfw/dip/Linuxa64
 NLOPT = $(HOME)/sfw/nlopt-2.4.1
 # NLOPT = $(HOME)/sfw/nlopt-2.4.1-x86_64
 # TCL = $(HOME)/sfw/tcl-8.6.1
@@ -9,7 +10,7 @@ TCLSH = $(wildcard $(TCL)/bin/tclsh8.* )
 TCL_INCLUDE = /usr/include/tcl
 TCL_LIB =  /usr/lib/x86_64-linux-gnu
 
-# Set Tcl version here: 
+# Set Tcl version here:
 TCL_VERSION = 8.5
 # TCL_VERSION = 8.6
 
@@ -78,7 +79,12 @@ bin/fo-nlopt:  $(LIBNFHEDM)                                           \
 		-o $(@) src/FitOrientation-main.o \
 		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
-		$(RPATHS) 
+		$(RPATHS)
+
+bin/MedianImage: $(LIBNFHEDM) src/MedianImage.c
+	gcc -o $(@) src/MedianImage.c                 \
+	           -I $(DIP)/include                  \
+	           -L $(DIP)/lib -ldipio -ldip -lm
 
 $(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS) lib
 	gcc -shared -o $(@)       \
