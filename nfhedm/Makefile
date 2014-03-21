@@ -42,11 +42,10 @@ sanity:
 bin:
 	mkdir -pv bin
 
-lib:
-	mkdir -pv lib
-
 LIBNFHEDM = lib/libnfhedm.so
 LIBTCLNFHEDM = lib/libtclnfhedm.so
+
+lib: $(LIBNFHEDM)
 
 NFHEDM_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
                  src/FitOrientation.o                \
@@ -92,7 +91,8 @@ bin/MedianImage: $(LIBNFHEDM) src/MedianImage.c
 bin/ImageProcessing: src/ImageProcessing.c
 	gcc -o bin/ImageProcessing src/ImageProcessing.c -lm
 
-$(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS) lib
+$(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS)
+	@mkdir -pv lib
 	gcc -shared -o $(@)       \
 		$(NFHEDM_NLOPT_OBJS) \
 		$(LIBS)           \
@@ -125,7 +125,7 @@ tests: $(TESTS)
 
 clean:
 	@echo CLEAN
-	rm -fv bin/fop-nlopt bin/fo-nlopt
+	rm -fv $(EXECUTABLES)
 	rm -fv src/*.o
 	rm -fv src/nfhedm_wrap.c
 	rm -fv lib/libtclnfhedm.so lib/libnfhedm.so
