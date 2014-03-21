@@ -1,17 +1,7 @@
 
-# Set software locations here:
-# TCL = $(HOME)/sfw/tcl-8.6.1
-TCL = /usr
-# TCL = $(HOME)/sfw/tcl-8.5.9-x86_64
-TCLSH = $(wildcard $(TCL)/bin/tclsh8.* )
-TCL_INCLUDE = /usr/include/tcl
-TCL_LIB =  /usr/lib/x86_64-linux-gnu
+# MAKEFILE
 
-# Set Tcl version here:
-TCL_VERSION = 8.5
-# TCL_VERSION = 8.6
-
-INCLUDES = -I $(NLOPT)/include -I $(TCL_INCLUDE) -I src
+INCLUDES = -I $(NLOPT)/include @TCL_INCLUDE_SPEC@ -I src
 
 CFLAGS += @CFLAGS@
 CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
@@ -25,16 +15,14 @@ LIBS += $(LIBDIRS) -lnlopt -lm
 RPATHS = @RPATHS@ \
          -Wl,-rpath -Wl,$(PWD)/lib
 
+TCLSH = @USE_TCLSH@
+
 EXECUTABLES = bin/fop-nlopt bin/fo-nlopt \
               bin/MedianImage bin/ImageProcessing
 
 all: $(EXECUTABLES)
 
 swift-pkg: pkgIndex.tcl
-
-sanity:
-#       Test that we have NLopt
-	test -d $(NLOPT)
 
 bin:
 	mkdir -pv bin
@@ -105,9 +93,8 @@ $(LIBTCLNFHEDM): sanity src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
 	gcc -shared -o $(@)         \
 		src/nfhedm_wrap.o  \
 		$(NFHEDM_NLOPT_OBJS)   \
-		$(LIBS)             \
-		-L $(TCL_LIB) -l tcl$(TCL_VERSION) \
-		$(RPATH_NLOPT) -Wl,-rpath -Wl,$(TCL)/lib
+	        $(LDFLAGS) \
+                $(RPATHS)
 
 src/nfhedm_wrap.c: src/nfhedm.i
 	swig $(<)

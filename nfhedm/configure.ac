@@ -4,8 +4,17 @@ AC_INIT([NFHEDM], [0.0], [wozniak@mcs.anl.gov])
 AC_CONFIG_SRCDIR([src/MakeHexGrid.c])
 AC_CONFIG_HEADERS([config.h])
 
+# Set shared object suffix (.so on Linux, .dylib on Mac)
+SO_SUFFIX=so
+if [[ $(uname) = "Darwin" ]]
+then
+   SO_SUFFIX=dylib
+fi
+
 # Checks for programs.
 AC_PROG_CC
+AC_CHECK_PROG(ZSH, zsh, zsh, "no")
+[[ ${ZSH} == "no" ]] && AC_MSG_ERROR([ZSH is required!])
 
 LDFLAGS="${LDFLAGS} -lm"
 
@@ -49,6 +58,8 @@ AC_CHECK_LIB([nlopt], [nlopt_create])
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdint.h stdlib.h string.h unistd.h])
+
+m4_include([find-tcl.m4])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
