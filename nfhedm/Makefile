@@ -28,7 +28,10 @@ RPATH_NLOPT = -Wl,-rpath -Wl,$(NLOPT)/lib
 RPATHS = $(RPATH_NLOPT) \
          -Wl,-rpath -Wl,$(PWD)/lib
 
-all: bin/fop-nlopt
+EXECUTABLES = bin/fop-nlopt bin/fo-nlopt \
+              bin/MedianImage bin/ImageProcessing
+
+all: $(EXECUTABLES)
 
 swift-pkg: pkgIndex.tcl
 
