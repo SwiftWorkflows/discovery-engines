@@ -86,6 +86,9 @@ bin/MedianImage: $(LIBNFHEDM) src/MedianImage.c
 	           -I $(DIP)/include                  \
 	           -L $(DIP)/lib -ldipio -ldip -lm
 
+bin/ImageProcessing: src/ImageProcessing.c
+	gcc -o bin/ImageProcessing src/ImageProcessing.c -lm
+
 $(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS) lib
 	gcc -shared -o $(@)       \
 		$(NFHEDM_NLOPT_OBJS) \
