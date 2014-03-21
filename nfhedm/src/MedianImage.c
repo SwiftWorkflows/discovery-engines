@@ -206,9 +206,21 @@ int CalcMedian(char fn[1000],
 }
 
 
+static void
+usage(void)
+{
+    printf("MedianImage: usage: ???\n");
+}
+
 int
 main(int argc, char *argv[])
 {
+    if (argc < 2)
+    {
+        usage();
+        return 1;
+    }
+
     clock_t start, end;
     double diftotal;
     start = clock();
