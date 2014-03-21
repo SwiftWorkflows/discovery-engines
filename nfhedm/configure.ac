@@ -7,10 +7,44 @@ AC_CONFIG_HEADERS([config.h])
 # Checks for programs.
 AC_PROG_CC
 
+LDFLAGS="${LDFLAGS} -lm"
+
+USE_DIP=0
+AC_ARG_WITH(dip,
+    AS_HELP_STRING([--with-dip], [location of DIP]),
+    [
+        DIP_HEADER=${withval}/include/dipio.h
+        AC_MSG_CHECKING([${DIP_HEADER}])
+        [[ -r ${DIP_HEADER} ]] && USE_DIP=1
+        if [[ ${USE_DIP} == 0 ]]
+        then
+            AC_MSG_ERROR([Could not find DIP!])
+        fi
+        AC_MSG_RESULT([ok])
+        CFLAGS="${CFLAGS} -I ${withval}/include"
+        LDFLAGS="${LDFLAGS} -L ${withval}/lib -ldipio -ldip"
+        RPATHS="${RPATHS} -Wl,-rpath -Wl,${withval}/lib"
+    ])
+
+USE_NLOPT=0
+AC_ARG_WITH(nlopt,
+    AS_HELP_STRING([--with-nlopt], [location of NLopt]),
+    [
+        NLOPT_HEADER=${withval}/include/nlopt.h
+        AC_MSG_CHECKING([${NLOPT_HEADER}])
+        [[ -r ${NLOPT_HEADER} ]] && USE_NLOPT=1
+        if [[ ${USE_NLOPT} == 0 ]]
+        then
+            AC_MSG_ERROR([Could not find NLopt!])
+        fi
+        AC_MSG_RESULT([ok])
+        CFLAGS="${CFLAGS} -I ${withval}/include"
+        LDFLAGS="${LDFLAGS} -L ${withval}/lib -lnlopt"
+        RPATHS="${RPATHS} -Wl,-rpath -Wl,${withval}/lib"
+    ])
+
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-ldip':
-AC_CHECK_LIB([dip], [Dip_Initialise])
-# FIXME: Replace `main' with a function in `-lnlopt':
+AC_CHECK_LIB([dip], [dip_Initialise])
 AC_CHECK_LIB([nlopt], [nlopt_create])
 
 # Checks for header files.
@@ -26,6 +60,8 @@ AC_TYPE_UINT32_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([floor memset pow sqrt strchr strstr])
+
+AC_SUBST(RPATHS)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
