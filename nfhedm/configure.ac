@@ -59,7 +59,7 @@ AC_CHECK_LIB([nlopt], [nlopt_create])
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdint.h stdlib.h string.h unistd.h])
 
-m4_include([find-tcl.m4])
+m4_include([maint/find-tcl.m4])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
