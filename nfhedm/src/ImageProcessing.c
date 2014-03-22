@@ -605,9 +605,20 @@ void FindPeakPositions(
 	free(FilledEdges);
 }
 
+static void
+usage(void)
+{
+    printf("ImageProcessing: usage: ./ImageProcessing <LayerNr> <ImageNr>\n");
+}
+
 int
 main(int argc, char *argv[])
 {
+	if (argc < 3)
+    {
+        usage();
+        return 1;
+    }
     clock_t start, end;
     double diftotal;
     start = clock();

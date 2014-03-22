@@ -69,7 +69,7 @@ pixelvalue***
 allocMatrix3Int(int nrows, int ncols, int nmats)
 {
     pixelvalue*** arr;
-    int i,j,k;
+    int i,j;
     arr = malloc(nrows * sizeof(*arr));
     for ( i = 0 ; i < nrows ; i++) {
         arr[i] = malloc(ncols * sizeof(*arr[i]));
@@ -231,7 +231,6 @@ main(int argc, char *argv[])
     ParamFN = argv[1];
     char aline[1000];
 	char fn[1000], ext[1000], extReduced[1000];
-    struct TParam * Param1;
     fileParam = fopen(ParamFN,"r");
     char *str, dummy[1000];
     int LowNr,nLayers,StartNr,NrFilesPerLayer,NrPixels,BlnketSubtraction;
