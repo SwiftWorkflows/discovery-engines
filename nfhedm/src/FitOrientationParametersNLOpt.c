@@ -108,8 +108,10 @@ double problem_function(
         ybc[i] = x[6+nLayers+i];
         zbc[i] = x[6+nLayers+nLayers+i];
     }
-    CalcOverlapAccOrient(NrOfFiles,nLayers,LatticeConstant,Wavelength,nRings,ExcludePoleAngle,Lsd,SizeObsSpots,XGrain,YGrain,
-		RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,RingNumbers,OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
+    CalcOverlapAccOrient(NrOfFiles,nLayers,LatticeConstant,Wavelength,
+		nRings,ExcludePoleAngle,Lsd,SizeObsSpots,XGrain,YGrain,
+		RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,RingNumbers,
+		OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
 		ObsSpotsInfo,OrientMatIn,&FracOverlap);
     return (1 - FracOverlap);
 }
@@ -152,7 +154,8 @@ FitOrientationP(
     double tolLsd,
     double tolLsdRel,
     double tolTilts,
-    double tolBCs)
+    double tolBCsa,
+    double tolBCsb)
 {
     unsigned n;
     long int i,j;
@@ -194,10 +197,11 @@ FitOrientationP(
     {
         x[i] = ybc[count];
         x[i+nLayers] = zbc[count];
-        xl[i] = x[i] - tolBCs;
-        xl[i+nLayers] = x[i+nLayers] - tolBCs;
-        xu[i] = x[i] + tolBCs;
-        xu[i+nLayers] = x[i+nLayers] + tolBCs;
+        xl[i] = x[i] - tolBCsa;
+        xl[i+nLayers] = x[i+nLayers] - tolBCsb;
+        xu[i] = x[i] + tolBCsa;
+        xu[i+nLayers] = x[i+nLayers] + tolBCsb;
+        count++;
     }
 	struct my_func_data f_data;
 	f_data.NrOfFiles = NrOfFiles;
@@ -236,39 +240,15 @@ FitOrientationP(
 	struct my_func_data *f_datat;
 	f_datat = &f_data;
 	void* trp = (struct my_func_data *) f_datat;
+	double tole = 1e-3;
 	nlopt_opt opt;
-	opt = nlopt_create(NLOPT_LN_NELDERMEAD, n);
+	opt = nlopt_create(NLOPT_LN_SBPLX, n);
 	nlopt_set_lower_bounds(opt, xl);
 	nlopt_set_upper_bounds(opt, xu);
 	nlopt_set_min_objective(opt, problem_function, trp);
 	double minf;
 	nlopt_optimize(opt, x, &minf);
 	nlopt_destroy(opt);
-	// if (minf < 0.7){
-	// 	printf("\n\nA good point found, trying global optimization.\nBefore global optimization: %f\n",1-minf);
-	// 	nlopt_opt local_opt;
-	// 	double stopval = 0;
-	// 	opt = nlopt_create(NLOPT_G_MLSL_LDS, n);
-	// 	local_opt = nlopt_create(NLOPT_LN_NELDERMEAD, n);
-	// 	nlopt_set_lower_bounds(opt, xl);
-	// 	nlopt_set_upper_bounds(opt, xu);
-	// 	nlopt_set_min_objective(opt, problem_function, trp);
-	// 	nlopt_set_stopval(opt, stopval);
-	// 	nlopt_set_ftol_abs(opt, tole);
-	// 	nlopt_set_xtol_rel(opt, tole);
-	// 	nlopt_set_local_optimizer(opt, local_opt);
-	// 	nlopt_optimize(opt, x, &minf);
-	// 	nlopt_destroy(local_opt);
-	// 	nlopt_destroy(opt);
-	// 	printf("After global optimization: %f\n",1-minf);
-	// 	opt = nlopt_create(NLOPT_LN_NELDERMEAD, n);
-	// 	nlopt_set_lower_bounds(opt, xl);
-	// 	nlopt_set_upper_bounds(opt, xu);
-	// 	nlopt_set_min_objective(opt, problem_function, trp);
-	// 	nlopt_optimize(opt, x, &minf);
-	// 	nlopt_destroy(opt);
-	// 	printf("After local optimization: %f (Final result!)\n",1-minf);
-	// }
     *ResultFracOverlap = minf;
     *EulerOutA = x[0];
     *EulerOutB = x[1];
@@ -297,9 +277,9 @@ optimizeOrientation(double *OrientMatrixRow,
                     int NoOfOmegaRanges,
                     /*21*/double BoxSizes[MAX_N_OMEGA_RANGES][4], double P0[nLayers][3], int NrPixelsGrid,
                     double tol, double lsdtol, double lsdtolrel,
-                    double tiltstol,double bctol, double *output, int outputMax)
+                    double tiltstol,double bctola, double bctolb, double *output, int outputMax)
 {
-  double EulerIn[3],OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,BestFrac,XG[3],YG[3],OMTemp[9];
+  double EulerIn[3],OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,BestFrac,BestEuler[3],OMTemp[9];
   double *LsdFit, *TiltsFit, **BCsFit;
   double TiltsOrig[3];
   TiltsOrig[0] = tx;
@@ -317,21 +297,16 @@ optimizeOrientation(double *OrientMatrixRow,
   FitOrientationP(nrFiles,nLayers,LatticeConstant,Wavelength,nRings,ExcludePoleAngle,Lsd,SizeObsSpots,
                  XG,YG,TiltsOrig,OmegaStart,OmegaStep,px,ybc,zbc,gs,RingNumbers,OmegaRanges,NoOfOmegaRanges,
                  BoxSizes,P0,NrPixelsGrid,ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,&EulerOutC,&FracOut,
-                 LsdFit,
-                 TiltsFit,
-                 BCsFit,
-                 lsdtol,
-                 lsdtolrel,
-                 tiltstol,
-                 bctol);
+                 LsdFit,TiltsFit,BCsFit,lsdtol,lsdtolrel,tiltstol,bctola,bctolb);
   if ((1-FracOut)>BestFrac){
     BestFrac = 1-FracOut;
-    for (int j=0;j<9;j++) {
-      printf("%f ",OrientMatrixRow[j]);
-    }
-    printf("\nEuler angles: %f %f %f, ConfidenceIndex: %f, Before fit: %f\nLsd: %f %f %f, Tilts: %f %f %f\nBCs:\t%f %f\n\t%f %f\n\t%f %f\n\n",
-           EulerOutA, EulerOutB, EulerOutC, 1-FracOut, OrientMatrixRow[9], LsdFit[0], LsdFit[1], LsdFit[2], TiltsFit[0], TiltsFit[1],
-           TiltsFit[2], BCsFit[0][0], BCsFit[0][1], BCsFit[1][0], BCsFit[1][1], BCsFit[2][0], BCsFit[2][1]);
+    printf("\nBest fraction: %f.\n",BestFrac);
+    printf("Euler angles: %f %f %f, ConfidenceIndex: %f, Before fit: %f\nTilts: %f %f %f\n",
+		EulerOutA, EulerOutB, EulerOutC, 1-FracOut, OrientMatrix[i][9],TiltsFit[0], TiltsFit[1],
+		TiltsFit[2]);
+	for (j=0;j<nLayers;j++){
+		printf("Layer Nr: %d, Lsd: %f, BCs: %f %f\n", j,LsdFit[j],BCsFit[j][0],BCsFit[j][1]);
+	}
   }
   output[0] = EulerOutA;
   output[1] = EulerOutB;

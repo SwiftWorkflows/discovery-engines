@@ -209,7 +209,7 @@ main(int argc, char *argv[])
                           params.BoxSizes, P0, NrPixelsGrid,
                           params.tol, params.lsdtol, params.lsdtolrel,
                           params.tiltstol,
-                          params.bctol,
+                          params.bctola,params.bctolb,
                           result,
                           resultMax);
 

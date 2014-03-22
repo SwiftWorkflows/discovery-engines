@@ -169,7 +169,7 @@ parameters_read(const char *filename, struct parameters *params)
         str = "BCTol ";
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &params->bctol);
+            sscanf(aline,"%s %lf %lf", dummy, &params->bctola, &params->bctolb);
             continue;
         }
         str = "TiltsTol ";

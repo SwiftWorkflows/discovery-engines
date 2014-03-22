@@ -22,7 +22,7 @@ struct parameters
     int nRings;
     int RingNumbers[20];
     double ExcludePoleAngle,LatticeConstant,Wavelength,minFracOverlap;
-    double tol,lsdtol,lsdtolrel,bctol,tiltstol;
+    double tol,lsdtol,lsdtolrel,bctola,bctolb,tiltstol;
     double tx, ty, tz, px;
     int NoOfOmegaRanges;
     double OmegaRanges[MAX_N_OMEGA_RANGES][2], BoxSizes[MAX_N_OMEGA_RANGES][4];

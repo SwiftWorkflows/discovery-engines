@@ -48,7 +48,7 @@ optimizeOrientation(double *OrientMatrixRow,
                     int NoOfOmegaRanges,
                     /*21*/double BoxSizes[MAX_N_OMEGA_RANGES][4], double P0[nLayers][3], int NrPixelsGrid,
                     double tol, double lsdtol, double lsdtolrel,
-                    double tiltstol,double bctol, double *output, int outputMax);
+                    double tiltstol,double bctola, double bctolb, double *output, int outputMax);
 
 void
 RotationTilts(
