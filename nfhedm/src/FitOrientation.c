@@ -9,6 +9,7 @@
 #include <nlopt.h>
 
 #include "checks.h"
+#include "parameters.h"
 #include "SharedFuncsFit.h"
 #include "FitOrientation.h"
 
@@ -211,8 +212,9 @@ FitOrientation(
 int FitOrientationAll(const char *ParamFN, int rown)
 {
     printf("FitOrientationAll(%s,%i)...\n", ParamFN, rown);
-    char aline[1000];
-       // struct TParam * Param1;
+    struct parameters params;
+    parameters_read(ParamFN, &params);
+    /*char aline[1000];
        FILE *fileParam = fopen(ParamFN,"r");
        if (fileParam == NULL)
            file_not_found(ParamFN);
@@ -364,26 +366,25 @@ int FitOrientationAll(const char *ParamFN, int rown)
                countr++;
                continue;
            }
-       }
+       }*/
 
        //Read bin files
-       char fnG[1000];
-       sprintf(fnG,"%s/grid.txt",direct);
+       char fnG[1000], fn[1000];
+       sprintf(fnG,"%s/grid.txt",params.direct);
        char fnDS[1000];
        char fnKey[1000];
        char fnOr[1000];
-       sprintf(fnDS,"%s/DiffractionSpots.txt",direct);
-       sprintf(fnKey,"%s/Key.txt",direct);
-       sprintf(fnOr,"%s/OrientMat.txt",direct);
-       sprintf(fn,"%s/%s",direct,fn2);
+       sprintf(fnDS,"%s/DiffractionSpots.txt",params.direct);
+       sprintf(fnKey,"%s/Key.txt",params.direct);
+       sprintf(fnOr,"%s/OrientMat.txt",params.direct);
+       sprintf(fn,"%s/%s",params.direct,params.fn);
        int i,nrFiles,nrPixels;
-       char *ext="bin";
        int *ObsSpotsInfo;
        int ReadCode;
-       nrFiles = EndNr - StartNr + 1;
-       nrPixels = 2048*2048;
+       nrFiles = params.EndNr - params.StartNr + 1;
+       nrPixels = params.NrPixels*params.NrPixels;
        long long int SizeObsSpots;
-       SizeObsSpots = (nLayers);
+       SizeObsSpots = (params.nLayers);
        SizeObsSpots*=nrPixels;
        SizeObsSpots*=nrFiles;
        SizeObsSpots/=32;
@@ -392,7 +393,8 @@ int FitOrientationAll(const char *ParamFN, int rown)
            printf("Could not allocate ObsSpotsInfo.\n");
            return 0;
        }
-       ReadCode = ReadBinFiles(fn,ext,StartNr,EndNr,ObsSpotsInfo,nLayers,SizeObsSpots);
+       ReadCode = ReadBinFiles(params.fn,params.ext,params.StartNr,params.EndNr,ObsSpotsInfo,
+                            params.nLayers,SizeObsSpots);
        if (ReadCode == 0){
            printf("Reading bin files did not go well. Please check.\n");
            return 0;
@@ -469,16 +471,16 @@ int FitOrientationAll(const char *ParamFN, int rown)
        }
 
 
-       fclose(fileParam);
+//       fclose(fileParam);
 
-       int rc = FitOrientation_Calc(rown, gs, px, tx, ty, tz,
-                         /*7*/nLayers, Lsd, XY, NrOrientations,
+       int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
+                         /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
                          /*11*/NrSpots, OrientationMatrix, SpotsMat,
-                         /*14*/nrFiles, OmegaStart, OmegaStep, SizeObsSpots,
-                         /*18*/ybc, zbc, ObsSpotsInfo, minFracOverlap,
-                         /*22*/LatticeConstant, Wavelength, nRings, ExcludePoleAngle,
-                         /*26*/RingNumbers, OmegaRanges, NoOfOmegaRanges, BoxSizes,
-                         tol, TotalDiffrSpots, xs, ys);
+                         /*14*/nrFiles, params.OmegaStart, params.OmegaStep, SizeObsSpots,
+                         /*18*/params.ybc, params.zbc, ObsSpotsInfo, params.minFracOverlap,
+                         /*22*/params.LatticeConstant, params.Wavelength, params.nRings, params.ExcludePoleAngle,
+                         /*26*/params.RingNumbers, params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
+                         params.tol, TotalDiffrSpots, xs, ys);
 
        assert(rc == 1);
        return 1;

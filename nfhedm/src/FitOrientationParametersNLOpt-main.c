@@ -37,7 +37,7 @@ main(int argc, char *argv[])
     int *ObsSpotsInfo;
     int ReadCode;
     nrFiles = params.EndNr - params.StartNr + 1;
-    nrPixels = 2048*2048;
+    nrPixels = params.NrPixels*params.NrPixels;
     long long int SizeObsSpots;
     SizeObsSpots = (params.nLayers);
     SizeObsSpots*=nrPixels;
@@ -206,7 +206,7 @@ main(int argc, char *argv[])
                           params.ExcludePoleAngle, params.Lsd, SizeObsSpots,
                           params.OmegaStart, params.OmegaStep, params.px, params.ybc, params.zbc,
                           gs, params.RingNumbers, params.OmegaRanges, params.NoOfOmegaRanges,
-                          params.BoxSizes, P0, NrPixelsGrid,
+                          params.BoxSizes, P0, NrPixelsGrid, XG, YG,
                           params.tol, params.lsdtol, params.lsdtolrel,
                           params.tiltstol,
                           params.bctola,params.bctolb,

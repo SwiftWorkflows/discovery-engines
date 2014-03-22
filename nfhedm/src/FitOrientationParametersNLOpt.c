@@ -240,7 +240,6 @@ FitOrientationP(
 	struct my_func_data *f_datat;
 	f_datat = &f_data;
 	void* trp = (struct my_func_data *) f_datat;
-	double tole = 1e-3;
 	nlopt_opt opt;
 	opt = nlopt_create(NLOPT_LN_SBPLX, n);
 	nlopt_set_lower_bounds(opt, xl);
@@ -276,10 +275,11 @@ optimizeOrientation(double *OrientMatrixRow,
                     double gs, /*18*/int *RingNumbers, /*19*/double OmegaRanges[MAX_N_OMEGA_RANGES][2],
                     int NoOfOmegaRanges,
                     /*21*/double BoxSizes[MAX_N_OMEGA_RANGES][4], double P0[nLayers][3], int NrPixelsGrid,
+                    double XG[3], double YG[3],
                     double tol, double lsdtol, double lsdtolrel,
                     double tiltstol,double bctola, double bctolb, double *output, int outputMax)
 {
-  double EulerIn[3],OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,BestFrac,BestEuler[3],OMTemp[9];
+  double EulerIn[3],OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,BestFrac,OMTemp[9];
   double *LsdFit, *TiltsFit, **BCsFit;
   double TiltsOrig[3];
   TiltsOrig[0] = tx;
@@ -301,10 +301,10 @@ optimizeOrientation(double *OrientMatrixRow,
   if ((1-FracOut)>BestFrac){
     BestFrac = 1-FracOut;
     printf("\nBest fraction: %f.\n",BestFrac);
-    printf("Euler angles: %f %f %f, ConfidenceIndex: %f, Before fit: %f\nTilts: %f %f %f\n",
-		EulerOutA, EulerOutB, EulerOutC, 1-FracOut, OrientMatrix[i][9],TiltsFit[0], TiltsFit[1],
+    printf("Euler angles: %f %f %f, ConfidenceIndex: %f\nTilts: %f %f %f\n",
+		EulerOutA, EulerOutB, EulerOutC, 1-FracOut,TiltsFit[0], TiltsFit[1],
 		TiltsFit[2]);
-	for (j=0;j<nLayers;j++){
+	for (int j=0;j<nLayers;j++){
 		printf("Layer Nr: %d, Lsd: %f, BCs: %f %f\n", j,LsdFit[j],BCsFit[j][0],BCsFit[j][1]);
 	}
   }

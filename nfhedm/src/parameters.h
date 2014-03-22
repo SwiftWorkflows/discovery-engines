@@ -13,8 +13,8 @@
 struct parameters
 {
     int StartNr,EndNr;
-    int nLayers;
-    char fn[1000],ext[1024];
+    int nLayers, NrPixels;
+    char fn[1000],ext[1024],direct[1024];
     double *Lsd;
     double *ybc;
     double *zbc;

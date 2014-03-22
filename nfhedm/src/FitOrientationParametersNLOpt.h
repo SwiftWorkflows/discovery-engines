@@ -47,6 +47,7 @@ optimizeOrientation(double *OrientMatrixRow,
                     double gs, /*18*/int *RingNumbers, /*19*/double OmegaRanges[MAX_N_OMEGA_RANGES][2],
                     int NoOfOmegaRanges,
                     /*21*/double BoxSizes[MAX_N_OMEGA_RANGES][4], double P0[nLayers][3], int NrPixelsGrid,
+                    double XG[3], double YG[3],
                     double tol, double lsdtol, double lsdtolrel,
                     double tiltstol,double bctola, double bctolb, double *output, int outputMax);
 

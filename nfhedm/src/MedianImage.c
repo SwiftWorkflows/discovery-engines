@@ -209,7 +209,7 @@ int CalcMedian(char fn[1000],
 static void
 usage(void)
 {
-    printf("MedianImage: usage: ???\n");
+    printf("MedianImage: usage: ./MedianImage <LayerNr>\n");
 }
 
 int

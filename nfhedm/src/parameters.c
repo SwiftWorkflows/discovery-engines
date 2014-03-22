@@ -49,6 +49,12 @@ parameters_read(const char *filename, struct parameters *params)
             sscanf(aline,"%s %s", dummy, params->fn);
             continue;
         }
+                 str = "DataDirectory ";
+        LowNr = strncmp(aline,str,strlen(str));
+        if (LowNr==0){
+            sscanf(aline,"%s %s", dummy, params->direct);
+            continue;
+        }
                 str = "extReduced ";
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
@@ -79,6 +85,12 @@ parameters_read(const char *filename, struct parameters *params)
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
             sscanf(aline,"%s %d", dummy, &params->EndNr);
+            continue;
+        }
+        str = "NrPixels ";
+        LowNr = strncmp(aline,str,strlen(str));
+        if (LowNr==0){
+            sscanf(aline,"%s %d", dummy, &params->NrPixels);
             continue;
         }
         str = "ExcludePoleAngle ";
