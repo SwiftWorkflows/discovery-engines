@@ -1,48 +1,36 @@
 
-# Set software locations here:
-NLOPT = $(HOME)/sfw/nlopt-2.4.1
-# NLOPT = $(HOME)/sfw/nlopt-2.4.1-x86_64
-# TCL = $(HOME)/sfw/tcl-8.6.1
-TCL = /usr
-# TCL = $(HOME)/sfw/tcl-8.5.9-x86_64
-TCLSH = $(wildcard $(TCL)/bin/tclsh8.* )
-TCL_INCLUDE = /usr/include/tcl
-TCL_LIB =  /usr/lib/x86_64-linux-gnu
+# MAKEFILE
 
-# Set Tcl version here: 
-TCL_VERSION = 8.5
-# TCL_VERSION = 8.6
+INCLUDES = -I $(NLOPT)/include @TCL_INCLUDE_SPEC@ -I src
 
-INCLUDES = -I $(NLOPT)/include -I $(TCL_INCLUDE) -I src
-
+CFLAGS += @CFLAGS@
 CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
 
-LDFLAGS =
+LDFLAGS += @LDFLAGS@
 
 LIBDIRS += -L $(NLOPT)/lib
 
 LIBS += $(LIBDIRS) -lnlopt -lm
 
-RPATH_NLOPT = -Wl,-rpath -Wl,$(NLOPT)/lib
-RPATHS = $(RPATH_NLOPT) \
+RPATHS = @RPATHS@ \
          -Wl,-rpath -Wl,$(PWD)/lib
 
-all: bin/fop-nlopt
+TCLSH = @USE_TCLSH@
+
+EXECUTABLES = bin/fop-nlopt bin/fo-nlopt \
+              bin/MedianImage bin/ImageProcessing
+
+all: $(EXECUTABLES)
 
 swift-pkg: pkgIndex.tcl
-
-sanity:
-#       Test that we have NLopt
-	test -d $(NLOPT)
 
 bin:
 	mkdir -pv bin
 
-lib:
-	mkdir -pv lib
-
 LIBNFHEDM = lib/libnfhedm.so
 LIBTCLNFHEDM = lib/libtclnfhedm.so
+
+lib: $(LIBNFHEDM)
 
 NFHEDM_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
                  src/FitOrientation.o                \
@@ -78,21 +66,35 @@ bin/fo-nlopt:  $(LIBNFHEDM)                                           \
 		-o $(@) src/FitOrientation-main.o \
 		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
-		$(RPATHS) 
+		$(RPATHS)
 
-$(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS) lib
+bin/MedianImage: $(LIBNFHEDM) src/MedianImage.c
+	gcc -o $(@)               \
+	       $(CFLAGS)          \
+	       src/MedianImage.c  \
+	       $(LDFLAGS)         \
+	       $(RPATHS)
+
+ # \
+ # 	           -I $(DIP)/include                  \
+ # 	           -L $(DIP)/lib -ldipio -ldip -lm
+
+bin/ImageProcessing: src/ImageProcessing.c
+	gcc -o bin/ImageProcessing src/ImageProcessing.c -lm
+
+$(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS)
+	@mkdir -pv lib
 	gcc -shared -o $(@)       \
 		$(NFHEDM_NLOPT_OBJS) \
-		$(LIBS)           \
+	        $(LDFLAGS)
 		$(RPATH_NLOPT)
 
 $(LIBTCLNFHEDM): sanity src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
 	gcc -shared -o $(@)         \
 		src/nfhedm_wrap.o  \
 		$(NFHEDM_NLOPT_OBJS)   \
-		$(LIBS)             \
-		-L $(TCL_LIB) -l tcl$(TCL_VERSION) \
-		$(RPATH_NLOPT) -Wl,-rpath -Wl,$(TCL)/lib
+	        $(LDFLAGS) \
+                $(RPATHS)
 
 src/nfhedm_wrap.c: src/nfhedm.i
 	swig $(<)
@@ -113,7 +115,7 @@ tests: $(TESTS)
 
 clean:
 	@echo CLEAN
-	rm -fv bin/fop-nlopt bin/fo-nlopt
+	rm -fv $(EXECUTABLES)
 	rm -fv src/*.o
 	rm -fv src/nfhedm_wrap.c
 	rm -fv lib/libtclnfhedm.so lib/libnfhedm.so
