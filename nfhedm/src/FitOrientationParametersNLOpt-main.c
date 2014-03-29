@@ -97,6 +97,8 @@ main(int argc, char *argv[])
         XY[2][1] =ys - y1;
     }
 
+	//TODO: include right directory in here.
+
     //Read Orientations
     clock_t startthis;
     startthis = clock();
@@ -195,7 +197,7 @@ main(int argc, char *argv[])
         }
     }
 
-    int resultMax = 6+params.nLayers*3;
+    int resultMax = 7+params.nLayers*3;
     double result[resultMax];
 
     for (int i = 0; i < OrientationGoodID; i++)
@@ -212,7 +214,22 @@ main(int argc, char *argv[])
                           params.bctola,params.bctolb,
                           result,
                           resultMax);
-
+    /*
+     * The format of result is as follows:
+     * Euler1
+     * Euler2
+     * Euler3
+     * FractionOverlap
+     * Tiltx
+     * Tilty
+     * Tiltz
+     * Lsd0
+     * Lsd1 .. till nLayers
+     * Ybc0
+     * Ybc1 .. till nLayers
+     * Zbc0
+     * Zbc1 .. till nLayers
+     */
     // Free memory
     FreeMemMatrix(SpotsMat,TotalDiffrSpots);
     FreeMemMatrixInt(NrSpots,NrOrientations);

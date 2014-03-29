@@ -298,17 +298,26 @@ optimizeOrientation(double *OrientMatrixRow,
                  XG,YG,TiltsOrig,OmegaStart,OmegaStep,px,ybc,zbc,gs,RingNumbers,OmegaRanges,NoOfOmegaRanges,
                  BoxSizes,P0,NrPixelsGrid,ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,&EulerOutC,&FracOut,
                  LsdFit,TiltsFit,BCsFit,lsdtol,lsdtolrel,tiltstol,bctola,bctolb);
-  if ((1-FracOut)>BestFrac){
-    BestFrac = 1-FracOut;
-    printf("\nBest fraction: %f.\n",BestFrac);
-    printf("Euler angles: %f %f %f, ConfidenceIndex: %f\nTilts: %f %f %f\n",
-		EulerOutA, EulerOutB, EulerOutC, 1-FracOut,TiltsFit[0], TiltsFit[1],
-		TiltsFit[2]);
-	for (int j=0;j<nLayers;j++){
-		printf("Layer Nr: %d, Lsd: %f, BCs: %f %f\n", j,LsdFit[j],BCsFit[j][0],BCsFit[j][1]);
-	}
+  BestFrac = 1-FracOut;
+  // This
+  printf("\nBest fraction: %f.\n",BestFrac);
+  printf("Euler angles: %f %f %f, ConfidenceIndex: %f\nTilts: %f %f %f\n",
+  	EulerOutA, EulerOutB, EulerOutC, 1-FracOut,TiltsFit[0], TiltsFit[1],
+	TiltsFit[2]);
+  for (int j=0;j<nLayers;j++){
+	printf("Layer Nr: %d, Lsd: %f, BCs: %f %f\n", j,LsdFit[j],BCsFit[j][0],BCsFit[j][1]);
   }
+  // till here can be commented out if needed.
   output[0] = EulerOutA;
   output[1] = EulerOutB;
   output[2] = EulerOutC;
+  output[3] = BestFrac;
+  output[4] = TiltsFit[0];
+  output[5] = TiltsFit[1];
+  output[6] = TiltsFit[2];
+  for (int j=0;j<nLayers;j++){
+	output[7+j] = LsdFit[j];
+	output[7+j+nLayers] = BCsFit[j][0];
+	output[7+j+(nLayers*2)] = BCsFit[j][1];
+  }
 }

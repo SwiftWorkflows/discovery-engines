@@ -209,7 +209,7 @@ FitOrientation(
     *EulerOutC = x[2];
 }
 
-int FitOrientationAll(const char *ParamFN, int rown)
+int FitOrientationAll(const char *ParamFN, int rown, double result[4])
 {
     printf("FitOrientationAll(%s,%i)...\n", ParamFN, rown);
     struct parameters params;
@@ -327,7 +327,7 @@ int FitOrientationAll(const char *ParamFN, int rown)
                          /*18*/params.ybc, params.zbc, ObsSpotsInfo, params.minFracOverlap,
                          /*22*/params.LatticeConstant, params.Wavelength, params.nRings, params.ExcludePoleAngle,
                          /*26*/params.RingNumbers, params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
-                         params.tol, TotalDiffrSpots, xs, ys);
+                         params.tol, TotalDiffrSpots, xs, ys, result);
 
        assert(rc == 1);
        return 1;
@@ -341,7 +341,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        double LatticeConstant, int Wavelength, int nRings, double ExcludePoleAngle,
                        int *RingNumbers, double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
                        double BoxSizes[MAX_N_OMEGA_RANGES][4],
-                       double tol, int TotalDiffrSpots, double xs, double ys)
+                       double tol, int TotalDiffrSpots, double xs, double ys, double result[4])
 {
    // Go through each orientation and compare with observed spots.
     clock_t startthis2;
@@ -442,5 +442,10 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     //printf("Time elapsed in comparing diffraction spots: %f [s]\n",diftotal);
     printf("%d %d %f %f %f %f %f %f %f\n",rown, OrientationGoodID, diftotal,
            xs, ys, BestEuler[0],BestEuler[1],BestEuler[2],BestFrac);
+           
+    result[0] = BestEuler[0];
+    result[1] = BestEuler[1];
+    result[2] = BestEuler[2];
+    result[3] = BestFrac;
     return 1;
 }

@@ -13,7 +13,7 @@
 /**
    @return 1 on success, 0 on failure
  */
-int FitOrientationAll(const char *ParameterFileName, int rown);
+int FitOrientationAll(const char *ParameterFileName, int rown, double result[4]);
 
 int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, double tz,
                        int nLayers, double *Lsd, double **XY, int NrOrientations,
@@ -23,6 +23,6 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        double LatticeConstant, int Wavelength, int nRings, double ExcludePoleAngle,
                        int *RingNumbers, double OmegaRanges[MAX_N_OMEGA_RANGES][2],
                        int NoOfOmegaRanges, double BoxSizes[MAX_N_OMEGA_RANGES][4],
-                       double tol, int TotalDiffrSpots, double xs, double ys);
+                       double tol, int TotalDiffrSpots, double xs, double ys, double result[4]);
 
 #endif

@@ -45,9 +45,9 @@ main(int argc, char *argv[])
     ParamFN = argv[1];
     //Read position.
     int rown=atoi(argv[2]);
+	double result[4];
 
-
-    FitOrientationAll(ParamFN, rown);
+    FitOrientationAll(ParamFN, rown, result);
 
     return 0;
 }
