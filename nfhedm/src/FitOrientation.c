@@ -240,7 +240,7 @@ int FitOrientationAll(const char *ParamFN, int rown, double result[4])
            printf("Could not allocate ObsSpotsInfo.\n");
            return 0;
        }
-       ReadCode = ReadBinFiles(params.fn,params.ext,params.StartNr,params.EndNr,ObsSpotsInfo,
+       ReadCode = ReadBinFiles(fn,params.ext,params.StartNr,params.EndNr,ObsSpotsInfo,
                             params.nLayers,SizeObsSpots);
        if (ReadCode == 0){
            printf("Reading bin files did not go well. Please check.\n");
