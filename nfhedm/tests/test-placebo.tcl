@@ -1,7 +1,7 @@
 
 lappend auto_path $env(PWD)
 
-package require tclfop
+package require tclnfhedm
 
 tclfop::fop_sanity
 

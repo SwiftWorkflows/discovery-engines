@@ -225,6 +225,7 @@ int FitOrientationAll(const char *ParamFN, int rown, double result[4])
        sprintf(fnKey,"%s/Key.txt",params.direct);
        sprintf(fnOr,"%s/OrientMat.txt",params.direct);
        sprintf(fn,"%s/%s",params.direct,params.fn);
+       printf("fn: %s\n", fn);
        int i,nrFiles,nrPixels;
        int *ObsSpotsInfo;
        int ReadCode;
