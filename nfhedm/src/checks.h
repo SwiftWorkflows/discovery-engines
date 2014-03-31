@@ -18,4 +18,11 @@ static void file_not_found(const char* filename)
     exit(EXIT_FAILURE);
 }
 
+static void file_not_writable(const char* filename)
+{
+    printf("Could not write to file: %s\n", filename);
+    fflush(NULL);
+    exit(EXIT_FAILURE);
+}
+
 #endif

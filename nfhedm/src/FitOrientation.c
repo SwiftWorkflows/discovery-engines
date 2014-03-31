@@ -1,10 +1,17 @@
 
 #include <assert.h>
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 #include <nlopt.h>
 
@@ -209,11 +216,30 @@ FitOrientation(
     *EulerOutC = x[2];
 }
 
-int FitOrientationAll(const char *ParamFN, int rown, double result[4])
+static bool fit_orientation_initialized = false;
+static int result_fd = -1;
+
+static inline void
+Init_FitOrientation(const char *params_direct)
+{
+    if (fit_orientation_initialized)
+        return;
+    printf("Init_FitOrientation\n");
+    char result_filename[1024];
+    sprintf(result_filename, "%s/%s", params_direct, "microstructure.mic");
+    result_fd = open(result_filename, O_WRONLY);
+    if (result_fd <= 0) file_not_writable(result_filename);
+    fit_orientation_initialized = true;
+}
+
+int FitOrientationAll(const char *ParamFN, int rown)
 {
     printf("FitOrientationAll(%s,%i)...\n", ParamFN, rown);
+
     struct parameters params;
     parameters_read(ParamFN, &params);
+
+    Init_FitOrientation(params.direct);
 
        //Read bin files
        char fnG[1000], fn[1000];
@@ -225,7 +251,6 @@ int FitOrientationAll(const char *ParamFN, int rown, double result[4])
        sprintf(fnKey,"%s/Key.txt",params.direct);
        sprintf(fnOr,"%s/OrientMat.txt",params.direct);
        sprintf(fn,"%s/%s",params.direct,params.fn);
-       printf("fn: %s\n", fn);
        int i,nrFiles,nrPixels;
        int *ObsSpotsInfo;
        int ReadCode;
@@ -328,11 +353,17 @@ int FitOrientationAll(const char *ParamFN, int rown, double result[4])
                          /*18*/params.ybc, params.zbc, ObsSpotsInfo, params.minFracOverlap,
                          /*22*/params.LatticeConstant, params.Wavelength, params.nRings, params.ExcludePoleAngle,
                          /*26*/params.RingNumbers, params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
-                         params.tol, TotalDiffrSpots, xs, ys, result);
+                         params.tol, TotalDiffrSpots, xs, ys);
 
        assert(rc == 1);
        return 1;
 }
+
+struct output_result
+{
+    double rown;
+    double best[4];
+};
 
 int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, double tz,
                        int nLayers, double *Lsd, double **XY, int NrOrientations,
@@ -342,7 +373,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        double LatticeConstant, int Wavelength, int nRings, double ExcludePoleAngle,
                        int *RingNumbers, double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
                        double BoxSizes[MAX_N_OMEGA_RANGES][4],
-                       double tol, int TotalDiffrSpots, double xs, double ys, double result[4])
+                       double tol, int TotalDiffrSpots, double xs, double ys)
 {
    // Go through each orientation and compare with observed spots.
     clock_t startthis2;
@@ -443,10 +474,18 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     //printf("Time elapsed in comparing diffraction spots: %f [s]\n",diftotal);
     printf("%d %d %f %f %f %f %f %f %f\n",rown, OrientationGoodID, diftotal,
            xs, ys, BestEuler[0],BestEuler[1],BestEuler[2],BestFrac);
-           
-    result[0] = BestEuler[0];
-    result[1] = BestEuler[1];
-    result[2] = BestEuler[2];
-    result[3] = BestFrac;
+    double result[5];
+    result[0] = (double) rown;
+    result[1] = BestEuler[0];
+    result[2] = BestEuler[1];
+    result[3] = BestEuler[2];
+    result[4] = BestFrac;
+    // fwrite(result, sizeof(double), 5, result_fd);
+    int rc = pwrite(result_fd, result, 5*sizeof(double), (rown-1)*5*sizeof(double));
+    if (rc < 0)
+    {
+        perror("result data file");
+        exit(EXIT_FAILURE);
+    }
     return 1;
 }
