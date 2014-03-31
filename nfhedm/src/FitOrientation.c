@@ -427,12 +427,12 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                 printf("No good ID found.\n");
         }
     // Free memory
-    FreeMemMatrix(SpotsMat,TotalDiffrSpots);
-    FreeMemMatrixInt(NrSpots,NrOrientations);
-    free(ObsSpotsInfo);
-    FreeMemMatrix(XY,3);
-    FreeMemMatrix(OrientationMatrix,NrOrientations);
-    FreeMemMatrix(OrientMatrix,MAX_POINTS_GRID_GOOD);
+    //FreeMemMatrix(SpotsMat,TotalDiffrSpots);
+    //FreeMemMatrixInt(NrSpots,NrOrientations);
+    //free(ObsSpotsInfo);
+    //FreeMemMatrix(XY,3);
+    //FreeMemMatrix(OrientationMatrix,NrOrientations);
+    //FreeMemMatrix(OrientMatrix,MAX_POINTS_GRID_GOOD);
     clock_t end = clock();
     //diftotal = ((double)(startthis-start))/CLOCKS_PER_SEC;
     //printf("Time elapsed in reading bin files: %f [s]\n",diftotal);
