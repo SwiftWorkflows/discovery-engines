@@ -30,7 +30,7 @@ LIBTCLNFHEDM = lib/libtclnfhedm.so
 INSTALL_PREFIX = @prefix@
 INSTALL_BIN    = $(INSTALL_PREFIX)/bin
 INSTALL_LIB    = $(INSTALL_PREFIX)/lib
-INSTALL_TCL    = $(INSTALL_PREFIX)/tcl
+INSTALL_SWIFT  = $(INSTALL_PREFIX)/swift
 INSTALL_TESTS  = $(INSTALL_PREFIX)/tests
 
 RPATHS = @RPATHS@ \
@@ -107,7 +107,7 @@ src/nfhedm_wrap.c: src/nfhedm.i
 
 pkgIndex.tcl: $(LIBTCLNFHEDM) make-package.tcl
 	LEAF_PKG=tclnfhedm LEAF_VERSION=0.0  \
-	LEAF_SO=$(<) LEAF_TCL=tcl/nfhedm.tcl \
+	LEAF_SO=libtclnfhedm.so LEAF_TCL=nfhedm.tcl \
 	$(TCLSH) make-package.tcl > $(@)
 
 TESTS = tests/test-placebo.x
@@ -125,6 +125,7 @@ clean:
 	rm -fv src/*.o
 	rm -fv src/nfhedm_wrap.c
 	rm -fv lib/libtclnfhedm.so lib/libnfhedm.so
+	rm -fv pkgIndex.tcl
 	rm -fv $(TESTS)
 	@echo
 
@@ -133,19 +134,24 @@ install: install-libs install-bin install-tcl
 
 install-bin:
 	@mkdir -pv $(INSTALL_BIN)
-	cp -uv bin/* $(INSTALL_BIN)
+	cp -uv bin/* -t $(INSTALL_BIN)
 
 install-libs:
 	@mkdir -pv $(INSTALL_LIB)
 	cp -uv lib/*.so $(INSTALL_LIB)
 
-install-tcl:
-	@mkdir -pv $(INSTALL_TCL)
+install-tcl: install-libs
 	cp -uv pkgIndex.tcl $(INSTALL_LIB)
-	cp -uv tcl/*.tcl $(INSTALL_TCL)
+	cp -uv tcl/*.tcl $(INSTALL_LIB)
 
-install-tests:
+install-tests: install
 	mkdir -pv $(INSTALL_TESTS)
 	cp -uv tests/* $(INSTALL_TESTS)
 
-.PHONY: sanity clean all
+install-swift: install-libs install-tcl
+	mkdir -pv $(INSTALL_SWIFT)
+	cp -uv swift/* $(INSTALL_SWIFT)
+
+.PHONY: sanity clean all                        \
+   install install-bin install-libs install-tcl \
+   install-test install-swift

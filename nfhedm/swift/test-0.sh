@@ -2,10 +2,8 @@
 
 set -e
 
-stc swift/test-0.swift
+DIR=$( cd $(dirname $0) ; /bin/pwd )
 
-turbine swift/test-0.tcl -a Params.txt ANYTHING
+stc ${DIR}/test-0.swift
 
-
-
-
+turbine ${DIR}/test-0.tcl -a Params.txt ANYTHING
