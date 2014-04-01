@@ -12,7 +12,10 @@ PARAMETERS=$1
 
 NFHEDM_HOME=$( cd $(dirname $0)/.. ; /bin/pwd )
 
-cd ${NFHEDM_HOME}/data
+# DATA=${NFHEDM_HOME}/data
+DATA=${HOME}/wozniak/data
 
-pwd 
-${VALGRIND} ../bin/fo-nlopt ${PARAMETERS} 135
+cd ${DATA}
+
+echo "PWD: $(pwd)"
+${VALGRIND} ${NFHEDM_HOME}/bin/fo-nlopt ${PARAMETERS} 135

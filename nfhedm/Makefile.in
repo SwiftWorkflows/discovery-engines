@@ -12,9 +12,6 @@ LIBDIRS += -L $(NLOPT)/lib
 
 LIBS += $(LIBDIRS) -lnlopt -lm
 
-RPATHS = @RPATHS@ \
-         -Wl,-rpath -Wl,$(PWD)/lib
-
 TCLSH = @USE_TCLSH@
 
 EXECUTABLES = bin/fop-nlopt bin/fo-nlopt \
@@ -29,6 +26,15 @@ bin:
 
 LIBNFHEDM = lib/libnfhedm.so
 LIBTCLNFHEDM = lib/libtclnfhedm.so
+
+INSTALL_PREFIX = @prefix@
+INSTALL_BIN    = $(INSTALL_PREFIX)/bin
+INSTALL_LIB    = $(INSTALL_PREFIX)/lib
+INSTALL_TCL    = $(INSTALL_PREFIX)/tcl
+INSTALL_TESTS  = $(INSTALL_PREFIX)/tests
+
+RPATHS = @RPATHS@ \
+         -Wl,-rpath -Wl,$(INSTALL_PREFIX)/lib
 
 lib: $(LIBNFHEDM)
 
@@ -121,5 +127,25 @@ clean:
 	rm -fv lib/libtclnfhedm.so lib/libnfhedm.so
 	rm -fv $(TESTS)
 	@echo
+
+install: install-libs install-bin install-tcl
+	@echo $(INSTALL_PREFIX) > install.txt
+
+install-bin:
+	@mkdir -pv $(INSTALL_BIN)
+	cp -uv bin/* $(INSTALL_BIN)
+
+install-libs:
+	@mkdir -pv $(INSTALL_LIB)
+	cp -uv lib/*.so $(INSTALL_LIB)
+
+install-tcl:
+	@mkdir -pv $(INSTALL_TCL)
+	cp -uv pkgIndex.tcl $(INSTALL_LIB)
+	cp -uv tcl/*.tcl $(INSTALL_TCL)
+
+install-tests:
+	mkdir -pv $(INSTALL_TESTS)
+	cp -uv tests/* $(INSTALL_TESTS)
 
 .PHONY: sanity clean all
