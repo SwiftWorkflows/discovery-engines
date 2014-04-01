@@ -226,8 +226,10 @@ Init_FitOrientation(const char *params_direct)
         return;
     printf("Init_FitOrientation\n");
     char result_filename[1024];
-    sprintf(result_filename, "%s/%s", params_direct, "microstructure.mic");
-    result_fd = open(result_filename, O_WRONLY);
+    sprintf(result_filename, "%s/%s",
+                             params_direct, "microstructure.mic");
+    result_fd = open(result_filename, O_CREAT|O_WRONLY,
+                                      S_IRUSR|S_IWUSR);
     if (result_fd <= 0) file_not_writable(result_filename);
     fit_orientation_initialized = true;
 }
