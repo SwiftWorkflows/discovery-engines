@@ -96,6 +96,7 @@ $(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS)
 		$(RPATH_NLOPT)
 
 $(LIBTCLNFHEDM): sanity src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
+	@mkdir -pv lib
 	gcc -shared -o $(@)         \
 		src/nfhedm_wrap.o  \
 		$(NFHEDM_NLOPT_OBJS)   \
@@ -133,8 +134,10 @@ install: install-libs install-bin install-tcl
 	@echo $(INSTALL_PREFIX) > install.txt
 
 install-bin:
-	@mkdir -pv $(INSTALL_BIN)
-	cp -uv bin/* -t $(INSTALL_BIN)
+	@mkdir -pv bin $(INSTALL_BIN)
+	@if [[ `ls bin` != "" ]] ;          \
+        then cp -uv bin/* -t $(INSTALL_BIN) ; \
+        else : ; fi
 
 install-libs:
 	@mkdir -pv $(INSTALL_LIB)
