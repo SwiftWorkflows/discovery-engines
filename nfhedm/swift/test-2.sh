@@ -4,7 +4,7 @@ set -e
 
 if [[ ${#*} != 3 ]]
 then
-  echo "Not given: PARAMETERS"
+  echo "usage: test-2 <PARAMETERS FILE> <START ROWN> <END ROWN>"
   exit 1
 fi
 
