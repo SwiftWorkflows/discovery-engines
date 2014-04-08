@@ -7,6 +7,13 @@ lsmo39_160k # no darkbeg
 lsmo39_180k # no darkbeg
 lsmo39_200k # no darkbeg
 lsmo39_220k # no darkbeg
+lsmo42_140k # ***
 lsmo42_400k # no sbscan, sfscan, fb2scan
+lsmo56_175k # ***
 
+
+
+# *** File "/gpfs/mira-home/wozniak/proj/d-e/bin/merge-tiffs.py", line 129, in write_data
+# *** d = A - bkgd
+# *** [9] ValueError: [9] operands could not be broadcast together with shapes (29,2048,2048) (3,2048,2048)
 
