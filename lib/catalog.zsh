@@ -1,5 +1,5 @@
 
-alias catalog='python ~/.local/lib/python2.6/site-packages/globusonline/catalog/client/examples/catalog.py -default_catalog'
+alias catalog='catalog.py'
 
 id-column()
 {
