@@ -1,26 +1,25 @@
 #!/bin/zsh -eu
 
-if [[ -z ${DEFAULT_CATALOG_ID} ]]
+if [[ -z ${GCAT_DEFAULT_CATALOG_ID} ]]
 then
-  print "Set DEFAULT_CATALOG_ID"
+  print "Set GCAT_DEFAULT_CATALOG_ID"
   exit 1
 fi
 
 usage()
 {
-  print "usage: catalog-tag-dataset.zsh <ENDPOINT> <DIRECTORY>"
+  print "usage: catalog-tag-dataset.zsh <DIRECTORY>"
 }
 
-if [[ ${#*} != 2 ]]
+if [[ ${#*} != 1 ]]
 then
   usage
   exit 1
 fi
 
-ENDPOINT=$1
-DIR=$2
+DIR=$1
 
-DE_HOME=$( cd $( dirname $0 )/.. && /bin/pwd )
+DE_HOME=$( cd $( dirname $0 )/../.. && /bin/pwd )
 if [[ ${?} != 0 || ${DE_HOME} == "" ]]
 then
   print "Could not find DE_HOME!"
@@ -34,8 +33,6 @@ then
   exit 1
 fi
 
-source ${DE_HOME}/lib/catalog.zsh
-
 cd ${DIR}
 
 # Get absolute path
@@ -43,9 +40,9 @@ DIR=$( /bin/pwd )
 
 NAME=$( basename ${DIR} )
 
-declare ENDPOINT NAME
+declare NAME
 
-DATASET_ID=$( catalog-create-dataset ${NAME} )
+DATASET_ID=$( catalog.py create_dataset ${NAME} )
 
 declare DATASET_ID
 
