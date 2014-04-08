@@ -259,4 +259,4 @@ if __name__=="__main__":
             with file(nxs_complete, 'w'):
                 nxs_msg("COMPLETE: " + nxs_complete)
 
-        report_profiles()
+        # report_profiles()
