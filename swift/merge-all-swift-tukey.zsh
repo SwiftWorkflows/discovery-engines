@@ -36,5 +36,15 @@ stc -u ${DE_SWIFT}/merge-all.swift
 cd ${DATA}
 cd -
 
+typeset -T LD_LIBRARY_PATH ld_library_path
+export LD_LIBRARY_PATH
+ld_library_path=( /soft/compilers/gcc/4.8.1/lib
+  /gpfs/mira-fs0/software/x86_64/compilers/gcc/4.8.1/lib64 )
+
+typeset LD_LIBRARY_PATH
+
+set -x
+
 turbine-cobalt-run.zsh -t 12:00:00 -n ${PROCS} -C ${DATA} \
+  -e LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
   ${DE_SWIFT}/merge-all.tcl --data=${DATA} --list=${LIST}
