@@ -9,6 +9,8 @@ config.h.in
 config.cache
 config.log
 config.status
+config.status.out
 configure
 configure.out
+install.txt
 .settings
