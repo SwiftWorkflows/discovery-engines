@@ -12,7 +12,7 @@ PARAMETERS=$1
 START=$2
 END=$3
 
-stc swift/test-2.swift
+stc -r ${PWD} swift/test-2.swift
 
 # export TURBINE_USER_LIB=${PWD}
 
@@ -33,5 +33,4 @@ export MODE=cluster
 export PROJECT=ExM
 export QUEUE=pubnet
 turbine-cobalt-run.zsh -n 3 ${NFHEDM_HOME}/swift/test-2.tcl \
- -e TURBINE_USER_LIB=${PWD} \
  -p=${PARAMETERS} ${START} ${END}
