@@ -31,7 +31,7 @@ KEYS=( "host" "path" "size" "year" "month" "temperature" "sample" \
 for KEY in ${KEYS}
 do
   # This fails if the annotation exists
-  catalog.py create_annotation_def ${DEFAULT_CATALOG_ID} ${KEY} "text" || true
+  catalog.py create_annotation_def ${KEY} "text" || true
 done
 
 CATALOG_TAG=${DE_HOME}/nexus/bin/catalog-tag-dataset.zsh
