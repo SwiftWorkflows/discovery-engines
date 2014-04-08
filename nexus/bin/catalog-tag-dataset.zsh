@@ -53,14 +53,14 @@ declare DATE TEMPERATURE
 print "Getting size..."
 SIZE=$( du -s . | zclm 1 )
 
-catalog-annotate-dataset ${DATASET_ID} "name" ${NAME}
-catalog-annotate-dataset ${DATASET_ID} "host" "mira"
-catalog-annotate-dataset ${DATASET_ID} "path" ${DIR}
-catalog-annotate-dataset ${DATASET_ID} "date" ${DATE}
-catalog-annotate-dataset ${DATASET_ID} "temperature" ${TEMPERATURE}
-catalog-annotate-dataset ${DATASET_ID} "sample" "LSMO"
-catalog-annotate-dataset ${DATASET_ID} "PI" "Ray Osborn"
-catalog-annotate-dataset ${DATASET_ID} "beamline" "ANL APS Sector 6"
-catalog-annotate-dataset ${DATASET_ID} "size" ${SIZE}
+catalog-annotate-dataset ${DATASET_ID} name:${NAME}
+catalog-annotate-dataset ${DATASET_ID} host:mira
+catalog-annotate-dataset ${DATASET_ID} path:${DIR}
+catalog-annotate-dataset ${DATASET_ID} date:${DATE}
+catalog-annotate-dataset ${DATASET_ID} temperature:${TEMPERATURE}
+catalog-annotate-dataset ${DATASET_ID} sample:LSMO
+catalog-annotate-dataset ${DATASET_ID} PI:"Ray Osborn"
+catalog-annotate-dataset ${DATASET_ID} beamline:"ANL APS Sector 6"
+catalog-annotate-dataset ${DATASET_ID} size:${SIZE}
 
 catalog-acl-add ${DATASET_ID} "*" "r"
