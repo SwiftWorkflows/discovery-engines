@@ -2,9 +2,10 @@
 
 # Simple workaround to accept/ignore background TIF
 
-DE_BIN=$( cd $( dirname $0 ) ; /bin/pwd )
+DE=$( cd $( dirname $0 )/.. ; /bin/pwd )
+source ${DE}/bin/python-settings.sh
 
-MERGE_TIFFS_PY=${DE_BIN}/merge-tiffs.py
+MERGE_TIFFS_PY=${DE}/bin/merge-tiffs.py
 
 # Drop background TIF: its location is implied
 shift
@@ -17,9 +18,8 @@ echo "CODE: ${CODE}"
 if [[ ${CODE} != 0 ]]
 then
   echo "NEXUS_ERROR: command failed: $0 $*"
+  exit 1
 fi
 
 # Let Swift continue...
 exit 0
-
-
