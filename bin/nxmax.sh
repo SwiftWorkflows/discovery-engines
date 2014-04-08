@@ -9,6 +9,9 @@ then
   exit 1
 fi
 
+DE=$( cd $( dirname $0 )/.. ; /bin/pwd )
+source ${DE}/bin/python-settings.sh
+
 DIRECTORY=$1
 NXS=$2
 NXMAX_OUT=$3
@@ -20,11 +23,10 @@ then
   exit 0
 fi
 
-DE_BIN=$( cd $( dirname $0 ) ; /bin/pwd )
+# Find nxmax in PATH
+NXMAX=nxmax
 
-NXMAX=${HOME}/.local/bin/nxmax
-
-${NXMAX} -d ${DIRECTORY} -f ${NXS} > ${NXMAX_OUT} 2>&1
+${NXMAX} -d ${DIRECTORY} -f ${NXS} | tee ${NXMAX_OUT}
 CODE=${?}
 
 echo "CODE: ${CODE}" >> ${NXMAX_OUT}
@@ -32,9 +34,12 @@ echo "CODE: ${CODE}" >> ${NXMAX_OUT}
 if [[ ${CODE} != 0 ]]
 then
   echo "nxmax.sh: command failed: $0 ${*}"
+  exit 1
 else
   touch ${NXMAX_COMPLETE}
 fi
+
+echo NXMAX DONE: $( date "+%m/%d/%Y %I:%M:%S%p" )
 
 # Let Swift continue...
 exit 0

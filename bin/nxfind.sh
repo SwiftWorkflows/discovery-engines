@@ -1,17 +1,18 @@
 #!/bin/sh -eu
 
 # NXFIND.SH
-# args: <directory> <nxs> <nxfind.out>
+# args: <directory> <nxs> <nxmax.out> <nxfind.out>
 
-if [[ ${#*} != 3 ]]
+if [[ ${#*} != 4 ]]
 then
-  echo "nxfind.sh: requires 3 args!"
+  echo "nxfind.sh: requires 4 args!"
   exit 1
 fi
 
 DIRECTORY=$1
 NXS=$2
-NXFIND_OUT=$3
+NXMAX_OUT=$3 # This is not read - just for synchronization
+NXFIND_OUT=$4
 
 NXFIND_COMPLETE=${NXFIND_OUT}.complete
 if [[ -f ${NXFIND_COMPLETE} ]]
@@ -20,18 +21,22 @@ then
   exit 0
 fi
 
-DE_BIN=$( cd $( dirname $0 ) ; /bin/pwd )
+DE=$( cd $( dirname $0 )/.. ; /bin/pwd )
+source ${DE}/bin/python-settings.sh
 
-NXFIND=${HOME}/.local/bin/nxfind
+# Use nxfind in PATH
+NXFIND=nxfind
 
-${NXFIND} -d ${DIRECTORY} -f ${NXS} > ${NXFIND_OUT} 2>&1
+NXS_FILE=$( basename ${NXS} )
+${NXFIND} -d ${DIRECTORY} -f ${NXS_FILE} 2>&1 | tee ${NXFIND_OUT} 
 CODE=${?}
 
-echo "CODE: ${CODE}" >> ${NXFIND_OUT}
+echo "CODE: ${CODE}" | tee -a ${NXFIND_OUT}
 
 if [[ ${CODE} != 0 ]]
 then
   echo "nxfind.sh: command failed: $0 ${*}"
+  exit ${CODE}
 else
   touch ${NXFIND_COMPLETE}
 fi
