@@ -9,7 +9,7 @@ then
   exit 1
 fi
 
-DE=$( cd $( dirname $0 )/.. ; /bin/pwd )
+DE=$( cd $( dirname $0 )/../.. ; /bin/pwd )
 source ${DE}/bin/python-settings.sh
 
 DIRECTORY=$1

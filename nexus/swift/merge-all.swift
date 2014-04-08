@@ -13,25 +13,25 @@ import sys;
 app (file background) merge_tiffs_background(string directory,
                                              string arguments[])
 {
-  "/home/wozniak/proj/d-e/bin/merge-tiffs.sh" background
+  "/home/wozniak/proj/d-e/nexus/bin/merge-tiffs.sh" background
     "-d" directory arguments;
 }
 
 app (file nxs) merge_tiffs(string directory, file background,
                            string arguments[])
 {
-  "/home/wozniak/proj/d-e/bin/merge-tiffs.sh" background
+  "/home/wozniak/proj/d-e/nexus/bin/merge-tiffs.sh" background
     "-d" directory arguments;
 }
 
 app (file nxmax_out) nxmax(string directory, file nxs)
 {
-  "/home/wozniak/proj/d-e/bin/nxmax.sh" directory nxs nxmax_out;
+  "/home/wozniak/proj/d-e/nexus/bin/nxmax.sh" directory nxs nxmax_out;
 }
 
 app (file nxfind_out) nxfind(string directory, file nxs, file nxmax_out)
 {
-  "/home/wozniak/proj/d-e/bin/nxfind.sh" directory nxs nxmax_out nxfind_out;
+  "/home/wozniak/proj/d-e/nexus/bin/nxfind.sh" directory nxs nxmax_out nxfind_out;
 }
 
 main

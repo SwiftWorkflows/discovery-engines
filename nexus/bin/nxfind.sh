@@ -21,14 +21,14 @@ then
   exit 0
 fi
 
-DE=$( cd $( dirname $0 )/.. ; /bin/pwd )
+DE=$( cd $( dirname $0 )/../.. ; /bin/pwd )
 source ${DE}/bin/python-settings.sh
 
 # Use nxfind in PATH
 NXFIND=nxfind
 
 NXS_FILE=$( basename ${NXS} )
-${NXFIND} -d ${DIRECTORY} -f ${NXS_FILE} 2>&1 | tee ${NXFIND_OUT} 
+${NXFIND} -d ${DIRECTORY} -f ${NXS_FILE} 2>&1 | tee ${NXFIND_OUT}
 CODE=${?}
 
 echo "CODE: ${CODE}" | tee -a ${NXFIND_OUT}
