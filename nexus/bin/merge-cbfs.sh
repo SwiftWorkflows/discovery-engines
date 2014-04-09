@@ -9,7 +9,7 @@ pwd
 DE=$( cd $( dirname $0 )/../.. ; /bin/pwd )
 source ${DE}/bin/python-settings.sh
 
-MERGE_TIFFS_PY=${DE}/nexus/bin/merge-tiffs.py
+MERGE_TIFFS_PY=${DE}/nexus/bin/merge-cbfs.py
 
 # Drop background TIF: its location is implied
 shift
