@@ -42,7 +42,7 @@ NAME=$( basename ${DIR} )
 
 declare NAME
 
-DATASET_ID=$( catalog.py create_dataset ${NAME} )
+DATASET_ID=$( catalog.py create_dataset name:${NAME} )
 
 declare DATASET_ID
 
@@ -53,14 +53,14 @@ declare DATE TEMPERATURE
 print "Getting size..."
 SIZE=$( du -s . | zclm 1 )
 
-catalog-annotate-dataset ${DATASET_ID} name:${NAME}
-catalog-annotate-dataset ${DATASET_ID} host:mira
-catalog-annotate-dataset ${DATASET_ID} path:${DIR}
-catalog-annotate-dataset ${DATASET_ID} date:${DATE}
-catalog-annotate-dataset ${DATASET_ID} temperature:${TEMPERATURE}
-catalog-annotate-dataset ${DATASET_ID} sample:LSMO
-catalog-annotate-dataset ${DATASET_ID} PI:"Ray Osborn"
-catalog-annotate-dataset ${DATASET_ID} beamline:"ANL APS Sector 6"
-catalog-annotate-dataset ${DATASET_ID} size:${SIZE}
+catalog.py -t add_dataset_annotation ${DATASET_ID} name:${NAME}
+catalog.py -t add_dataset_annotation ${DATASET_ID} host:mira
+catalog.py -t add_dataset_annotation ${DATASET_ID} path:${DIR}
+catalog.py -t add_dataset_annotation ${DATASET_ID} date:${DATE}
+catalog.py -t add_dataset_annotation ${DATASET_ID} temperature:${TEMPERATURE}
+catalog.py -t add_dataset_annotation ${DATASET_ID} sample:LSMO
+catalog.py -t add_dataset_annotation ${DATASET_ID} PI:"Ray Osborn"
+catalog.py -t add_dataset_annotation ${DATASET_ID} beamline:"ANL APS Sector 6"
+catalog.py -t add_dataset_annotation ${DATASET_ID} size:${SIZE}
 
-catalog-acl-add ${DATASET_ID} "*" "r"
+# catalog-acl-add ${DATASET_ID} "*" "r"
