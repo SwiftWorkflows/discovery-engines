@@ -7,6 +7,8 @@ export PROJECT="ExM"
 export QUEUE="default"
 export ADLB_PRINT_TIME=1
 
+GCAT_DEFAULT_CATALOG_ID=71
+
 usage()
 {
   print "merge-all-swift-tukey.zsh <PROCS> <DATA> <LIST>"
@@ -47,4 +49,5 @@ set -x
 
 turbine-cobalt-run.zsh -t 12:00:00 -n ${PROCS} -C ${DATA} \
   -e LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
+  -e GCAT_DEFAULT_CATALOG_ID=${GCAT_DEFAULT_CATALOG_ID} \
   ${DE_SWIFT}/merge-all.tcl --data=${DATA} --list=${LIST}
