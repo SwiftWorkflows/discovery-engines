@@ -1,5 +1,6 @@
 .gitignore
-Archive.zip # Original bulk test data
+# Original bulk test data
+Archive.zip
 bin
 data
 lib
