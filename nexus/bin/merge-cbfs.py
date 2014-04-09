@@ -10,7 +10,7 @@
 import os, getopt, glob, re, sys, timeit
 import numpy as np
 from ConfigParser import ConfigParser
-from api.nexus import *
+from nexpy.api.nexus import *
 import pycbf
 
 def get_prefixes(directory):
@@ -124,7 +124,7 @@ def write_metadata(root, directory, prefix):
 
 def natural_sort(key):
     import re
-    return [int(t) if t.isdigit() else t for t in re.split(r'(\d+)', key)]    
+    return [int(t) if t.isdigit() else t for t in re.split(r'(\d+)', key)]
 
 
 def main():
@@ -172,7 +172,7 @@ def main():
     for prefix in prefixes:
         tic=timeit.default_timer()
         data_files = get_files(directory, prefix, extension, reverse)
-        root = initialize_nexus_file(directory, prefix, data_files, omega, step)       
+        root = initialize_nexus_file(directory, prefix, data_files, omega, step)
         if prefix == background:
             write_data(root, data_files)
             bkgd_root = root
@@ -182,8 +182,9 @@ def main():
             write_data(root, data_files)
         write_metadata(root, directory, prefix)
         toc=timeit.default_timer()
-        print toc-tic, 'seconds for', '%s.nxs' % prefix 
+        print toc-tic, 'seconds for', '%s.nxs' % prefix
 
 
 if __name__=="__main__":
     main()
+    print "main done"
