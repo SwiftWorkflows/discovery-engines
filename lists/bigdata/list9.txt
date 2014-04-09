@@ -1,0 +1,7 @@
+lsmo48_200k
+lsmo48_225k
+lsmo48_250k
+lsmo48_300k
+lsmo48_325k
+lsmo48_350k
+lsmo48_400k

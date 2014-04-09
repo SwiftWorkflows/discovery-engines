@@ -1,0 +1,16 @@
+lsmo50_090k
+lsmo50_125k
+lsmo50_150k
+lsmo50_160k
+lsmo50_170k
+lsmo50_180k
+lsmo50_190k
+lsmo50_200k
+lsmo50_210k
+lsmo50_220k
+lsmo50_230k
+lsmo50_250k
+lsmo50_275k
+lsmo50_300k
+lsmo50_350k
+lsmo50_400k
