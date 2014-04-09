@@ -1,4 +1,5 @@
 .gitignore
+Archive.zip # Original bulk test data
 bin
 data
 lib
