@@ -5,8 +5,8 @@ LOG=~wozniak/proj/d-e/logs/go-sync3.log
 
 mkdir -p $( dirname ${LOG} )
 
-SITE1="wozniak#aps-detector:/~/G/bigdata"
-SITE2="alcf#dtn_mira:/projects/ExM/DE"
+SITE1="wozniak#s11pilatus:/~/sharedbigdata/data1/osborn-2014-1"
+SITE2="alcf#dtn_mira:/~/DE/2014-04"
 
 GO_USER="wozniak"
 GO=cli.globusonline.org
