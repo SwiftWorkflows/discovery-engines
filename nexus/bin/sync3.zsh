@@ -1,9 +1,10 @@
 #!/bin/zsh -eu
 
-LOG=~wozniak/proj/d-e/logs/sync3.log
+LOGDIR=${HOME}/proj/d-e/logs
+LOG=${LOGDIR}/nexus-sync.log
 # LOG=/dev/stdout
 
-mkdir -p $( dirname ${LOG} )
+mkdir -p ${LOGDIR}
 
 SITE1="wozniak#aps-detector:/~/F/"
 SITE2="lcrc#fusion:d-e.d"
