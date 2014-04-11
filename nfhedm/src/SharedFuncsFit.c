@@ -183,21 +183,21 @@ ReadBinFiles(
             ReadHeader(fp,&Header1);
             nCheck = (Header1.DataSize - Header1.NameSize)/2;
             if (nCheck!=nElements){
-                printf("Number of elements mismatch.\n");
+                printf("Number of elements mismatch. (1)\n");
                 return 0;
             }
             fread(zs,sizeof(uint16_t)*nElements,1,fp);
             ReadHeader(fp,&Header1);
             nCheck = (Header1.DataSize - Header1.NameSize)/4;
             if (nCheck!=nElements){
-                printf("Number of elements mismatch.\n");
+                printf("Number of elements mismatch. (2)\n");
                 return 0;
             }
             fread(intensity,sizeof(float32_t)*nElements,1,fp);
             ReadHeader(fp,&Header1);
             nCheck = (Header1.DataSize - Header1.NameSize)/2;
             if (nCheck!=nElements){
-                printf("Number of elements mismatch.\n");
+                printf("Number of elements mismatch. (3)\n");
                 return 0;
             }
             fread(peakID,sizeof(uint16_t)*nElements,1,fp);
