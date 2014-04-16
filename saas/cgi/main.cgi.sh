@@ -1,3 +1,3 @@
 #!/bin/sh
 
-m4 -P $JWWW_ROOT/templates/form-1.html
+m4 -P $JWWW_ROOT/html/main.html
