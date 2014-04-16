@@ -1,0 +1,158 @@
+
+<!--
+    Define a convenience macro:
+    m4_define(`m4_getenv', `m4_esyscmd(printf -- "$`$1' ")')
+  -->
+
+<html>
+  <head>
+    <title>Discovery Engines: </title>
+  </head>
+  <body>
+    <center>
+      <h1>
+        Discovery Engines
+      </h1>
+    </center>
+    <hr/>
+
+    <!-- Metadata -->
+    <table>
+      <tr>
+        <td>Working Catalog:</td>
+        <td> Osborn-2014-04 (78) 
+        </td>
+      </tr>
+      <tr>
+        <td>Working Host:</td>
+        <td><tt>m4_esyscmd(hostname)</tt></td>
+      </tr>
+      <tr>
+        <td>Working Root Directory:</td>
+        <td><tt>/projects/ExM/DE/osborn-2014-04</tt></td>
+      </tr>
+    </table> 
+
+    <hr/>
+
+    <table>
+
+      <!-- Main headings -->
+      <tr>
+        <td><center><b>Jobs</b></center></td>
+        <td><center><b>Catalog</b></center></td>
+        <td><center><b>Files</b></center></td>
+        <td><center><b>Scripts</b></center></td>
+      </tr> 
+
+      
+      <!-- Four sections --> 
+      <tr>
+
+        <!-- Jobs --> 
+        <td>
+          <table>
+            <tr>
+              <td>
+                <form action="">
+                  <table>
+                    <tr><td><input size="8" value="9345"/></td>
+                      <td>
+                        <input type="submit" value="Status"/>
+                        <input type="submit" value="Cancel"/>
+                      </td>
+                    </tr>
+                    <tr><td><input size="8" value="9346"/></td>
+                      <td>
+                        <input type="submit" value="Status"/>
+                        <input type="submit" value="Cancel"/>
+                      </td>
+                    </tr>
+                    <tr><td><input size="8" value="9350"/></td>
+                      <td>
+                        <input type="submit" value="Status"/>
+                        <input type="submit" value="Cancel"/>
+                      </td>
+                    </tr>
+                    <tr><td><input size="8" value="9355"/></td>
+                      <td>
+                        <input type="submit" value="Status"/>
+                        <input type="submit" value="Cancel"/>
+                      </td>
+                    </tr>
+                    <tr><td><input size="8" value="9356"/>
+                      <td>
+                        <input type="submit" value="Status"/>
+                        <input type="submit" value="Cancel"/>
+                      </td>
+                    </td></tr>
+                  </table>
+                </form>
+          </td></tr></table>
+        </td> 
+        
+        <!-- Datasets -->
+        <td>
+          <table>
+            <tr><td><input type="submit" value="lsmo34_090k"/></td></tr>
+            <tr><td><input type="submit" value="lsmo34_100k"/></td></tr>
+            <tr><td><input type="submit" value="lsmo34_110k"/></td></tr>
+            <tr><td><input type="submit" value="lsmo34_120k"/></td></tr>
+            <tr><td><input type="submit" value="lsmo34_130k"/></td></tr>
+            <tr><td><input type="submit" value="lsmo34_140k"/></td></tr>
+          </table>
+        </td> 
+
+        <!-- Files -->
+        <td>
+          <table>
+            <tr>
+              <select size="6"  style="width: 150px">
+                <option>lsmo34_090k</option>
+                <option>lsmo34_100k</option>
+                <option>lsmo34_110k</option>
+                <option>lsmo34_120k</option>
+                <option>lsmo34_130k</option>
+                <option>lsmo34_140k</option>
+                <option>lsmo34_150k</option>
+                <option>lsmo34_160k</option>
+                <option>lsmo34_170k</option>
+              </select>
+            </tr>
+            <tr>
+              <td>     
+                <input type="submit" value="CD"/>
+                <input type="submit" value="Download"/>
+              </td>
+            </tr>
+          </table>
+        </td>       
+
+        <!-- Scripts -->
+
+        <td>
+          <form>
+            <table>
+              <tr><td><input type="radio">nxmerge</td></tr>
+              <tr><td><input type="radio">nxmax</td></tr>
+              <tr><td><input type="radio">nxpeaks</td></tr>
+              <tr><td><input type="radio">cctw</td></tr>
+              <tr>
+                <td>     
+                  args: 
+                  <input type="text" size="8" value=""/>
+                  <input type="submit" value="Run"/>
+                </td>
+              </tr>
+            </table>
+          </form>
+        </td> 
+      </tr>
+
+    </table>
+    <hr/>
+    Session: 234 <!-- m4_esyscmd(`session') -->
+    <br/>
+    Date: m4_esyscmd(`date "+%Y/%m/%d %I:%M%p"')
+  </body>
+</html>
