@@ -26,11 +26,11 @@
         <td><tt>m4_esyscmd(hostname)</tt></td>
       </tr>
       <tr>
-        <td>Working Root Directory:</td>
+        <td>Current Directory:</td>
         <td>
           <form action="main.cgi.sh">
             <input type="hidden" name="session" value="m4_getenv(session)"/>
-            <input type="text"   name="root_directory" value="m4_getenv(root_directory)"/>
+            <input type="text"   name="current_directory" value="m4_getenv(current_directory)"/>
             <input type="submit" value="Update"/> 
           </form>
         </td>
@@ -111,16 +111,9 @@
         <td>
           <table>
             <tr>
+              m4_getenv(SESSION_D)
               <select size="6"  style="width: 150px">
-                <option>lsmo34_090k</option>
-                <option>lsmo34_100k</option>
-                <option>lsmo34_110k</option>
-                <option>lsmo34_120k</option>
-                <option>lsmo34_130k</option>
-                <option>lsmo34_140k</option>
-                <option>lsmo34_150k</option>
-                <option>lsmo34_160k</option>
-                <option>lsmo34_170k</option>
+                m4_include(m4_getenv(SESSION_D)/pwd.html)
               </select>
             </tr>
             <tr>
@@ -155,7 +148,12 @@
 
     </table>
     <hr/>
-    Session: m4_getenv(`session') 
+    <form action="main.cgi.sh">
+      Session: 
+      <input type="text" size="8" name="session" value="m4_getenv(`session')"/> 
+      <input type="submit" name="change_session" value="Update"/>
+      <input type="submit" name="change_session" value="Reset"/>
+    </form>
     <br/>
     Date: m4_esyscmd(`date "+%Y/%m/%d %I:%M%p"')
   </body>

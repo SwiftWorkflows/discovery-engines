@@ -1,8 +1,12 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 
 SESSIONS=$JWWW_ROOT/sessions
 
-if [[ -z $session ]]
+mkdir -p $SESSIONS
+
+export session=${session:-none}
+change_session=${change_session:-none}
+if [[ $session == "none" || $change_session == "Reset" ]]
 then
   f=$( mktemp )
   while (( 1 )) 
@@ -14,18 +18,24 @@ then
     fi
     sleep 1
   done
-  export session
+  SESSION_D=$SESSIONS/$session.d
+  mkdir -p $SESSION_D
+  export current_directory="/tmp"
+  echo $current_directory  > $SESSION_D/current_directory.txt
+  date "+%Y/%m/%d %I:%M%p" > $SESSION_D/created-human.txt
+  date "+%s"               > $SESSION_D/created-seconds.txt
+fi
+
+SESSION_D=$SESSIONS/$session.d
+export current_directory=${current_directory:-none}
+if [[ $current_directory == "none" ]] 
+then
+  current_directory=$( cat $SESSION_D/current_directory.txt )
 fi
 
 echo session: $session
-echo root_directory: $root_directory
+echo current
 
-
-mkdir -p $SESSIONS
-SESSION=$SESSIONS/$session
-if [[ ! -f $SESSION ]]
-then
-  touch $SESSION
-fi
+echo 
 
 m4 -P $JWWW_ROOT/html/main.html
