@@ -154,7 +154,9 @@
       <input type="submit" name="change_session" value="Update"/>
       <input type="submit" name="change_session" value="Reset"/>
     </form>
+    Session created: m4_getenv(created_human)
     <br/>
-    Date: m4_esyscmd(`date "+%Y/%m/%d %I:%M%p"')
+    Current time: m4_esyscmd(`date "+%Y/%m/%d %I:%M%p"')
+    <br/>
   </body>
 </html>
