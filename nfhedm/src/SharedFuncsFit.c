@@ -160,7 +160,7 @@ ReadBinFiles(
     for (k=0;k<nLayers;k++){
         for (i=StartNr;i<=EndNr;i++){
             sprintf(FileName,"%s_%06d.%s%d",FileStem,i,ext,k);
-			//printf("Reading file : %s\n",FileName);
+            printf("Reading file : %s\n",FileName);
             fp = fopen(FileName,"r");
             if (fp == NULL)
                 file_not_found(FileName);
