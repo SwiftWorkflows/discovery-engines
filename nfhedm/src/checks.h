@@ -18,6 +18,7 @@ static void file_not_found(const char* filename)
     exit(EXIT_FAILURE);
 }
 
+__attribute__((unused))
 static void file_not_writable(const char* filename)
 {
     printf("Could not write to file: %s\n", filename);

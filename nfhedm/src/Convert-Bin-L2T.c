@@ -12,15 +12,6 @@
 #include "checks.h"
 #include "SharedFuncsFit.h"
 
-#define CHECK(condition, msg) \
-{ if (!condition) { printf(msg); return false; } }
-
-#define READ(data, size, count, fp)           \
- { int actual = fread(data, size, count, fp); \
-   if (actual != count) {                     \
-        printf("short read!\n");              \
-        return false;        }}
-
 bool
 L2P(const char *filename)
 {
@@ -31,13 +22,16 @@ L2P(const char *filename)
     struct Theader head;
     int nElements;
 
+    bool b;
+
     // 1 dummy
     printf("Dummies\n");
     uint32_t dummy;
     READ(&dummy, sizeof(uint32_t), 1, fp);
 
     // 5 dummies
-    ReadHeader(fp, &head);
+    b = ReadHeader(fp, &head);
+    CHECK(b, "ReadHeader failed (dummies)!");
     PrintHeader(stdout, &head);
     uint32_t *t_ui32=NULL;
     t_ui32 = malloc(sizeof(uint32_t) * 5);
@@ -46,7 +40,8 @@ L2P(const char *filename)
 
     // Y positions
     printf("Y positions\n");
-    ReadHeader(fp, &head);
+    b = ReadHeader(fp, &head);
+    CHECK(b, "ReadHeader failed (Y)!");
     PrintHeader(stdout, &head);
     nElements = (head.DataSize - head.NameSize) / sizeof(uint16_t);
     uint16_t *t_ui16 = malloc(nElements*sizeof(uint16_t));
@@ -55,23 +50,32 @@ L2P(const char *filename)
 
     // Z positions
     printf("Z positions\n");
-    ReadHeader(fp,&head);
+    b = ReadHeader(fp,&head);
+    CHECK(b, "ReadHeader failed (Z)!");
     PrintHeader(stdout, &head);
+    int nCheck = (head.DataSize - head.NameSize) / sizeof(uint16_t);
+    CHECK(nCheck == nElements, "size mismatch (Z)!");
     READ(t_ui16,sizeof(uint16_t),nElements,fp);
     PrintUint16s(stdout, t_ui16, nElements);
 
     // Intensities
     printf("Intensities:\n");
     float32_t *t_f32 = malloc(sizeof(float32_t)*nElements);
-    ReadHeader(fp,&head);
+    b = ReadHeader(fp,&head);
+    CHECK(b, "ReadHeader failed (intensities)!");
     PrintHeader(stdout, &head);
+    nCheck = (head.DataSize - head.NameSize) / sizeof(float32_t);
+    CHECK(nCheck == nElements, "size mismatch (intensities)!");
     READ(t_f32,sizeof(float32_t),nElements,fp);
     PrintFloat32s(stdout, t_f32, nElements);
 
     // Peak IDs
     printf("Peak IDs\n");
-    ReadHeader(fp,&head);
+    b = ReadHeader(fp,&head);
+    CHECK(b, "ReadHeader failed (peak IDs)!");
     PrintHeader(stdout,&head);
+    nCheck = (head.DataSize - head.NameSize) / sizeof(uint16_t);
+    CHECK(nCheck == nElements, "size mismatch (peak IDs)!");
     READ(t_ui16,sizeof(uint16_t),nElements,fp);
     PrintUint16s(stdout, t_ui16, nElements);
 

@@ -1,6 +1,5 @@
-#include <stdio.h>
+
 #include <math.h>
-#include <stdlib.h>
 #include <time.h>
 #include <limits.h>
 #include <sys/stat.h>
@@ -89,21 +88,22 @@ Convert9To3x3(double MatIn[9],double MatOut[3][3])
     }
 }
 
-void ReadHeader(
+bool ReadHeader(
     FILE *fp,
     struct Theader * head)
 {
     // printf("ReadHeader\n");
-    fread(&head->uBlockHeader,sizeof(uint32_t),1,fp);
-    fread(&head->BlockType,sizeof(uint16_t),1,fp);
-    fread(&head->DataFormat,sizeof(uint16_t),1,fp);
-    fread(&head->NumChildren,sizeof(uint16_t),1,fp);
-    fread(&head->NameSize,sizeof(uint16_t),1,fp);
-    fread(&head->DataSize,sizeof(uint32_t),1,fp);
-    fread(&head->ChunkNumber,sizeof(uint16_t),1,fp);
-    fread(&head->TotalChunks,sizeof(uint16_t),1,fp);
-    fread(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
+    READ(&head->uBlockHeader,sizeof(uint32_t),1,fp);
+    READ(&head->BlockType,sizeof(uint16_t),1,fp);
+    READ(&head->DataFormat,sizeof(uint16_t),1,fp);
+    READ(&head->NumChildren,sizeof(uint16_t),1,fp);
+    READ(&head->NameSize,sizeof(uint16_t),1,fp);
+    READ(&head->DataSize,sizeof(uint32_t),1,fp);
+    READ(&head->ChunkNumber,sizeof(uint16_t),1,fp);
+    READ(&head->TotalChunks,sizeof(uint16_t),1,fp);
+    READ(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
     head->BlockName[head->NameSize] = '\0';
+    return true;
 }
 
 #define append(string,  args...) \

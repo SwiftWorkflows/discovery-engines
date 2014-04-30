@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,6 +21,14 @@
 typedef double RealType;
 #define float32_t float
 
+#define CHECK(condition, msg) \
+{ if (!condition) { printf("%s\n", msg); return false; } }
+
+#define READ(data, size, count, fp)           \
+ { int actual = fread(data, size, count, fp); \
+   if (actual != count) {                     \
+        printf("short read!\n");              \
+        return false;        }}
 
 struct Theader {
     uint32_t uBlockHeader;
@@ -174,7 +183,7 @@ realloc_buffers(int nElements, int nElements_previous,
 void PrintUint16s( FILE *fp, uint16_t  *data, int count);
 void PrintUint32s( FILE *fp, uint32_t  *data, int count);
 void PrintFloat32s(FILE *fp, float32_t *data, int count);
-void PrintHeader( FILE *fp, struct Theader *head);
-void ReadHeader(  FILE *fp, struct Theader *head);
+void PrintHeader(  FILE *fp, struct Theader *head);
+bool ReadHeader(   FILE *fp, struct Theader *head);
 
 #endif
