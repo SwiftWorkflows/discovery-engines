@@ -6,13 +6,13 @@ LOG=~wozniak/proj/d-e/logs/go-sync3.log
 mkdir -p $( dirname ${LOG} )
 
 SITE1="wozniak#s11pilatus:/~/sharedbigdata/data1/osborn-2014-1"
-SITE2="alcf#dtn_mira:/~/DE/2014-04"
+SITE2="alcf#dtn_mira:/~/DE"
 
 GO_USER="wozniak"
 GO=cli.globusonline.org
 ACCT=${GO_USER}@${GO}
 
-DELAY=60
+DELAY=$(( 30 * 60 ))
 
 # Sync on file size:
 XFER_ARGS=( -r --preserve-mtime -s 1 )
@@ -35,4 +35,4 @@ do
 done < /dev/null
 date
 print DONE
-} |& tee -a ${LOG}
+} >>& ${LOG}
