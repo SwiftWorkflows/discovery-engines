@@ -154,9 +154,9 @@ void PrintUint32(
     char *q = p;
     for (int i = 0; i < count; i++)
         append(q, "%i: %"PRIu32"\n", i, data[i]);
-    q = '\0';
-    // fwrite(s, sizeof(char), q-p+1, fp);
-    puts(s);
+    *q = '\0';
+    // printf("%p %p %i\n", q, p, q-p);
+    fwrite(p, sizeof(char), q-p, fp);
 }
 
 void PrintUint16(
@@ -171,9 +171,7 @@ void PrintUint16(
     char *q = p;
     for (int i = 0; i < count; i++)
         append(q, "%i: %"PRIu16"\n", i, data[i]);
-    q = '\0';
-    // fwrite(s, sizeof(char), q-p+1, fp);
-    puts(s);
+    fwrite(s, sizeof(char), q-p, fp);
 }
 
 void PrintFloat32(
@@ -188,9 +186,7 @@ void PrintFloat32(
     char *q = p;
     for (int i = 0; i < count; i++)
         append(q, "%i: %0.3f\n", i, (double) data[i]);
-    q = '\0';
-    // fwrite(s, sizeof(char), q-p, fp);
-    puts(s);
+    fwrite(s, sizeof(char), q-p, fp);
 }
 
 int
