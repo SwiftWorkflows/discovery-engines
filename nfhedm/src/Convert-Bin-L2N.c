@@ -75,14 +75,14 @@ L2N(const char *input, const char *output)
     nCheck = (head.DataSize - head.NameSize) / sizeof(float32_t);
     CHECK(nCheck == nElements, "size mismatch (intensities)!");
     READ(t_f32,sizeof(float32_t),nElements,fp_in);
-    hton_Floats(t_f32, nElements);
+    hton_Float32s(t_f32, nElements);
     fwrite(t_f32, sizeof(float32_t), nElements, fp_out);
 
     // Peak IDs
     printf("Peak IDs\n");
     b = ReadHeader(fp_in,&head);
     CHECK(b, "ReadHeader failed (peak IDs)!");
-    NWriteHeader(stdout,&head);
+    NWriteHeader(fp_out,&head);
     nCheck = (head.DataSize - head.NameSize) / sizeof(uint16_t);
     CHECK(nCheck == nElements, "size mismatch (peak IDs)!");
     READ(t_ui16,sizeof(uint16_t),nElements,fp_in);
