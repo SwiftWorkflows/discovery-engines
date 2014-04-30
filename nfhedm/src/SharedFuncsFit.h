@@ -171,9 +171,9 @@ realloc_buffers(int nElements, int nElements_previous,
     }
 }
 
-void PrintUint16( FILE *fp, uint16_t  *data, int count);
-void PrintUint32( FILE *fp, uint32_t  *data, int count);
-void PrintFloat32(FILE *fp, float32_t *data, int count);
+void PrintUint16s( FILE *fp, uint16_t  *data, int count);
+void PrintUint32s( FILE *fp, uint32_t  *data, int count);
+void PrintFloat32s(FILE *fp, float32_t *data, int count);
 void PrintHeader( FILE *fp, struct Theader *head);
 void ReadHeader(  FILE *fp, struct Theader *head);
 

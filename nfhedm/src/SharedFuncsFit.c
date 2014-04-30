@@ -93,19 +93,16 @@ void ReadHeader(
     FILE *fp,
     struct Theader * head)
 {
-    printf("ReadHeader\n");
+    // printf("ReadHeader\n");
     fread(&head->uBlockHeader,sizeof(uint32_t),1,fp);
-    printf("uBlockHeader: %i\n", head->uBlockHeader);
     fread(&head->BlockType,sizeof(uint16_t),1,fp);
     fread(&head->DataFormat,sizeof(uint16_t),1,fp);
     fread(&head->NumChildren,sizeof(uint16_t),1,fp);
     fread(&head->NameSize,sizeof(uint16_t),1,fp);
-    printf("NameSize: %i\n", head->NameSize);
     fread(&head->DataSize,sizeof(uint32_t),1,fp);
     fread(&head->ChunkNumber,sizeof(uint16_t),1,fp);
     fread(&head->TotalChunks,sizeof(uint16_t),1,fp);
     fread(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
-    fwrite(head->BlockName, 1, 1, stdout);
     head->BlockName[head->NameSize] = '\0';
 }
 
@@ -142,7 +139,7 @@ void PrintHeader(
     fprintf(fp, "BlockName:   '%s'\n",       head->BlockName);
 }
 
-void PrintUint32(
+void PrintUint32s(
         FILE *fp,
         uint32_t *data,
         int count)
@@ -158,7 +155,7 @@ void PrintUint32(
     fwrite(p, sizeof(char), q-p, fp);
 }
 
-void PrintUint16(
+void PrintUint16s(
         FILE *fp,
         uint16_t *data,
         int count)
@@ -173,7 +170,7 @@ void PrintUint16(
     fwrite(p, sizeof(char), q-p, fp);
 }
 
-void PrintFloat32(
+void PrintFloat32s(
         FILE *fp,
         float32_t *data,
         int count)
