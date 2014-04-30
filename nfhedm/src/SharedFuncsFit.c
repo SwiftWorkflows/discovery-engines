@@ -155,7 +155,6 @@ void PrintUint32(
     for (int i = 0; i < count; i++)
         append(q, "%i: %"PRIu32"\n", i, data[i]);
     *q = '\0';
-    // printf("%p %p %i\n", q, p, q-p);
     fwrite(p, sizeof(char), q-p, fp);
 }
 
@@ -171,7 +170,7 @@ void PrintUint16(
     char *q = p;
     for (int i = 0; i < count; i++)
         append(q, "%i: %"PRIu16"\n", i, data[i]);
-    fwrite(s, sizeof(char), q-p, fp);
+    fwrite(p, sizeof(char), q-p, fp);
 }
 
 void PrintFloat32(
@@ -179,14 +178,14 @@ void PrintFloat32(
         float32_t *data,
         int count)
 {
-    int bytes = count*sizeof(float32_t);
+    int bytes = count*32; // Up to 32 characters per line
     assert(bytes < 1024*1024);
     char s[bytes];
     char *p = &s[0];
     char *q = p;
     for (int i = 0; i < count; i++)
         append(q, "%i: %0.3f\n", i, (double) data[i]);
-    fwrite(s, sizeof(char), q-p, fp);
+    fwrite(p, sizeof(char), q-p, fp);
 }
 
 int
