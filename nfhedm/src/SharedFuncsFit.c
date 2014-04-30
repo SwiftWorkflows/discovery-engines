@@ -7,14 +7,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <nlopt.h>
-#include <stdint.h>
 
 #include "checks.h"
 #include "SharedFuncsFit.h"
 #include "CalcDiffractionSpots.h"
 
 #define RealType double
-#define float32_t float
 #define SetBit(A,k)   (A[(k/32)] |=  (1 << (k%32)))
 #define ClearBit(A,k) (A[(k/32)] &= ~(1 << (k%32)))
 #define TestBit(A,k)  (A[(k/32)] &   (1 << (k%32)))
@@ -91,44 +89,108 @@ Convert9To3x3(double MatIn[9],double MatOut[3][3])
     }
 }
 
-struct Theader {
-    uint32_t uBlockHeader;
-    uint16_t BlockType;
-    uint16_t DataFormat;
-    uint16_t NumChildren;
-    uint16_t NameSize;
-    char BlockName[4096];
-    uint32_t DataSize;
-    uint16_t ChunkNumber;
-    uint16_t TotalChunks;
-};
-
 void ReadHeader(
     FILE *fp,
     struct Theader * head)
 {
+    printf("ReadHeader\n");
     fread(&head->uBlockHeader,sizeof(uint32_t),1,fp);
+    printf("uBlockHeader: %i\n", head->uBlockHeader);
     fread(&head->BlockType,sizeof(uint16_t),1,fp);
     fread(&head->DataFormat,sizeof(uint16_t),1,fp);
     fread(&head->NumChildren,sizeof(uint16_t),1,fp);
     fread(&head->NameSize,sizeof(uint16_t),1,fp);
+    printf("NameSize: %i\n", head->NameSize);
     fread(&head->DataSize,sizeof(uint32_t),1,fp);
     fread(&head->ChunkNumber,sizeof(uint16_t),1,fp);
     fread(&head->TotalChunks,sizeof(uint16_t),1,fp);
     fread(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
+    fwrite(head->BlockName, 1, 1, stdout);
+    head->BlockName[head->NameSize] = '\0';
 }
 
-static inline void
-realloc_buffers(int nElements, int nElements_previous,
-                uint16_t **ys, uint16_t **zs, uint16_t **peakID,
-                float32_t **intensity)
+#define append(string,  args...) \
+  string += sprintf(string, ## args)
+
+void WriteHeader(
+    FILE *fp,
+    struct Theader * head)
 {
-    if (nElements > nElements_previous) {
-        *ys = realloc(*ys, nElements*sizeof(**ys));
-        *zs = realloc(*zs, nElements*sizeof(**zs));
-        *peakID = realloc(*peakID, nElements*sizeof(**peakID));
-        *intensity = realloc(*intensity, nElements*sizeof(**intensity));
-    }
+    fwrite(&head->uBlockHeader,sizeof(uint32_t),1,fp);
+    fwrite(&head->BlockType,sizeof(uint16_t),1,fp);
+    fwrite(&head->DataFormat,sizeof(uint16_t),1,fp);
+    fwrite(&head->NumChildren,sizeof(uint16_t),1,fp);
+    fwrite(&head->NameSize,sizeof(uint16_t),1,fp);
+    fwrite(&head->DataSize,sizeof(uint32_t),1,fp);
+    fwrite(&head->ChunkNumber,sizeof(uint16_t),1,fp);
+    fwrite(&head->TotalChunks,sizeof(uint16_t),1,fp);
+    fwrite(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
+}
+
+void PrintHeader(
+    FILE *fp,
+    struct Theader * head)
+{
+    fprintf(fp, "BlockHeader: %"PRIu32"\n",  head->uBlockHeader);
+    fprintf(fp, "BlockType:   %"PRIu16"\n" , head->BlockType);
+    fprintf(fp, "DataFormat:  %"PRIu16"\n" , head->DataFormat);
+    fprintf(fp, "NumChildren: %"PRIu16"\n" , head->NumChildren);
+    fprintf(fp, "NameSize:    %"PRIu16"\n" , head->NameSize);
+    fprintf(fp, "DataSize:    %"PRIu32"\n" , head->DataSize);
+    fprintf(fp, "ChunkNumber: %"PRIu16"\n" , head->ChunkNumber);
+    fprintf(fp, "TotalChunks: %"PRIu16"\n" , head->TotalChunks);
+    fprintf(fp, "BlockName:   '%s'\n",       head->BlockName);
+}
+
+void PrintUint32(
+        FILE *fp,
+        uint32_t *data,
+        int count)
+{
+    int bytes = count*24; // Up to 24 characters per line
+    assert(bytes < 1024*1024);
+    char s[bytes];
+    char *p = &s[0];
+    char *q = p;
+    for (int i = 0; i < count; i++)
+        append(q, "%i: %"PRIu32"\n", i, data[i]);
+    q = '\0';
+    // fwrite(s, sizeof(char), q-p+1, fp);
+    puts(s);
+}
+
+void PrintUint16(
+        FILE *fp,
+        uint16_t *data,
+        int count)
+{
+    int bytes = count*16; // Up to 16 characters per line
+    assert(bytes < 1024*1024);
+    char s[bytes];
+    char *p = &s[0];
+    char *q = p;
+    for (int i = 0; i < count; i++)
+        append(q, "%i: %"PRIu16"\n", i, data[i]);
+    q = '\0';
+    // fwrite(s, sizeof(char), q-p+1, fp);
+    puts(s);
+}
+
+void PrintFloat32(
+        FILE *fp,
+        float32_t *data,
+        int count)
+{
+    int bytes = count*sizeof(float32_t);
+    assert(bytes < 1024*1024);
+    char s[bytes];
+    char *p = &s[0];
+    char *q = p;
+    for (int i = 0; i < count; i++)
+        append(q, "%i: %0.3f\n", i, (double) data[i]);
+    q = '\0';
+    // fwrite(s, sizeof(char), q-p, fp);
+    puts(s);
 }
 
 int

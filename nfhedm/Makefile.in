@@ -1,10 +1,12 @@
 
 # MAKEFILE
 
+SHELL = bash
+
 INCLUDES = -I $(NLOPT)/include @TCL_INCLUDE_SPEC@ -I src
 
 CFLAGS += @CFLAGS@
-CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
+CFLAGS += $(INCLUDES) -O0 -g -Wall -fPIC -std=gnu99
 
 LDFLAGS += @LDFLAGS@
 
@@ -15,7 +17,8 @@ LIBS += $(LIBDIRS) -lnlopt -lm
 TCLSH = @USE_TCLSH@
 
 EXECUTABLES = bin/fop-nlopt bin/fo-nlopt \
-              bin/MedianImage bin/ImageProcessing
+              bin/MedianImage bin/ImageProcessing \
+              bin/convert-bin-l2t
 
 all: $(EXECUTABLES)
 
@@ -81,9 +84,14 @@ bin/MedianImage: $(LIBNFHEDM) src/MedianImage.c
 	       $(LDFLAGS)         \
 	       $(RPATHS)
 
- # \
- # 	           -I $(DIP)/include                  \
- # 	           -L $(DIP)/lib -ldipio -ldip -lm
+bin/convert-bin-l2t:  $(LIBNFHEDM)                                           \
+                src/Convert-Bin-L2T.o
+	@mkdir -pv bin
+	gcc $(LDFLAGS)                                           \
+		-o $(@) src/Convert-Bin-L2T.o \
+		-L lib -l nfhedm                                    \
+		$(LIBS)                                          \
+		$(RPATHS)
 
 bin/ImageProcessing: src/ImageProcessing.c
 	gcc -o bin/ImageProcessing src/ImageProcessing.c -lm
@@ -135,7 +143,7 @@ install: install-libs install-bin install-tcl
 
 install-bin:
 	@mkdir -pv bin $(INSTALL_BIN)
-	@if [[ `ls bin` != "" ]] ;          \
+	if [[ `ls bin` != "" ]] ;          \
         then cp -uv bin/* -t $(INSTALL_BIN) ; \
         else : ; fi
 

@@ -8,11 +8,30 @@
 #ifndef SHAREDFUNCSFIT_H
 #define SHAREDFUNCSFIT_H
 
+#include <assert.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #define MAX_POINTS_GRID_GOOD 200000
 #define MAX_N_SPOTS 200
 #define MAX_N_OMEGA_RANGES 20
 
 typedef double RealType;
+#define float32_t float
+
+
+struct Theader {
+    uint32_t uBlockHeader;
+    uint16_t BlockType;
+    uint16_t DataFormat;
+    uint16_t NumChildren;
+    uint16_t NameSize;
+    char BlockName[4096];
+    uint32_t DataSize;
+    uint16_t ChunkNumber;
+    uint16_t TotalChunks;
+};
 
 void
 RotateAroundZ(
@@ -122,5 +141,40 @@ RotationTilts(
     double ty,
     double tz,
     double RotMatOut[3][3]);
+
+static inline void
+realloc_array(void *p, int oldSize, int newSize)
+{
+    if (p == NULL)
+    {
+        p = malloc(newSize);
+        assert(p != NULL);
+        return;
+    }
+    if (newSize <= oldSize)
+        return;
+
+    void *t = realloc(p, newSize);
+    assert(t != NULL);
+}
+
+static inline void
+realloc_buffers(int nElements, int nElements_previous,
+                uint16_t **ys, uint16_t **zs, uint16_t **peakID,
+                float32_t **intensity)
+{
+    if (nElements > nElements_previous) {
+        *ys = realloc(*ys, nElements*sizeof(**ys));
+        *zs = realloc(*zs, nElements*sizeof(**zs));
+        *peakID = realloc(*peakID, nElements*sizeof(**peakID));
+        *intensity = realloc(*intensity, nElements*sizeof(**intensity));
+    }
+}
+
+void PrintUint16( FILE *fp, uint16_t  *data, int count);
+void PrintUint32( FILE *fp, uint32_t  *data, int count);
+void PrintFloat32(FILE *fp, float32_t *data, int count);
+void PrintHeader( FILE *fp, struct Theader *head);
+void ReadHeader(  FILE *fp, struct Theader *head);
 
 #endif
