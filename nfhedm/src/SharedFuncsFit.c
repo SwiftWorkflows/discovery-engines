@@ -6,6 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <nlopt.h>
+#include <arpa/inet.h>
 
 #include "checks.h"
 #include "SharedFuncsFit.h"
@@ -121,6 +122,31 @@ void WriteHeader(
     fwrite(&head->DataSize,sizeof(uint32_t),1,fp);
     fwrite(&head->ChunkNumber,sizeof(uint16_t),1,fp);
     fwrite(&head->TotalChunks,sizeof(uint16_t),1,fp);
+    fwrite(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
+}
+
+void NWriteHeader(
+    FILE *fp,
+    struct Theader * head)
+{
+    uint16_t t16;
+    uint32_t t32;
+    t32 = htonl(head->uBlockHeader);
+    fwrite(&t32,sizeof(uint32_t),1,fp);
+    t16 = htons(head->BlockType);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t16 = htons(head->DataFormat);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t16 = htons(head->NumChildren);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t16 = htons(head->NameSize);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t32 = htonl(head->DataSize);
+    fwrite(&t32,sizeof(uint32_t),1,fp);
+    t16 = htons(head->ChunkNumber);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t16 = htons(head->TotalChunks);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
     fwrite(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
 }
 
@@ -710,4 +736,21 @@ NormalizeMat(
     for (i=0;i<9;i++){
         OMOut[i] = OMIn[i]/determinant;
     }
+}
+
+void
+hton_Uint16s(uint16_t  *data, int count) {
+    for (int i = 0; i < count; i++)
+        data[i] = htons(data[i]);
+}
+void
+hton_Uint32s(uint32_t  *data, int count) {
+    for (int i = 0; i < count; i++)
+        data[i] = htonl(data[i]);
+}
+
+void
+hton_Float32s(float32_t *data, int count) {
+    for (int i = 0; i < count; i++)
+        data[i] = htonl(data[i]);
 }

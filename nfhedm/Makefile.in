@@ -93,6 +93,15 @@ bin/convert-bin-l2t:  $(LIBNFHEDM)                                           \
 		$(LIBS)                                          \
 		$(RPATHS)
 
+bin/convert-bin-l2n:  $(LIBNFHEDM)                                           \
+                src/Convert-Bin-L2N.o
+	@mkdir -pv bin
+	gcc $(LDFLAGS)                                           \
+		-o $(@) src/Convert-Bin-L2N.o \
+		-L lib -l nfhedm                                    \
+		$(LIBS)                                          \
+		$(RPATHS)
+
 bin/ImageProcessing: src/ImageProcessing.c
 	gcc -o bin/ImageProcessing src/ImageProcessing.c -lm
 
