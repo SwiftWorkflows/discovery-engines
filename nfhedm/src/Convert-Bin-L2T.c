@@ -33,8 +33,13 @@ L2P(const char *filename)
 
     printf("BUFSIZ: %i\n", BUFSIZ);
     setvbuf(stdout, NULL, _IONBF, 4096);
-    // 5 dummies
+
+    // 1 dummy
     printf("Dummies\n");
+    uint32_t dummy;
+    READ(&dummy, sizeof(uint32_t), 1, fp);
+
+    // 5 dummies
     ReadHeader(fp, &head);
     PrintHeader(stdout, &head);
     uint32_t *t_ui32=NULL;
