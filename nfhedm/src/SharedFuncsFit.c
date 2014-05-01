@@ -751,6 +751,11 @@ hton_Uint32s(uint32_t  *data, int count) {
 
 void
 hton_Float32s(float32_t *data, int count) {
-    for (int i = 0; i < count; i++)
-        data[i] = htonl(data[i]);
+    int32_t t;
+    for (int i = 0; i < count; i++) {
+        // These memcpy's are required for correctness
+        memcpy(&t, &data[i], 4);
+        int32_t v = htonl(t);
+        memcpy(&data[i], &v, 4);
+    }
 }
