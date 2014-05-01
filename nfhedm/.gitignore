@@ -3,6 +3,7 @@
 Archive.zip
 bin
 data
+convert # Data converted to other-endian
 lib
 Makefile
 autom4te.cache
