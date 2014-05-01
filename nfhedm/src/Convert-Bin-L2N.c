@@ -19,7 +19,7 @@ L2N(const char *input, const char *output)
     FILE* fp_in = fopen(input, "r");
     if (fp_in == NULL) file_not_found(input);
     FILE* fp_out = fopen(output, "w");
-    if (fp_in == NULL) file_not_writable(output);
+    if (fp_out == NULL) file_not_writable(output);
     // setvbuf(stdout, NULL, _IOFBF, 4*1024*1024);
 
     struct Theader head;
