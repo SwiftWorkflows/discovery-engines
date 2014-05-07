@@ -25,9 +25,6 @@
 struct my_func_data{
 	int NrOfFiles;
     int nLayers;
-    double LatticeConstant;
-    double Wavelength;
-    int nRings;
     double ExcludePoleAngle;
     long long int SizeObsSpots;
     double XGrain[3];
@@ -36,9 +33,11 @@ struct my_func_data{
     double OmegaStep;
     double px;
     double gs;
+    int hkls[5000][4];
+    int n_hkls;
+    double Thetas[5000];
     int NoOfOmegaRanges;
     int NrPixelsGrid;
-    int RingNumbers[MAX_N_OMEGA_RANGES];
     double OmegaRanges[MAX_N_OMEGA_RANGES][2];
     double BoxSizes[MAX_N_OMEGA_RANGES][4];
     double **P0;
@@ -53,12 +52,9 @@ double problem_function(
 	void* f_data_trial)
 {
 	struct my_func_data *f_data = (struct my_func_data *) f_data_trial;
-	int i, j;
+	int i, j, count = 1;
 	const int NrOfFiles = f_data->NrOfFiles;
     const int nLayers = f_data->nLayers;
-    const double LatticeConstant = f_data->LatticeConstant;
-    const double Wavelength = f_data->Wavelength;
-    const int nRings = f_data->nRings;
     const double ExcludePoleAngle = f_data->ExcludePoleAngle;
     const long long int SizeObsSpots = f_data->SizeObsSpots;
     double XGrain[3];
@@ -70,9 +66,18 @@ double problem_function(
     const int NoOfOmegaRanges = f_data->NoOfOmegaRanges;
     const int NrPixelsGrid = f_data->NrPixelsGrid;
     double P0[nLayers][3];
-    int RingNumbers[MAX_N_OMEGA_RANGES];
     double OmegaRanges[MAX_N_OMEGA_RANGES][2];
     double BoxSizes[MAX_N_OMEGA_RANGES][4];
+    int hkls[5000][4];
+    int n_hkls = f_data->n_hkls;
+    double Thetas[5000];
+    for (i=0;i<5000;i++){
+		hkls[i][0] = f_data->hkls[i][0];
+		hkls[i][1] = f_data->hkls[i][1];
+		hkls[i][2] = f_data->hkls[i][2];
+		hkls[i][3] = f_data->hkls[i][3];
+		Thetas[i] = f_data->Thetas[i];
+	}
     int *ObsSpotsInfo;
 	ObsSpotsInfo = &(f_data->ObsSpotsInfo[0]);
 	for (i=0;i<3;i++){
@@ -81,9 +86,6 @@ double problem_function(
 		for (j=0;j<nLayers;j++){
 			P0[j][i] = f_data->P0[j][i];
 		}
-	}
-	for (i=0;i<MAX_N_OMEGA_RANGES;i++){
-		RingNumbers[i] = f_data->RingNumbers[i];
 	}
 	for (i=0;i<MAX_N_OMEGA_RANGES;i++){
 		for (j=0;j<2;j++){
@@ -108,10 +110,9 @@ double problem_function(
         ybc[i] = x[6+nLayers+i];
         zbc[i] = x[6+nLayers+nLayers+i];
     }
-    CalcOverlapAccOrient(NrOfFiles,nLayers,LatticeConstant,Wavelength,
-		nRings,ExcludePoleAngle,Lsd,SizeObsSpots,XGrain,YGrain,
-		RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,RingNumbers,
-		OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
+    CalcOverlapAccOrient(NrOfFiles,nLayers,ExcludePoleAngle,Lsd,SizeObsSpots,XGrain,
+		YGrain,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,hkls,n_hkls,
+		Thetas,OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
 		ObsSpotsInfo,OrientMatIn,&FracOverlap);
     return (1 - FracOverlap);
 }
@@ -120,11 +121,8 @@ void
 FitOrientationP(
     const int NrOfFiles,
     const int nLayers,
-    const double LatticeConstant,
-    const double Wavelength,
-    const int nRings,
     const double ExcludePoleAngle,
-    const double Lsd[nLayers],
+    double Lsd[nLayers],
     const long long int SizeObsSpots,
     const double XGrain[3],
     const double YGrain[3],
@@ -132,10 +130,9 @@ FitOrientationP(
     const double OmegaStart,
     const double OmegaStep,
     const double px,
-    const double ybc[nLayers],
-    const double zbc[nLayers],
+    double ybc[nLayers],
+    double zbc[nLayers],
     const double gs,
-    const int RingNumbers[MAX_N_OMEGA_RANGES],
     double OmegaRanges[MAX_N_OMEGA_RANGES][2],
     const int NoOfOmegaRanges,
     double BoxSizes[MAX_N_OMEGA_RANGES][4],
@@ -148,6 +145,9 @@ FitOrientationP(
     double *EulerOutB,
     double *EulerOutC,
     double *ResultFracOverlap,
+    int hkls[5000][4],
+    double Thetas[5000],
+    int n_hkls,
     double *LsdFit,
     double *TiltsFit,
     double **BCsFit,
@@ -206,9 +206,14 @@ FitOrientationP(
 	struct my_func_data f_data;
 	f_data.NrOfFiles = NrOfFiles;
 	f_data.nLayers = nLayers;
-	f_data.LatticeConstant = LatticeConstant;
-	f_data.Wavelength = Wavelength;
-	f_data.nRings = nRings;
+	f_data.n_hkls = n_hkls;
+	for (i=0;i<5000;i++){
+		f_data.hkls[i][0] = hkls[i][0];
+		f_data.hkls[i][1] = hkls[i][1];
+		f_data.hkls[i][2] = hkls[i][2];
+		f_data.hkls[i][3] = hkls[i][3];
+		f_data.Thetas[i] = Thetas[i];
+	}
 	f_data.ExcludePoleAngle = ExcludePoleAngle;
 	f_data.SizeObsSpots = SizeObsSpots;
 	f_data.P0 = allocMatrix(nLayers,3);
@@ -218,9 +223,6 @@ FitOrientationP(
 		for (j=0;j<nLayers;j++){
 			f_data.P0[j][i] = P0[j][i];
 		}
-	}
-	for (i=0;i<MAX_N_OMEGA_RANGES;i++){
-		f_data.RingNumbers[i] = RingNumbers[i];
 	}
 	for (i=0;i<MAX_N_OMEGA_RANGES;i++){
 		for (j=0;j<2;j++){
@@ -245,7 +247,7 @@ FitOrientationP(
 	nlopt_set_lower_bounds(opt, xl);
 	nlopt_set_upper_bounds(opt, xu);
 	nlopt_set_min_objective(opt, problem_function, trp);
-	double minf;
+	double minf=1;
 	nlopt_optimize(opt, x, &minf);
 	nlopt_destroy(opt);
     *ResultFracOverlap = minf;
