@@ -174,7 +174,7 @@ FitOrientation(
 	}
 	f_data.ExcludePoleAngle = ExcludePoleAngle;
 	f_data.SizeObsSpots = SizeObsSpots;
-	f_data.P0 = allocMatrixF(nLayers,3);
+	f_data.P0 = allocMatrix(nLayers,3);
 	for (i=0;i<3;i++){
 		f_data.XGrain[i] = XGrain[i];
 		f_data.YGrain[i] = YGrain[i];
@@ -365,7 +365,7 @@ int FitOrientationAll(const char *ParamFN, int rown)
                          /*14*/nrFiles, params.OmegaStart, params.OmegaStep, SizeObsSpots,
                          /*18*/params.ybc, params.zbc, ObsSpotsInfo, params.minFracOverlap,
                          /*22*/params.LatticeConstant, params.Wavelength, params.SpaceGroup, params.ExcludePoleAngle,
-                         /*26*/params.RingNumbers, params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
+                         /*26*/params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
                          params.tol, TotalDiffrSpots, xs, ys, MaxTtheta);
 
        assert(rc == 1);
@@ -379,12 +379,12 @@ struct output_result
 };
 
 int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, double tz,
-                       int nLayers, double *Lsd, double **XY, int NrOrientations,
-                       int **NrSpots, double **OrientationMatrix, double **SpotsMat,
-                       int nrFiles, double OmegaStart, double OmegaStep, long long int SizeObsSpots,
-                       double *ybc, double *zbc, int *ObsSpotsInfo, double minFracOverlap,
-                       double LatticeConstant, int Wavelength, int SpaceGroup, double ExcludePoleAngle,
-                       int *RingNumbers, double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
+                       /*7*/int nLayers, double *Lsd, double **XY, int NrOrientations,
+                       /*11*/int **NrSpots, double **OrientationMatrix, double **SpotsMat,
+                       /*14*/int nrFiles, double OmegaStart, double OmegaStep, long long int SizeObsSpots,
+                       /*18*/double *ybc, double *zbc, int *ObsSpotsInfo, double minFracOverlap,
+                       double LatticeConstant[6], int Wavelength, int SpaceGroup, double ExcludePoleAngle,
+                       double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
                        double BoxSizes[MAX_N_OMEGA_RANGES][4],
                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta)
 {
@@ -451,7 +451,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
 		int n_hkls = 0;
 		int hkls[5000][4];
 		double Thetas[5000];
-		for (i=0;i<5000;i++){
+		for (int i=0;i<5000;i++){
 			hkls[i][0] = 0;
 			hkls[i][1] = 0;
 			hkls[i][2] = 0;

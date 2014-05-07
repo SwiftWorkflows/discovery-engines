@@ -5,6 +5,7 @@
  *      Author: wozniak
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -107,7 +108,11 @@ parameters_read(const char *filename, struct parameters *params)
         str = "LatticeParameter ";
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &params->LatticeConstant);
+            int n = sscanf(aline,"%s %lf %lf %lf %lf %lf %lf ", dummy,
+                   &params->LatticeConstant[0], &params->LatticeConstant[1],
+                   &params->LatticeConstant[2], &params->LatticeConstant[3],
+                   &params->LatticeConstant[4], &params->LatticeConstant[5]);
+            assert(n == 7);
             continue;
         }
         str = "tx ";

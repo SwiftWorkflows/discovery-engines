@@ -18,6 +18,9 @@
 #define MAX_N_SPOTS 200
 #define MAX_N_OMEGA_RANGES 20
 
+#define deg2rad 0.0174532925199433
+#define rad2deg 57.2957795130823
+
 typedef double RealType;
 #define float32_t float
 
