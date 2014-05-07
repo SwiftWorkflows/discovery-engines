@@ -39,7 +39,6 @@ parameters_read(const char *filename, struct parameters *params)
     params->zbc = zbc;
     int cntr=0,countr=0,conter=0;
 
-    params->nRings = 0;
     params->NoOfOmegaRanges = 0;
 
     while (fgets(aline,1000,fileParam)!=NULL){
@@ -68,11 +67,17 @@ parameters_read(const char *filename, struct parameters *params)
             cntr++;
             continue;
         }
-        str = "RingNr ";
+        str = "SpaceGroup ";
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
-            sscanf(aline,"%s %d", dummy, &params->RingNumbers[params->nRings]);
-            params->nRings++;
+            sscanf(aline,"%s %d", dummy, &params->SpaceGroup);
+            continue;
+        }
+        str = "MaxRingRad ";
+        LowNr = strncmp(aline,str,strlen(str));
+        if (LowNr==0){
+            sscanf(aline,"%s %lf", dummy, &params->MaxRingRad);
+            cntr++;
             continue;
         }
         str = "StartNr ";

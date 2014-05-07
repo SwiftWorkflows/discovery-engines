@@ -13,15 +13,13 @@
 struct parameters
 {
     int StartNr,EndNr;
-    int nLayers, NrPixels;
+    int nLayers, NrPixels, SpaceGroup;
     char fn[1000],ext[1024],direct[1024];
     double *Lsd;
     double *ybc;
     double *zbc;
-    double OmegaStart,OmegaStep;
-    int nRings;
-    int RingNumbers[20];
-    double ExcludePoleAngle,LatticeConstant,Wavelength,minFracOverlap;
+    double OmegaStart,OmegaStep, MaxRingRad;
+    double ExcludePoleAngle,LatticeConstant[6],Wavelength,minFracOverlap;
     double tol,lsdtol,lsdtolrel,bctola,bctolb,tiltstol;
     double tx, ty, tz, px;
     int NoOfOmegaRanges;

@@ -15,6 +15,11 @@
  */
 int FitOrientationAll(const char *ParameterFileName, int rown);
 
+int GenerateRingInfo(int SpaceGroup,double a,double b, double c,
+	double alpha, double beta, double gamma, double wavelength,
+	double TthetaMax, double ThetasSorted[5000],
+	int HKLs[5000][4], int *NPs);
+
 int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, double tz,
                        int nLayers, double *Lsd, double **XY, int NrOrientations,
                        int **NrSpots, double **OrientationMatrix, double **SpotsMat,

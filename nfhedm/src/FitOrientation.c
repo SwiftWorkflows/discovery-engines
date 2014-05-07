@@ -21,11 +21,8 @@
 #include "FitOrientation.h"
 
 struct my_func_data{
-        int NrOfFiles;
+	int NrOfFiles;
     int nLayers;
-    double LatticeConstant;
-    double Wavelength;
-    int nRings;
     double ExcludePoleAngle;
     long long int SizeObsSpots;
     double XGrain[3];
@@ -34,9 +31,11 @@ struct my_func_data{
     double OmegaStep;
     double px;
     double gs;
+    int hkls[5000][4];
+    int n_hkls;
+    double Thetas[5000];
     int NoOfOmegaRanges;
     int NrPixelsGrid;
-    int RingNumbers[MAX_N_OMEGA_RANGES];
     double OmegaRanges[MAX_N_OMEGA_RANGES][2];
     double BoxSizes[MAX_N_OMEGA_RANGES][4];
     double **P0;
@@ -50,17 +49,14 @@ struct my_func_data{
 static
 double problem_function(
     unsigned n,
-        const double *x,
-        double *grad,
-        void* f_data_trial)
+	const double *x,
+	double *grad,
+	void* f_data_trial)
 {
-        struct my_func_data *f_data = (struct my_func_data *) f_data_trial;
-        int i, j = 1;
-        const int NrOfFiles = f_data->NrOfFiles;
+	struct my_func_data *f_data = (struct my_func_data *) f_data_trial;
+	int i, j, count = 1;
+	const int NrOfFiles = f_data->NrOfFiles;
     const int nLayers = f_data->nLayers;
-    const double LatticeConstant = f_data->LatticeConstant;
-    const double Wavelength = f_data->Wavelength;
-    const int nRings = f_data->nRings;
     const double ExcludePoleAngle = f_data->ExcludePoleAngle;
     const long long int SizeObsSpots = f_data->SizeObsSpots;
     double XGrain[3];
@@ -72,45 +68,54 @@ double problem_function(
     const int NoOfOmegaRanges = f_data->NoOfOmegaRanges;
     const int NrPixelsGrid = f_data->NrPixelsGrid;
     double P0[nLayers][3];
-    int RingNumbers[MAX_N_OMEGA_RANGES];
     double OmegaRanges[MAX_N_OMEGA_RANGES][2];
     double BoxSizes[MAX_N_OMEGA_RANGES][4];
+    int hkls[5000][4];
+    int n_hkls = f_data->n_hkls;
+    double Thetas[5000];
+    for (i=0;i<5000;i++){
+		hkls[i][0] = f_data->hkls[i][0];
+		hkls[i][1] = f_data->hkls[i][1];
+		hkls[i][2] = f_data->hkls[i][2];
+		hkls[i][3] = f_data->hkls[i][3];
+		Thetas[i] = f_data->Thetas[i];
+	}
     int *ObsSpotsInfo;
-        ObsSpotsInfo = &(f_data->ObsSpotsInfo[0]);
-        double *Lsd;
-        Lsd = &(f_data->Lsd[0]);
-        double *ybc;
-        ybc = &(f_data->ybc[0]);
-        double *zbc;
-        zbc = &(f_data->zbc[0]);
-        for (i=0;i<3;i++){
-                XGrain[i] = f_data->XGrain[i];
-                YGrain[i] = f_data->YGrain[i];
-                for (j=0;j<nLayers;j++){
-                        P0[j][i] = f_data->P0[j][i];
-                }
-        }
-        for (i=0;i<MAX_N_OMEGA_RANGES;i++){
-                RingNumbers[i] = f_data->RingNumbers[i];
-        }
-        for (i=0;i<MAX_N_OMEGA_RANGES;i++){
-                for (j=0;j<2;j++){
-                        OmegaRanges[i][j] = f_data->OmegaRanges[i][j];
-                }
-                for (j=0;j<4;j++){
-                        BoxSizes[i][j] = f_data->BoxSizes[i][j];
-                }
-        }
-        double RotMatTilts[3][3];
-        for (i=0;i<3;i++){
-                for (j=0;j<3;j++){
-                        RotMatTilts[i][j] = f_data->RotMatTilts[i][j];
-                }
-        }
+	ObsSpotsInfo = &(f_data->ObsSpotsInfo[0]);
+	double *Lsd;
+	Lsd = &(f_data->Lsd[0]);
+	double *ybc;
+	ybc = &(f_data->ybc[0]);
+	double *zbc;
+	zbc = &(f_data->zbc[0]);
+	for (i=0;i<3;i++){
+		XGrain[i] = f_data->XGrain[i];
+		YGrain[i] = f_data->YGrain[i];
+		for (j=0;j<nLayers;j++){
+			P0[j][i] = f_data->P0[j][i];
+		}
+	}
+	for (i=0;i<MAX_N_OMEGA_RANGES;i++){
+		for (j=0;j<2;j++){
+			OmegaRanges[i][j] = f_data->OmegaRanges[i][j];
+		}
+		for (j=0;j<4;j++){
+			BoxSizes[i][j] = f_data->BoxSizes[i][j];
+		}
+	}
+	double RotMatTilts[3][3];
+	for (i=0;i<3;i++){
+		for (j=0;j<3;j++){
+			RotMatTilts[i][j] = f_data->RotMatTilts[i][j];
+		}
+	}
     double OrientMatIn[3][3], FracOverlap, x2[3];
     x2[0] = x[0]; x2[1] = x[1]; x2[2] = x[2];
     Euler2OrientMat(x2,OrientMatIn);
-    CalcOverlapAccOrient(NrOfFiles,nLayers,LatticeConstant,Wavelength,nRings,ExcludePoleAngle,Lsd,SizeObsSpots,XGrain,YGrain,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,RingNumbers,OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,ObsSpotsInfo,OrientMatIn,&FracOverlap);
+    CalcOverlapAccOrient(NrOfFiles,nLayers,ExcludePoleAngle,Lsd,SizeObsSpots,XGrain,
+		YGrain,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,hkls,n_hkls,
+		Thetas,OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
+		ObsSpotsInfo,OrientMatIn,&FracOverlap);
     return (1 - FracOverlap);
 }
 
@@ -118,9 +123,6 @@ void
 FitOrientation(
     const int NrOfFiles,
     const int nLayers,
-    const double LatticeConstant,
-    const double Wavelength,
-    const int nRings,
     const double ExcludePoleAngle,
     double Lsd[nLayers],
     const long long int SizeObsSpots,
@@ -133,7 +135,6 @@ FitOrientation(
     double ybc[nLayers],
     double zbc[nLayers],
     const double gs,
-    const int RingNumbers[MAX_N_OMEGA_RANGES],
     double OmegaRanges[MAX_N_OMEGA_RANGES][2],
     const int NoOfOmegaRanges,
     double BoxSizes[MAX_N_OMEGA_RANGES][4],
@@ -145,71 +146,75 @@ FitOrientation(
     double *EulerOutA,
     double *EulerOutB,
     double *EulerOutC,
-    double *ResultFracOverlap)
+    double *ResultFracOverlap,
+    int hkls[5000][4],
+    double Thetas[5000],
+    int n_hkls)
 {
-        unsigned n;
+	unsigned n;
     long int i,j;
     n  = 3;
     double x[n],xl[n],xu[n];
     for( i=0; i<n; i++)
     {
         x[i] = EulerIn[i];
-        xl[i] = x[i] - tol;
-        xu[i] = x[i] + tol;
+        xl[i] = x[i] - (tol*M_PI/180);
+        xu[i] = x[i] + (tol*M_PI/180);
     }
-        struct my_func_data f_data;
-        f_data.NrOfFiles = NrOfFiles;
-        f_data.nLayers = nLayers;
-        f_data.LatticeConstant = LatticeConstant;
-        f_data.Wavelength = Wavelength;
-        f_data.nRings = nRings;
-        f_data.ExcludePoleAngle = ExcludePoleAngle;
-        f_data.SizeObsSpots = SizeObsSpots;
-        f_data.P0 = allocMatrix(nLayers,3);
-        for (i=0;i<3;i++){
-                f_data.XGrain[i] = XGrain[i];
-                f_data.YGrain[i] = YGrain[i];
-                //printf("%f %f %f %f\n",XG rain[i],f_data.XGrain[i],YGrain[i],f_data.YGrain[i]);
-                for (j=0;j<nLayers;j++){
-                        f_data.P0[j][i] = P0[j][i];
-                }
-                for (j=0;j<3;j++){
-                        f_data.RotMatTilts[i][j] = RotMatTilts[i][j];
-                }
-        }
-        for (i=0;i<MAX_N_OMEGA_RANGES;i++){
-                f_data.RingNumbers[i] = RingNumbers[i];
-        }
-        for (i=0;i<MAX_N_OMEGA_RANGES;i++){
-                for (j=0;j<2;j++){
-                        f_data.OmegaRanges[i][j] = OmegaRanges[i][j];
-                }
-                for (j=0;j<4;j++){
-                        f_data.BoxSizes[i][j] = BoxSizes[i][j];
-                }
-        }
-        f_data.ObsSpotsInfo = &ObsSpotsInfo[0];
-        f_data.Lsd = &Lsd[0];
-        f_data.ybc = &ybc[0];
-        f_data.zbc = &zbc[0];
-        f_data.OmegaStart = OmegaStart;
-        f_data.OmegaStep = OmegaStep;
-        f_data.px = px;
-        f_data.gs = gs;
-        f_data.NoOfOmegaRanges = NoOfOmegaRanges;
-        f_data.NrPixelsGrid = NrPixelsGrid;
-        struct my_func_data *f_datat;
-        f_datat = &f_data;
-        void* trp = (struct my_func_data *) f_datat;
-        // double tole = 1e-3;
-        nlopt_opt opt;
-        opt = nlopt_create(NLOPT_LN_SBPLX, n);
-        nlopt_set_lower_bounds(opt, xl);
-        nlopt_set_upper_bounds(opt, xu);
-        nlopt_set_min_objective(opt, problem_function, trp);
-        double minf;
-        nlopt_optimize(opt, x, &minf);
-        nlopt_destroy(opt);
+	struct my_func_data f_data;
+	f_data.NrOfFiles = NrOfFiles;
+	f_data.nLayers = nLayers;
+	f_data.n_hkls = n_hkls;
+	for (i=0;i<5000;i++){
+		f_data.hkls[i][0] = hkls[i][0];
+		f_data.hkls[i][1] = hkls[i][1];
+		f_data.hkls[i][2] = hkls[i][2];
+		f_data.hkls[i][3] = hkls[i][3];
+		f_data.Thetas[i] = Thetas[i];
+	}
+	f_data.ExcludePoleAngle = ExcludePoleAngle;
+	f_data.SizeObsSpots = SizeObsSpots;
+	f_data.P0 = allocMatrixF(nLayers,3);
+	for (i=0;i<3;i++){
+		f_data.XGrain[i] = XGrain[i];
+		f_data.YGrain[i] = YGrain[i];
+		for (j=0;j<nLayers;j++){
+			f_data.P0[j][i] = P0[j][i];
+		}
+		for (j=0;j<3;j++){
+			f_data.RotMatTilts[i][j] = RotMatTilts[i][j];
+		}
+	}
+	for (i=0;i<MAX_N_OMEGA_RANGES;i++){
+		for (j=0;j<2;j++){
+			f_data.OmegaRanges[i][j] = OmegaRanges[i][j];
+		}
+		for (j=0;j<4;j++){
+			f_data.BoxSizes[i][j] = BoxSizes[i][j];
+		}
+	}
+	f_data.ObsSpotsInfo = &ObsSpotsInfo[0];
+	f_data.Lsd = &Lsd[0];
+	f_data.ybc = &ybc[0];
+	f_data.zbc = &zbc[0];
+	f_data.OmegaStart = OmegaStart;
+	f_data.OmegaStep = OmegaStep;
+	f_data.px = px;
+	f_data.gs = gs;
+	f_data.NoOfOmegaRanges = NoOfOmegaRanges;
+	f_data.NrPixelsGrid = NrPixelsGrid;
+	struct my_func_data *f_datat;
+	f_datat = &f_data;
+	void* trp = (struct my_func_data *) f_datat;
+	double tole = 1e-3;
+	nlopt_opt opt;
+	opt = nlopt_create(NLOPT_LN_SBPLX, n);	
+	nlopt_set_lower_bounds(opt, xl);
+	nlopt_set_upper_bounds(opt, xu);
+	nlopt_set_min_objective(opt, problem_function, trp);
+	double minf=1;
+	nlopt_optimize(opt, x, &minf);
+	nlopt_destroy(opt);
     *ResultFracOverlap = minf;
     *EulerOutA = x[0];
     *EulerOutB = x[1];
@@ -248,6 +253,7 @@ int FitOrientationAll(const char *ParamFN, int rown)
 
     Init_FitOrientation(params.direct);
 
+    double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
        //Read bin files
        char fnG[1000], fn[1000];
        sprintf(fnG,"%s/grid.txt",params.direct);
@@ -318,7 +324,7 @@ int FitOrientationAll(const char *ParamFN, int rown)
            XY[2][0] =xs + gs;
            XY[2][1] =ys - y1;
        }
-
+    double GridSize=2*gs;
 
        //Read Orientations
        FILE *fd, *fk, *fo;
@@ -358,9 +364,9 @@ int FitOrientationAll(const char *ParamFN, int rown)
                          /*11*/NrSpots, OrientationMatrix, SpotsMat,
                          /*14*/nrFiles, params.OmegaStart, params.OmegaStep, SizeObsSpots,
                          /*18*/params.ybc, params.zbc, ObsSpotsInfo, params.minFracOverlap,
-                         /*22*/params.LatticeConstant, params.Wavelength, params.nRings, params.ExcludePoleAngle,
+                         /*22*/params.LatticeConstant, params.Wavelength, params.SpaceGroup, params.ExcludePoleAngle,
                          /*26*/params.RingNumbers, params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
-                         params.tol, TotalDiffrSpots, xs, ys);
+                         params.tol, TotalDiffrSpots, xs, ys, MaxTtheta);
 
        assert(rc == 1);
        return 1;
@@ -377,10 +383,10 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        int **NrSpots, double **OrientationMatrix, double **SpotsMat,
                        int nrFiles, double OmegaStart, double OmegaStep, long long int SizeObsSpots,
                        double *ybc, double *zbc, int *ObsSpotsInfo, double minFracOverlap,
-                       double LatticeConstant, int Wavelength, int nRings, double ExcludePoleAngle,
+                       double LatticeConstant, int Wavelength, int SpaceGroup, double ExcludePoleAngle,
                        int *RingNumbers, double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
                        double BoxSizes[MAX_N_OMEGA_RANGES][4],
-                       double tol, int TotalDiffrSpots, double xs, double ys)
+                       double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta)
 {
    // Go through each orientation and compare with observed spots.
     clock_t startthis2;
@@ -442,6 +448,20 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     }
     double BestFrac, BestEuler[3];
     if (OrientationGoodID>0){
+		int n_hkls = 0;
+		int hkls[5000][4];
+		double Thetas[5000];
+		for (i=0;i<5000;i++){
+			hkls[i][0] = 0;
+			hkls[i][1] = 0;
+			hkls[i][2] = 0;
+			hkls[i][3] = 0;
+			Thetas[i] = 0;
+		}
+		int rc;
+		rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
+			LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
+			LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
         double Fractions, EulerIn[3], OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,OMTemp[9];
         BestFrac = -1;
         for (int i=0;i<OrientationGoodID;i++){
@@ -450,10 +470,11 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
             }
             Convert9To3x3(OMTemp,OrientIn);
             OrientMat2Euler(OrientIn,EulerIn);
-            FitOrientation(nrFiles,nLayers,LatticeConstant,Wavelength,nRings,ExcludePoleAngle,Lsd,SizeObsSpots,
-                           /*9*/XG,YG,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,
-                           /*18*/RingNumbers,OmegaRanges,NoOfOmegaRanges,BoxSizes,
-                           /*22*/P0,NrPixelsGrid,ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,&EulerOutC,&FracOut);
+            FitOrientation(nrFiles,nLayers,ExcludePoleAngle,Lsd,SizeObsSpots,
+				XG,YG,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,
+				OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
+				ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,
+				&EulerOutC,&FracOut,hkls,Thetas,n_hkls);
             Fractions = 1-FracOut;
             if (Fractions > BestFrac){
                 BestFrac = Fractions;

@@ -14,14 +14,13 @@
    @return 0 on success, 1 on error
  */
 int
-CalcDiffractionSpots(double LatticeConstant,
-        double Wavelength,
-        double Distance,
-        int nRings,
-        double ExcludePoleAngle,
-        const int RingNumbers[MAX_N_OMEGA_RANGES],
+CalcDiffractionSpots(double Distance,
+		double ExcludePoleAngle,
         double OmegaRanges[MAX_N_OMEGA_RANGES][2],
         int NoOfOmegaRanges,
+		int hkls[5000][4],
+		int n_hkls,
+		double Thetas[5000],
         double BoxSizes[MAX_N_OMEGA_RANGES][4],
         int *nTspots,
         double OrientMatr[3][3],
