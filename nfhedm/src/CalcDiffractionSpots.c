@@ -21,6 +21,7 @@
 #define RealType double
 #define MAX_N_HKLS 1000
 #define MAX_N_OMEGA_RANGES 20
+#define EPS 0.000000001
 
 #define crossProduct(a,b,c) \
 (a)[0] = (b)[1] * (c)[2] - (c)[1] * (b)[2]; \
@@ -34,10 +35,6 @@
 
 #define CalcLength(x,y,z) sqrt((x)*(x) + (y)*(y) + (z)*(z))
 
-int n_hkls = 0;
-int hkls[MAX_N_HKLS][4];
-
-
 void
 MatrixMult(
            RealType m[3][3],
@@ -49,97 +46,6 @@ MatrixMult(
         r[i] = m[i][0]*v[0] +
         m[i][1]*v[1] +
         m[i][2]*v[2];
-    }
-}
-
-void
-GenerateHKLsFCC(
-                int ringnos[],
-                int nrings,
-                int hkls[][4],
-                int *nhkls)
-
-{
-    
-#define N_HKLSFCC 58
-    int hklsFCC[N_HKLSFCC][4] ={
-        {-1,-1,-1,1},
-        { 1, 1, 1,1},
-        {-1,-1, 1,1},
-        {-1, 1,-1,1},
-        {-1, 1, 1,1},
-        { 1,-1,-1,1},
-        { 1,-1, 1,1},
-        { 1, 1,-1,1},
-        
-        {-2, 0, 0,2},
-        { 0,-2, 0,2},
-        { 0, 0,-2,2},
-        { 0, 0, 2,2},
-        { 0, 2, 0,2},
-        { 2, 0, 0,2},
-        
-        {-2,-2, 0,3},
-        {-2, 0,-2,3},
-        {-2, 0, 2,3},
-        {-2, 2, 0,3},
-        { 0,-2,-2,3},
-        { 0,-2, 2,3},
-        { 0, 2,-2,3},
-        { 0, 2, 2,3},
-        { 2,-2, 0,3},
-        { 2, 0,-2,3},
-        { 2, 0, 2,3},
-        { 2, 2, 0,3},
-        
-        {-3,-1,-1,4},
-        {-1,-3,-1,4},
-        { 1, 3, 1,4},
-        { 3, 1, 1,4},
-        {-3,-1, 1,4},
-        {-3, 1,-1,4},
-        {-3, 1, 1,4},
-        {-1,-3, 1,4},
-        {-1,-1,-3,4},
-        {-1,-1, 3,4},
-        {-1, 1,-3,4},
-        {-1, 1, 3,4},
-        {-1, 3,-1,4},
-        {-1, 3, 1,4},
-        { 1,-3,-1,4},
-        { 1,-3, 1,4},
-        { 1,-1,-3,4},
-        { 1,-1, 3,4},
-        { 1, 1,-3,4},
-        { 1, 1, 3,4},
-        { 1, 3,-1,4},
-        { 3,-1,-1,4},
-        { 3,-1, 1,4},
-        { 3, 1,-1,4},
-        
-        {-2,-2,-2,5},
-        { 2, 2, 2,5},
-        {-2,-2, 2,5},
-        {-2, 2,-2,5},
-        {-2, 2, 2,5},
-        { 2,-2,-2,5},
-        { 2,-2, 2,5},
-        { 2, 2,-2,5} };
-    
-    int i, ringno, rowno;
-    
-    *nhkls = 0;
-    for ( i = 0 ; i < nrings ; i++ ) {
-        ringno = ringnos[i];
-        for ( rowno = 0 ; rowno < N_HKLSFCC ; rowno++ ) {
-            if (hklsFCC[rowno][3] == ringno) {
-                hkls[*nhkls][0] = hklsFCC[rowno][0];
-                hkls[*nhkls][1] = hklsFCC[rowno][1];
-                hkls[*nhkls][2] = hklsFCC[rowno][2];
-                hkls[*nhkls][3] = hklsFCC[rowno][3];
-                (*nhkls)++;
-            }
-        }
     }
 }
 
@@ -167,77 +73,6 @@ QuatToOrientMat(
     OrientMat[2][0] = 2*(Q13+Q02);
     OrientMat[2][1] = 2*(Q23-Q01);
     OrientMat[2][2] = 1 - 2*(Q1_2+Q2_2);
-}
-
-void
-CalcTheta(
-          int h,
-          int k,
-          int l,
-          RealType LatticeParameter,
-          RealType Wavelength,
-          RealType *theta)
-{
-    RealType dspacing;
-    
-    RealType h2k2l2 = h*h + k*k + l*l;
-    dspacing = sqrt(LatticeParameter * LatticeParameter/h2k2l2);
-    *theta = rad2deg*asin(Wavelength/(2*dspacing));
-}
-
-void
-GenerateRingInfo(
-                 RealType LatticeConstant,
-                 RealType Wavelength,
-                 RealType RingTtheta[],
-                 int   RingMult[],
-                 int   RingHKL[][3])
-
-{
-    RealType theta;
-    RingTtheta[0] = 0;
-    CalcTheta(1, 1, 1, LatticeConstant, Wavelength, &theta);
-    RingTtheta[1] = 2*theta;
-    CalcTheta(2, 0, 0, LatticeConstant, Wavelength, &theta);
-    RingTtheta[2] = 2*theta;
-    CalcTheta(2, 2, 0, LatticeConstant, Wavelength, &theta);
-    RingTtheta[3] = 2*theta;
-    CalcTheta(3, 1, 1, LatticeConstant, Wavelength, &theta);
-    RingTtheta[4] = 2*theta;
-    CalcTheta(2, 2, 2, LatticeConstant, Wavelength, &theta);
-    RingTtheta[5] = 2*theta;
-    
-    RingMult[0] = 0;
-    RingMult[1] = 8;
-    RingMult[2] = 6;
-    RingMult[3] = 12;
-    RingMult[4] = 24;
-    RingMult[5] = 8;
-    
-    RingHKL[0][0] = 0;
-    RingHKL[0][1] = 0;
-    RingHKL[0][2] = 0;
-    
-    RingHKL[1][0] = 1;
-    RingHKL[1][1] = 1;
-    RingHKL[1][2] = 1;
-    
-    RingHKL[2][0] = 2;
-    RingHKL[2][1] = 0;
-    RingHKL[2][2] = 0;
-    
-    RingHKL[3][0] = 2;
-    RingHKL[3][1] = 2;
-    RingHKL[3][2] = 0;
-    
-    RingHKL[4][0] = 3;
-    RingHKL[4][1] = 1;
-    RingHKL[4][2] = 1;
-    
-    RingHKL[5][0] = 2;
-    RingHKL[5][1] = 2;
-    RingHKL[5][2] = 2;
-    
 }
 
 void
@@ -357,48 +192,22 @@ CalcOmega(
 }
 
 void
-CalcRingRadii(
-              RealType Distance,
-              RealType Ttheta[],
-              int RingNrs[],
-              int NrRings,
-              RealType RingRadii[])
-{
-    int i;
-    for (i=0;i<NrRings;i++){
-        RingRadii[i+1] = tan(deg2rad*Ttheta[RingNrs[i]])*Distance;
-    }
-}
-
-void
 CalcDiffrSpots_Furnace(
                        RealType OrientMatrix[3][3],
-                       RealType LatticeConstant,
-                       RealType Wavelength ,
                        RealType distance,
-                       RealType RingRadii[],
                        RealType OmegaRange[][2],
                        RealType BoxSizes[][4],
                        int NOmegaRanges,
+                       int hkls[5000][4],
+                       int n_hkls,
+                       double Thetas[5000],
                        RealType ExcludePoleAngle,
                        RealType **spots,
                        int *nspots)
-
 {
     int i, OmegaRangeNo;
-    RealType DSpacings[MAX_N_HKLS];
-    RealType thetas[MAX_N_HKLS];
-    RealType ds;
     RealType theta;
     int KeepSpot;
-    for (i = 0 ;i < n_hkls; i++) {
-        int sumhkl = hkls[i][0]*hkls[i][0] + hkls[i][1]*hkls[i][1] + hkls[i][2]*hkls[i][2];
-        ds = sqrt(LatticeConstant*LatticeConstant / sumhkl);
-        theta = rad2deg * asin(Wavelength/(2*ds));
-        DSpacings[i] = ds;
-        thetas[i] = theta;
-    }
-    
     int Ghkl[3];
     int indexhkl;
     RealType Gc[3];
@@ -409,16 +218,13 @@ CalcDiffrSpots_Furnace(
     int nspotsPlane;
     int spotnr = 0;
     int spotid = 0;
-    int ringnr = 0;
     for (indexhkl=0; indexhkl < n_hkls ; indexhkl++)  {
         Ghkl[0] = hkls[indexhkl][0];
         Ghkl[1] = hkls[indexhkl][1];
         Ghkl[2] = hkls[indexhkl][2];
-        ringnr = hkls[indexhkl][3];
-        RealType RingRadius = RingRadii[ringnr];
+        RealType RingRadius = distance * tan(2*deg2rad*Thetas[indexhkl]);
         MatrixMult(OrientMatrix,Ghkl, Gc);
-        ds    = DSpacings[indexhkl];
-        theta = thetas[indexhkl];
+        theta = Thetas[indexhkl];
         CalcOmega(Gc[0], Gc[1], Gc[2], theta, omegas, etas, &nspotsPlane);
         for (i=0 ; i<nspotsPlane ; i++) {
             RealType Omega = omegas[i];
@@ -439,17 +245,9 @@ CalcDiffrSpots_Furnace(
                 }
             }
             if (KeepSpot==1) {
-                //    spots[spotnr][0] = OrientID;
-                //                spots[spotnr][0] = spotid;
-                //      spots[spotnr][2] = indexhkl;
-                //        spots[spotnr][3] = distance;
                 spots[spotnr][0] = yl;
                 spots[spotnr][1] = zl;
                 spots[spotnr][2] = omegas[i];
-                //                printf("%f %f %f %f\n",yl,zl,omegas[i],RingRadius);
-                //            spots[spotnr][7] = etas[i];
-                //              spots[spotnr][8] = theta;
-                //                spots[spotnr][9] = ringnr;
                 spotnr++;
                 spotid++;
             }
@@ -459,34 +257,26 @@ CalcDiffrSpots_Furnace(
 }
 
 int
-CalcDiffractionSpots(double LatticeConstant, 
-	double Wavelength, 
-	double Distance, 
-	int nRings, 
+CalcDiffractionSpots(double Distance, 
 	double ExcludePoleAngle, 
-	int RingNumbers[MAX_N_OMEGA_RANGES], 
 	double OmegaRanges[MAX_N_OMEGA_RANGES][2], 
-	int NoOfOmegaRanges, 
+	int NoOfOmegaRanges,
+	int hkls[5000][4],
+	int n_hkls,
+	double Thetas[5000],
 	double BoxSizes[MAX_N_OMEGA_RANGES][4], 
 	int *nTspots, 
 	double OrientMatr[3][3], 
 	double **TheorSpots)
 {
-    double RingTtheta[MAX_N_HKLS], RingRadii[nRings+1];
-    int RingMult[MAX_N_HKLS];
-    int RingHKL[MAX_N_HKLS][3];
-    int NrOfRings;
-    NrOfRings = nRings;
     *nTspots = 0;
-    GenerateHKLsFCC(RingNumbers,NrOfRings, hkls, &n_hkls);
-    GenerateRingInfo(LatticeConstant, Wavelength, RingTtheta, RingMult, RingHKL);
-    CalcRingRadii(Distance,RingTtheta,RingNumbers,nRings,RingRadii);
     int nTsps;
     if (TheorSpots == NULL ) {
         printf("Memory error: could not allocate memory for output matrix. Memory full?\n");
         return 1;
     }
-    CalcDiffrSpots_Furnace(OrientMatr, LatticeConstant, Wavelength, Distance, RingRadii, OmegaRanges, BoxSizes, NoOfOmegaRanges, ExcludePoleAngle, TheorSpots, &nTsps);
+    CalcDiffrSpots_Furnace(OrientMatr, Distance, OmegaRanges, BoxSizes,
+		NoOfOmegaRanges, hkls, n_hkls, Thetas, ExcludePoleAngle, TheorSpots, &nTsps);
     *nTspots = nTsps;
     return 0;
 }

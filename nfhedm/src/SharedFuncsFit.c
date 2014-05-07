@@ -446,30 +446,23 @@ void
 DisplacementSpots(
     RealType a,
     RealType b,
-    RealType xi,
+    RealType Lsd,
     RealType yi,
     RealType zi,
     RealType omega,
     RealType *Displ_y,
     RealType *Displ_z)
 {
-    RealType lenInv = 1/sqrt(xi*xi + yi*yi + zi*zi);
-    xi = xi*lenInv;
-    yi = yi*lenInv;
-    zi = zi*lenInv;
-    
     RealType OmegaRad = deg2rad * omega;
     RealType sinOme = sin(OmegaRad);
     RealType cosOme = cos(OmegaRad);
-    RealType t = (a*cosOme - b*sinOme)/xi;
-    
-    *Displ_y = ((a*sinOme)+(b*cosOme))-(t*yi);
-    *Displ_z = -t*zi;
+    RealType xa = a*cosOme - b*sinOme;
+    RealType ya = a*sinOme + b*cosOme;
+    RealType t = 1 - (xa/Lsd);
+    *Displ_y = ya + (yi*t);
+    *Displ_z = t*zi;
 }
 
-int sign(int x){
-    return (x > 0) ? 1 : ((x < 0) ? -1 : 0);
-}
 
 struct Point2D {
     int x, y;
@@ -579,11 +572,11 @@ CalcFracOverlap(
     double *FracOver)
 {
     int j,OmeBin,OutofBounds,k,l;
-    // int nSpotsReduced=nTspots;
-    double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,xyz[3],P1[3],ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3];
+    double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,
+		xyz[3],P1[3],ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3],
+		YZSpotsTemp[2],YZSpotsT[3][2];
     int **InPixels,NrInPixels, OverlapPixels,Layer;
     long long int BinNr;
-    // double SpotsOverAll=0;
     int MultY, MultZ, AllDistsFound, TotalPixels;
     *FracOver = 0;
     InPixels = allocMatrixInt(NrPixelsGrid,2);
@@ -605,8 +598,8 @@ CalcFracOverlap(
 			XGT = XGrain[k];
 			YGT = YGrain[k];
 			DisplacementSpots(XGT,YGT,Lsd,ythis,zthis,OmegaThis,&Displ_Y,&Displ_Z);
-			ytemp = (ythis + Displ_Y);
-			ztemp = (zthis + Displ_Z);
+			ytemp = Displ_Y;
+			ztemp = Displ_Z;
 			xyz[0] = 0;
 			xyz[1] = ytemp;
 			xyz[2] = ztemp;
@@ -617,11 +610,30 @@ CalcFracOverlap(
 			outxyz[0] = 0;
 			outxyz[1] = P0[1] -(ABC[1]*P0[0])/(ABC[0]);
 			outxyz[2] = P0[2] -(ABC[2]*P0[0])/(ABC[0]);
-			YZSpots[k][0] = (outxyz[1])/px + ybc;
-			YZSpots[k][1] = (outxyz[2])/px + zbc;
-			if (YZSpots[k][0] > 2048 || YZSpots[k][0] < 0 || YZSpots[k][1] > 2048 || YZSpots[k][1] < 0){
+			YZSpotsT[k][0] = (outxyz[1])/px + ybc;
+			YZSpotsT[k][1] = (outxyz[2])/px + zbc;
+			if (YZSpotsT[k][0] > 2048 || YZSpotsT[k][0] < 0 || YZSpotsT[k][1] > 2048 || YZSpotsT[k][1] < 0){
 				OutofBounds = 1;
 				break;
+			}
+			if (k==2){
+				xyz[0] = 0;
+				xyz[1] = ythis;
+				xyz[2] = zthis;
+				MatrixMultF(RotMatTilts,xyz,P1);
+				for (l=0;l<3;l++){
+					ABC[l] = P1[l]-P0[l];
+				}
+				outxyz[0] = 0;
+				outxyz[1] = P0[1] -(ABC[1]*P0[0])/(ABC[0]);
+				outxyz[2] = P0[2] -(ABC[2]*P0[0])/(ABC[0]);
+				YZSpotsTemp[0] = (outxyz[1])/px + ybc;
+				YZSpotsTemp[1] = (outxyz[2])/px + zbc;
+				for (l=0;l<3;l++){
+					YZSpots[l][0] = YZSpotsT[l][0] - YZSpotsTemp[0];
+					YZSpots[l][1] = YZSpotsT[l][1] - YZSpotsTemp[1];
+					//printf("%f %f %f %f %f %f\n",YZSpots[l][0],YZSpotsT[l][0],YZSpotsTemp[0],YZSpots[l][1],YZSpotsT[l][1],YZSpotsTemp[1]);
+				}
 			}
 		}
 		if (OutofBounds == 1){
@@ -637,8 +649,8 @@ CalcFracOverlap(
 		for (k=0;k<NrInPixels;k++){
 			AllDistsFound = 1;
 			for (Layer=0;Layer<nLayers;Layer++){
-				MultY = (int) floor(((((double)(InPixels[k][0]-ybc))*px)*(Lsds[Layer]/Lsd))/px + ybcs[Layer]);
-				MultZ = (int) floor(((((double)(InPixels[k][1]-zbc))*px)*(Lsds[Layer]/Lsd))/px + zbcs[Layer]);
+				MultY = (int) floor(((((double)(YZSpotsTemp[0]-ybc))*px)*(Lsds[Layer]/Lsd))/px + ybcs[Layer]) + InPixels[k][0];
+				MultZ = (int) floor(((((double)(YZSpotsTemp[1]-zbc))*px)*(Lsds[Layer]/Lsd))/px + zbcs[Layer]) + InPixels[k][1];
 				if (MultY > 2048 || MultY < 0 || MultZ > 2048 || MultZ < 0){
 					OutofBounds = 1;
 					break;
@@ -676,9 +688,6 @@ void
 CalcOverlapAccOrient(
     const int NrOfFiles,
     const int nLayers,
-    const double LatticeConstant,
-    const double Wavelength,
-    const int nRings,
     const double ExcludePoleAngle,
     const double Lsd[nLayers],
     const long long int SizeObsSpots,
@@ -691,7 +700,9 @@ CalcOverlapAccOrient(
     const double ybc[nLayers],
     const double zbc[nLayers],
     const double gs,
-    const int RingNumbers[MAX_N_OMEGA_RANGES],
+    int hkls[5000][4],
+    int n_hkls,
+    double Thetas[5000],
     double OmegaRanges[MAX_N_OMEGA_RANGES][2],
     const int NoOfOmegaRanges,
     double BoxSizes[MAX_N_OMEGA_RANGES][4],
@@ -704,8 +715,8 @@ CalcOverlapAccOrient(
     int nTspots,i;
     double **TheorSpots, Lsd0=Lsd[0];
     TheorSpots = allocMatrix(MAX_N_SPOTS,3);
-    CalcDiffractionSpots(LatticeConstant, Wavelength, Lsd0, nRings, ExcludePoleAngle, RingNumbers, OmegaRanges, NoOfOmegaRanges,
-		BoxSizes, &nTspots, OrientMatIn,TheorSpots);
+    CalcDiffractionSpots(Lsd0, ExcludePoleAngle, OmegaRanges, NoOfOmegaRanges,
+		hkls, n_hkls, Thetas, BoxSizes, &nTspots, OrientMatIn,TheorSpots);
     double FracOver;
     double XG[3],YG[3],ThrSps[nTspots][3];
     for (i=0;i<3;i++){
@@ -717,7 +728,8 @@ CalcOverlapAccOrient(
         ThrSps[i][1] = TheorSpots[i][1];
         ThrSps[i][2] = TheorSpots[i][2];
     }
-    CalcFracOverlap(NrOfFiles,nLayers,nTspots,ThrSps,OmegaStart,OmegaStep,XG,YG,Lsd,SizeObsSpots,RotMatTilts,px,ybc,zbc,gs,
+    CalcFracOverlap(NrOfFiles,nLayers,nTspots,ThrSps,OmegaStart,
+		OmegaStep,XG,YG,Lsd,SizeObsSpots,RotMatTilts,px,ybc,zbc,gs,
 		P0,NrPixelsGrid,ObsSpotsInfo,OrientMatIn,&FracOver);
     *FracOverlap = FracOver;
     FreeMemMatrix(TheorSpots,MAX_N_SPOTS);
