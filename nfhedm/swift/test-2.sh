@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -e
+set -ex
+
+NFHEDM_INSTALL=${HOME}/sfw/nfhedm
+DATA=${HOME}/proj/d-e/nfhedm/data
 
 if [[ ${#*} != 3 ]]
 then
@@ -12,8 +15,8 @@ PARAMETERS=$1
 START=$2
 END=$3
 
-DIR=$( cd $(dirname $0) ; /bin/pwd )
-NFHEDM_INSTALL=$( cd ${DIR}/.. ; /bin/pwd )
+TEST_DIR=$(  cd $(dirname $0)  ; /bin/pwd )
+SWIFT_DIR=$( cd ${TEST_DIR}/.. ; /bin/pwd )
 
 if [[ ! -f ${NFHEDM_INSTALL}/lib/pkgIndex.tcl ]]
 then
@@ -22,10 +25,9 @@ then
 fi
 export TURBINE_USER_LIB=${NFHEDM_INSTALL}/lib
 
-stc swift/test-2.swift
+stc ${TEST_DIR}/test-2.swift
 
-DATA=${HOME}/wozniak/data
 cd ${DATA}
 echo "PWD: $(pwd)"
 export TURBINE_LOG=0
-turbine -l ${NFHEDM_INSTALL}/swift/test-2.tcl -p=${PARAMETERS} ${START} ${END}
+turbine -l ${TEST_DIR}/test-2.tcl -p=${PARAMETERS} ${START} ${END}
