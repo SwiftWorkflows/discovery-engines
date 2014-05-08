@@ -199,21 +199,23 @@ main(int argc, char *argv[])
 
     int resultMax = 7+params.nLayers*3;
     double result[resultMax];
+    double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
+
 
     for (int i = 0; i < OrientationGoodID; i++)
       optimizeOrientation(OrientMatrix[i],
                           params.tx, params.ty, params.tz, params.nLayers,
                           nrFiles, ObsSpotsInfo,
-                          params.LatticeConstant, params.Wavelength, params.nRings,
+                          params.LatticeConstant, params.Wavelength,
                           params.ExcludePoleAngle, params.Lsd, SizeObsSpots,
                           params.OmegaStart, params.OmegaStep, params.px, params.ybc, params.zbc,
-                          gs, params.RingNumbers, params.OmegaRanges, params.NoOfOmegaRanges,
+                          gs, params.OmegaRanges, params.NoOfOmegaRanges,
                           params.BoxSizes, P0, NrPixelsGrid, XG, YG,
                           params.tol, params.lsdtol, params.lsdtolrel,
                           params.tiltstol,
                           params.bctola,params.bctolb,
                           result,
-                          resultMax);
+                          resultMax,params.SpaceGroup,MaxTtheta);
     /*
      * The format of result is as follows:
      * Euler1

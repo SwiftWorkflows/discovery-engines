@@ -271,15 +271,16 @@ void
 optimizeOrientation(double *OrientMatrixRow,
                     double tx, double ty, double tz, int nLayers,
                     int nrFiles, int *ObsSpotsInfo,
-                    double LatticeConstant, double Wavelength, int nRings,
+                    double LatticeConstant[6], double Wavelength,
                     double ExcludePoleAngle, double *Lsd, int SizeObsSpots,
                     double OmegaStart, double OmegaStep, double px, double *ybc, double *zbc,
-                    double gs, /*18*/int *RingNumbers, /*19*/double OmegaRanges[MAX_N_OMEGA_RANGES][2],
+                    double gs,/*19*/double OmegaRanges[MAX_N_OMEGA_RANGES][2],
                     int NoOfOmegaRanges,
                     /*21*/double BoxSizes[MAX_N_OMEGA_RANGES][4], double P0[nLayers][3], int NrPixelsGrid,
                     double XG[3], double YG[3],
                     double tol, double lsdtol, double lsdtolrel,
-                    double tiltstol,double bctola, double bctolb, double *output, int outputMax)
+                    double tiltstol,double bctola, double bctolb, double *output, int outputMax,
+		    int SpaceGroup, double MaxTtheta)
 {
   double EulerIn[3],OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,BestFrac,OMTemp[9];
   double *LsdFit, *TiltsFit, **BCsFit;
@@ -290,18 +291,32 @@ optimizeOrientation(double *OrientMatrixRow,
   LsdFit = malloc(nLayers*sizeof(*LsdFit));
   TiltsFit = malloc(nLayers+sizeof(*TiltsFit));
   BCsFit = allocMatrix(nLayers,2);
+		int n_hkls = 0;
+		int hkls[5000][4];
+		double Thetas[5000];
+		for (int i=0;i<5000;i++){
+			hkls[i][0] = 0;
+			hkls[i][1] = 0;
+			hkls[i][2] = 0;
+			hkls[i][3] = 0;
+			Thetas[i] = 0;
+		}
+		int rc;
+		rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
+			LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
+			LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
   BestFrac = -1;
   for (int j=0;j<9;j++){
     OMTemp[j] = OrientMatrixRow[j];
   }
   Convert9To3x3(OMTemp,OrientIn);
   OrientMat2Euler(OrientIn,EulerIn);
-  FitOrientationP(nrFiles,nLayers,LatticeConstant,Wavelength,nRings,ExcludePoleAngle,Lsd,SizeObsSpots,
-                 XG,YG,TiltsOrig,OmegaStart,OmegaStep,px,ybc,zbc,gs,RingNumbers,OmegaRanges,NoOfOmegaRanges,
-                 BoxSizes,P0,NrPixelsGrid,ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,&EulerOutC,&FracOut,
-                 LsdFit,TiltsFit,BCsFit,lsdtol,lsdtolrel,tiltstol,bctola,bctolb);
+  FitOrientationP(nrFiles,nLayers,ExcludePoleAngle,Lsd,SizeObsSpots,
+                 XG,YG,TiltsOrig,OmegaStart,OmegaStep,px,ybc,zbc,gs,
+		 OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
+		 ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,&EulerOutC,&FracOut,
+                 hkls,Thetas,n_hkls,LsdFit,TiltsFit,BCsFit,lsdtol,lsdtolrel,tiltstol,bctola,bctolb);
   BestFrac = 1-FracOut;
-  // This
   printf("\nBest fraction: %f.\n",BestFrac);
   printf("Euler angles: %f %f %f, ConfidenceIndex: %f\nTilts: %f %f %f\n",
   	EulerOutA, EulerOutB, EulerOutC, 1-FracOut,TiltsFit[0], TiltsFit[1],
@@ -309,7 +324,6 @@ optimizeOrientation(double *OrientMatrixRow,
   for (int j=0;j<nLayers;j++){
 	printf("Layer Nr: %d, Lsd: %f, BCs: %f %f\n", j,LsdFit[j],BCsFit[j][0],BCsFit[j][1]);
   }
-  // till here can be commented out if needed.
   output[0] = EulerOutA;
   output[1] = EulerOutB;
   output[2] = EulerOutC;
