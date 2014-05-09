@@ -230,7 +230,7 @@ main(int argc, char *argv[])
     FILE *fileParam;
     ParamFN = argv[1];
     char aline[1000];
-	char fn[1000], ext[1000], extReduced[1000];
+	char fn2[1000],fn[1000], direct[1000], ext[1000], extReduced[1000];
     fileParam = fopen(ParamFN,"r");
     char *str, dummy[1000];
     int LowNr,nLayers,StartNr,NrFilesPerLayer,NrPixels,BlnketSubtraction;
@@ -240,6 +240,12 @@ main(int argc, char *argv[])
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
             sscanf(aline,"%s %d", dummy, &StartNr);
+            continue;
+        }
+	str = "DataDirectory ";
+        LowNr = strncmp(aline,str,strlen(str));
+        if (LowNr==0){
+            sscanf(aline,"%s %s", dummy, direct);
             continue;
         }
         str = "NrPixels ";
@@ -263,7 +269,7 @@ main(int argc, char *argv[])
         str = "OrigFileName ";
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
-            sscanf(aline,"%s %s", dummy, fn);
+            sscanf(aline,"%s %s", dummy, fn2);
             continue;
         }
         str = "extOrig ";
@@ -279,6 +285,7 @@ main(int argc, char *argv[])
             continue;
         }
     }
+    sprintf(fn,"%s/%s",direct,fn2);
     fclose(fileParam);
 	int ReturnCode;
 	ReturnCode = CalcMedian(fn, nLayers,StartNr,NrPixels,NrFilesPerLayer,ext,extReduced,BlnketSubtraction);
