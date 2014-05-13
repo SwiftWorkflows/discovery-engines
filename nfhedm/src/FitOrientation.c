@@ -286,6 +286,8 @@ int FitOrientationAll(const char *ParamFN, int rown)
            return 0;
        }
 
+       printf("reading: %s\n", fnG);
+       
        FILE *fp;
        fp = fopen(fnG,"r");
        if (fp == NULL)
@@ -308,6 +310,7 @@ int FitOrientationAll(const char *ParamFN, int rown)
        }
        sscanf(line,"%lf %lf %lf %lf %lf",&y1,&y2,&xs,&ys,&gs);
        fclose(fp);
+       printf("closed: %s\n", fnG);
        if (y1>y2){
            XY[0][0] =xs;
            XY[0][1] =ys - y1;
@@ -337,6 +340,7 @@ int FitOrientationAll(const char *ParamFN, int rown)
        int **NrSpots;
        NrSpots = allocMatrixInt(NrOrientations,2);
        TotalDiffrSpots=0;
+       printf("reading: %s\n", fnKey);
        for (i=0;i<NrOrientations;i++){
            fgets(line,1000,fk);
            sscanf(line,"%d",&NrSpots[i][0]);
@@ -345,20 +349,31 @@ int FitOrientationAll(const char *ParamFN, int rown)
        }
        double **SpotsMat;
        SpotsMat = allocMatrix(TotalDiffrSpots,3);
+       printf("reading: %s\n", fnDS);
+       printf("TotalDiffrSpots: %i\n", TotalDiffrSpots);
        for (i=0;i<TotalDiffrSpots;i++){
-           fgets(line,1000,fd);
-           sscanf(line,"%lf %lf %lf",&SpotsMat[i][0],&SpotsMat[i][1],&SpotsMat[i][2]);
+           char *t = fgets(line,1000,fd);
+           if (t == NULL)
+           {
+             printf("Error reading: %s\n", fnDS);
+             return 0;
+           }
+           // printf("read: %i: %s", i, line);
+           int count = sscanf(line,"%lf %lf %lf",&SpotsMat[i][0],&SpotsMat[i][1],&SpotsMat[i][2]);
+           assert(count == 3);
        }
        double **OrientationMatrix;
        OrientationMatrix = allocMatrix(NrOrientations,9);
+       printf("reading: %s\n", fnOr);
        for (i=0;i<NrOrientations;i++){
            fgets(line,1000,fo);
            sscanf(line,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",&OrientationMatrix[i][0],&OrientationMatrix[i][1],&OrientationMatrix[i][2],&OrientationMatrix[i][3],&OrientationMatrix[i][4],&OrientationMatrix[i][5],&OrientationMatrix[i][6],&OrientationMatrix[i][7],&OrientationMatrix[i][8]);
        }
 
-
-//       fclose(fileParam);
-
+       fclose(fd);
+       fclose(fk);
+       fclose(fo);
+       
        int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
                          /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
                          /*11*/NrSpots, OrientationMatrix, SpotsMat,
@@ -389,6 +404,10 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta)
 {
    // Go through each orientation and compare with observed spots.
+
+  printf("FitOrientation_Calc()...\n");
+       
+
     clock_t startthis2;
     startthis2 = clock();
     int NrPixelsGrid=2*(ceil((gs*2)/px))*(ceil((gs*2)/px));
@@ -509,11 +528,14 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     result[3] = BestEuler[2];
     result[4] = BestFrac;
     // fwrite(result, sizeof(double), 5, result_fd);
+    printf("FitOrientation_Calc() pwrite: rown=%i\n",rown-1);
     int rc = pwrite(result_fd, result, 5*sizeof(double), (rown-1)*5*sizeof(double));
     if (rc < 0)
     {
         perror("result data file");
         exit(EXIT_FAILURE);
     }
+    printf("FitOrientation_Calc() done.\n");
+    
     return 1;
 }

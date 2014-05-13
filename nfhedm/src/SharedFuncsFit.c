@@ -24,6 +24,9 @@ allocMatrix(int nrows, int ncols)
 {
     double** arr;
     int i;
+
+    printf("allocMatrix: %ix%i\n", nrows, ncols);
+    
     arr = malloc(nrows * sizeof(*arr));
     if (arr == NULL ) {
         return NULL;
@@ -230,6 +233,10 @@ ReadBinFiles(
     uint16_t *ys=NULL, *zs=NULL, *peakID=NULL;
     float32_t *intensity=NULL;
     int counter=0;
+
+    printf("ReadBinFiles: Start: %i End: %i Total: %i\n",
+           StartNr, EndNr, EndNr-StartNr+1);
+    
     NrOfFiles = EndNr - StartNr + 1;
     NrOfPixels = 2048*2048;
     for (k=0;k<ObsSpotsSize;k++){
@@ -292,10 +299,12 @@ ReadBinFiles(
                 SetBit(ObsSpotsMat,BinNr);
             }
             fclose(fp);
+            printf("Closed file : %s\n",FileName);
             counter+=1;
         }
         counter = 0;
     }
+    printf("ReadBinFiles: done.\n");
     // TODO: Check use of free() here:
 
 //    free(ys);

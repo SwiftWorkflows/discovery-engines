@@ -18,6 +18,7 @@ parameters_read(const char *filename, struct parameters *params)
     FILE *fileParam;
     char aline[1000];
 //    struct TParam * Param1;
+    printf("Parameters: %s\n", filename);
     fileParam = fopen(filename,"r");
     if (fileParam == NULL) file_not_found(filename);
     char *str, dummy[1000];

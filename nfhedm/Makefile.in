@@ -60,12 +60,12 @@ src/CalcDiffractionSpots.o: src/CalcDiffractionSpots.c $(HEADERS)
 src/FitOrientationParametersNLOpt-main.o:        \
 	src/FitOrientationParametersNLOpt-main.c \
 	$(HEADERS)
-	gcc -c $(CFLAGS) -o $(@) $(<)
+	$(CC) -c $(CFLAGS) -o $(@) $(<)
 
 bin/fop-nlopt:  $(LIBNFHEDM)                                           \
                 src/FitOrientationParametersNLOpt-main.o
 	@mkdir -pv bin
-	gcc $(LDFLAGS)                                           \
+	$(CC) $(LDFLAGS)                                           \
 		-o $(@) src/FitOrientationParametersNLOpt-main.o \
 		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
@@ -74,14 +74,14 @@ bin/fop-nlopt:  $(LIBNFHEDM)                                           \
 bin/fo-nlopt:  $(LIBNFHEDM)                                           \
                 src/FitOrientation-main.o
 	@mkdir -pv bin
-	gcc $(LDFLAGS)                                           \
+	$(CC) $(LDFLAGS)                                           \
 		-o $(@) src/FitOrientation-main.o \
 		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
 		$(RPATHS)
 
 bin/MedianImage: $(LIBNFHEDM) src/MedianImage.c
-	gcc -o $(@)               \
+	$(CC) -o $(@)               \
 	       $(CFLAGS)          \
 	       src/MedianImage.c  \
 	       $(LDFLAGS)         \
@@ -90,7 +90,7 @@ bin/MedianImage: $(LIBNFHEDM) src/MedianImage.c
 bin/convert-bin-l2t:  $(LIBNFHEDM)                                           \
                 src/Convert-Bin-L2T.o
 	@mkdir -pv bin
-	gcc $(LDFLAGS)                                           \
+	$(CC) $(LDFLAGS)                                           \
 		-o $(@) src/Convert-Bin-L2T.o \
 		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
@@ -99,25 +99,25 @@ bin/convert-bin-l2t:  $(LIBNFHEDM)                                           \
 bin/convert-bin-l2n:  $(LIBNFHEDM)                                           \
                 src/Convert-Bin-L2N.o
 	@mkdir -pv bin
-	gcc $(LDFLAGS)                                           \
+	$(CC) $(LDFLAGS)                                           \
 		-o $(@) src/Convert-Bin-L2N.o \
 		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
 		$(RPATHS)
 
 bin/ImageProcessing: src/ImageProcessing.c
-	gcc -o bin/ImageProcessing src/ImageProcessing.c -lm
+	$(CC) -o bin/ImageProcessing src/ImageProcessing.c -lm
 
 $(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS)
 	@mkdir -pv lib
-	gcc -shared -o $(@)       \
+	$(CC) -shared -o $(@)       \
 		$(NFHEDM_NLOPT_OBJS) \
 	        $(LDFLAGS)
 		$(RPATH_NLOPT)
 
 $(LIBTCLNFHEDM): sanity src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
 	@mkdir -pv lib
-	gcc -shared -o $(@)         \
+	$(CC) -shared -o $(@)         \
 		src/nfhedm_wrap.o  \
 		$(NFHEDM_NLOPT_OBJS)   \
 	        $(LDFLAGS) \
@@ -136,7 +136,7 @@ TESTS = tests/test-placebo.x
 tests: $(TESTS)
 
 %.x: %.o $(LIBNFHEDM)
-	gcc -o $(@) $(<)      \
+	$(CC) -o $(@) $(<)      \
 		-L lib -l nfhedm \
 		$(RPATHS)
 
@@ -155,8 +155,8 @@ install: install-libs install-bin install-tcl
 
 install-bin:
 	@mkdir -pv bin $(INSTALL_BIN)
-	if [[ `ls bin` != "" ]] ;          \
-        then cp -uv bin/* -t $(INSTALL_BIN) ; \
+	@if [[ `ls bin` != "" ]] ;          \
+         then cp -uv bin/* -t $(INSTALL_BIN) ; \
         else : ; fi
 
 install-libs:

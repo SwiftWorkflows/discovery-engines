@@ -30,4 +30,5 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        int NoOfOmegaRanges, double BoxSizes[MAX_N_OMEGA_RANGES][4],
                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta);
 
+
 #endif
