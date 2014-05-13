@@ -31,7 +31,9 @@ parameters_read(const char *filename, struct parameters *params)
             break;
         }
     }
-    rewind(fileParam);
+    fclose(fileParam);
+    fileParam = fopen(filename,"r");
+    if (fileParam == NULL) file_not_found(filename);
     // double Lsd[nLayers],ybc[nLayers],zbc[nLayers];
     double *Lsd = malloc(params->nLayers*sizeof(double));
     params->Lsd = Lsd;
@@ -45,6 +47,7 @@ parameters_read(const char *filename, struct parameters *params)
 
     while (fgets(aline,1000,fileParam)!=NULL){
                 str = "ReducedFileName ";
+                
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
             sscanf(aline,"%s %s", dummy, params->fn);
@@ -65,9 +68,10 @@ parameters_read(const char *filename, struct parameters *params)
         str = "Lsd ";
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &Lsd[cntr]);
-            cntr++;
-            continue;
+          int n = sscanf(aline,"%s %lf", dummy, &Lsd[cntr]);
+          assert(n == 2);
+          cntr++;
+          continue;
         }
         str = "SpaceGroup ";
         LowNr = strncmp(aline,str,strlen(str));
@@ -79,7 +83,6 @@ parameters_read(const char *filename, struct parameters *params)
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
             sscanf(aline,"%s %lf", dummy, &params->MaxRingRad);
-            cntr++;
             continue;
         }
         str = "StartNr ";
@@ -168,8 +171,9 @@ parameters_read(const char *filename, struct parameters *params)
         str = "Wavelength ";
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
-            sscanf(aline,"%s %lf", dummy, &params->Wavelength);
-            continue;
+          int n = sscanf(aline,"%s %lf", dummy, &params->Wavelength);
+          assert(n == 2);
+          continue;
         }
         str = "px ";
         LowNr = strncmp(aline,str,strlen(str));
@@ -220,8 +224,9 @@ parameters_read(const char *filename, struct parameters *params)
             continue;
         }
     }
-    fclose(fileParam);
+    fflush(stdout);
+    // int rc = fclose(fileParam);
+    // printf("fclose2 OK. %i\n", rc);
+    fflush(stdout);
     return 1;
 }
-
-
