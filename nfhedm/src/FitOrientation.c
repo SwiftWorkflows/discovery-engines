@@ -54,7 +54,7 @@ double problem_function(
 	void* f_data_trial)
 {
 	struct my_func_data *f_data = (struct my_func_data *) f_data_trial;
-	int i, j, count = 1;
+	int i, j;
 	const int NrOfFiles = f_data->NrOfFiles;
     const int nLayers = f_data->nLayers;
     const double ExcludePoleAngle = f_data->ExcludePoleAngle;
@@ -206,7 +206,7 @@ FitOrientation(
 	struct my_func_data *f_datat;
 	f_datat = &f_data;
 	void* trp = (struct my_func_data *) f_datat;
-	double tole = 1e-3;
+	// double tole = 1e-3;
 	nlopt_opt opt;
 	opt = nlopt_create(NLOPT_LN_SBPLX, n);	
 	nlopt_set_lower_bounds(opt, xl);
@@ -223,15 +223,21 @@ FitOrientation(
 
 static bool fit_orientation_initialized = false;
 static int result_fd = -1;
+static struct parameters params;
 
 static inline void
-Init_FitOrientation(const char *params_direct)
+Init_FitOrientation(const char *ParamFN)
 {
     if (fit_orientation_initialized)
         return;
+
+    int result = parameters_read(ParamFN, &params);
+    printf("parameters_read() OK. %i\n", result);
+    fflush(stdout);
+    
     char result_filename[1024];
     sprintf(result_filename, "%s/%s",
-                             params_direct, "microstructure.mic");
+                             params.direct, "microstructure.mic");
     printf("Init_FitOrientation (result_filename=%s)\n",
                                  result_filename);
     result_fd = open(result_filename, O_CREAT|O_WRONLY,
@@ -248,11 +254,11 @@ int FitOrientationAll(const char *ParamFN, int rown)
 {
     printf("FitOrientationAll(%s,%i)...\n", ParamFN, rown);
 
-    struct parameters params;
-    parameters_read(ParamFN, &params);
-
-    Init_FitOrientation(params.direct);
-
+   
+    Init_FitOrientation(ParamFN);
+    printf("Init_FitOrientation() OK.\n");
+    fflush(stdout);
+    
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
        //Read bin files
        char fnG[1000], fn[1000];
@@ -398,7 +404,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        /*11*/int **NrSpots, double **OrientationMatrix, double **SpotsMat,
                        /*14*/int nrFiles, double OmegaStart, double OmegaStep, long long int SizeObsSpots,
                        /*18*/double *ybc, double *zbc, int *ObsSpotsInfo, double minFracOverlap,
-                       double LatticeConstant[6], int Wavelength, int SpaceGroup, double ExcludePoleAngle,
+                       double LatticeConstant[6], double Wavelength, int SpaceGroup, double ExcludePoleAngle,
                        double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
                        double BoxSizes[MAX_N_OMEGA_RANGES][4],
                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta)
@@ -435,6 +441,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         XG[j] = XY[j][0];
         YG[j] = XY[j][1];
     }
+    printf("%i: %i %f %f\n", nrFiles, nLayers, px, gs);
     for (int i=0;i<NrOrientations;i++){
         NrSpotsThis = NrSpots[i][0];
         StartingRowNr = NrSpots[i][1];
@@ -451,12 +458,14 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
             ThrSps[m][0] = SpotsMat[j][0];
             ThrSps[m][1] = SpotsMat[j][1];
             ThrSps[m][2] = SpotsMat[j][2];
+            // printf("ThrSps: %f %f %f\n", ThrSps[m][0], ThrSps[m][1], ThrSps[m][2]);
             m++;
         }
         Convert9To3x3(OrientationMatThis,OrientMatIn);
         CalcFracOverlap(nrFiles,nLayers,NrSpotsThis,ThrSps,OmegaStart,OmegaStep,XG,YG,Lsd,SizeObsSpots,RotMatTilts,px,
                         ybc,zbc,
                         gs,P0,NrPixelsGrid,ObsSpotsInfo,OrientMatIn,&FracOverT);
+        if (i == 17) printf("FracOverT: %f\n", FracOverT);
         if (FracOverT >= minFracOverlap){
             for (int j=0;j<9;j++){
                 OrientMatrix[OrientationGoodID][j] = OrientationMatThis[j];

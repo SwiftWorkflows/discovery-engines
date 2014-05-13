@@ -25,7 +25,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        int **NrSpots, double **OrientationMatrix, double **SpotsMat,
                        int nrFiles, double OmegaStart, double OmegaStep, long long int SizeObsSpots,
                        double *ybc, double *zbc, int *ObsSpotsInfo, double minFracOverlap,
-                       double LatticeConstant[6], int Wavelength, int nRings, double ExcludePoleAngle,
+                       double LatticeConstant[6], double Wavelength, int nRings, double ExcludePoleAngle,
                        double OmegaRanges[MAX_N_OMEGA_RANGES][2],
                        int NoOfOmegaRanges, double BoxSizes[MAX_N_OMEGA_RANGES][4],
                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta);
