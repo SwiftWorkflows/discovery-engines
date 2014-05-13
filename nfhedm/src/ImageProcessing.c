@@ -688,7 +688,7 @@ main(int argc, char *argv[])
         str = "OrigFileName ";
         LowNr = strncmp(aline,str,strlen(str));
         if (LowNr==0){
-            sscanf(aline,"%s %s", dummy, fn);
+            sscanf(aline,"%s %s", dummy, fn2);
             continue;
         }
         str = "ReducedFileName ";
