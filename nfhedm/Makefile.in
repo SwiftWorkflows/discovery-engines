@@ -16,10 +16,10 @@ LIBS += $(LIBDIRS) -lnlopt -lm
 
 TCLSH = @USE_TCLSH@
 
-EXECUTABLES = bin/fo-nlopt 
-              # bin/fop-nlopt 
-              # bin/MedianImage bin/ImageProcessing 
-              # bin/convert-bin-l2t
+EXECUTABLES = bin/fo-nlopt \
+              bin/fop-nlopt \
+              bin/MedianImage bin/ImageProcessing \
+              bin/convert-bin-l2t
 
 all: $(EXECUTABLES)
 
@@ -42,7 +42,8 @@ RPATHS = @RPATHS@ \
 
 lib: $(LIBNFHEDM)
 
-NFHEDM_NLOPT_OBJS =                 src/FitOrientation.o                   \
+NFHEDM_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
+                 src/FitOrientation.o                   \
                  src/GenerateRingInfo.o                 \
                  src/SharedFuncsFit.o                   \
                  src/CalcDiffractionSpots.o             \
@@ -50,7 +51,6 @@ NFHEDM_NLOPT_OBJS =                 src/FitOrientation.o                   \
                  src/placebo.o                          \
                  src/parameters.o
 
-#  src/FitOrientationParametersNLOpt.o 
 
 HEADERS = src/checks.h src/SharedFuncsFit.h src/CalcDiffractionSpots.h \
            src/swift-bindings.h
