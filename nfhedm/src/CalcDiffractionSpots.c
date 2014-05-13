@@ -207,7 +207,7 @@ CalcDiffrSpots_Furnace(
 {
     int i, OmegaRangeNo;
     RealType theta;
-    int KeepSpot;
+    int KeepSpot = 0;
     int Ghkl[3];
     int indexhkl;
     RealType Gc[3];

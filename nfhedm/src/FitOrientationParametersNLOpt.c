@@ -52,7 +52,7 @@ double problem_function(
 	void* f_data_trial)
 {
 	struct my_func_data *f_data = (struct my_func_data *) f_data_trial;
-	int i, j, count = 1;
+	int i, j;
 	const int NrOfFiles = f_data->NrOfFiles;
     const int nLayers = f_data->nLayers;
     const double ExcludePoleAngle = f_data->ExcludePoleAngle;
