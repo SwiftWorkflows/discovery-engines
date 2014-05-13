@@ -1,3 +1,11 @@
 cluster fitorientation  /clhome/TOMO1/PeaksAnalysisHemant/NF_HEDM/FitOrientation.sh
 cluster runmedian  /clhome/TOMO1/PeaksAnalysisHemant/discovery-engines/nfhedm/swift/MedianImage.sh
 cluster runimageprocessing  /clhome/TOMO1/PeaksAnalysisHemant/discovery-engines/nfhedm/swift/ImageProcessing.sh
+
+
+
+
+
+wozniak fitorientation      /home/wozniak/proj/d-e/nfhedm/swift/FitOrientation.sh
+wozniak runmedian           /home/wozniak/proj/d-e/nfhedm/swift/MedianImage.sh
+wozniak runimageprocessing  /home/wozniak/proj/d-e/nfhedm/swift/ImageProcessing.sh
