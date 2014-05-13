@@ -9,6 +9,8 @@
 #include <ctype.h>
 #include <stdint.h>
 
+#include "checks.h"
+
 #define SetBit(A,k)   (A[(k/32)] |=  (1 << (k%32)))
 #define ClearBit(A,k) (A[(k/32)] &= ~(1 << (k%32)))
 #define TestBit(A,k)  (A[(k/32)] &   (1 << (k%32)))
@@ -630,6 +632,7 @@ main(int argc, char *argv[])
     char aline[1000];
 	char fn2[1000],fn[1000], direct[1000], ext[1000], extReduced[1000],ReducedFileName[1024];
     fileParam = fopen(ParamFN,"r");
+    if (fileParam == NULL) file_not_found(ParamFN);
     char *str, dummy[1000];
     int LowNr,nLayers,StartNr,NrFilesPerLayer,NrPixels,BlnketSubtraction,MeanFiltRadius,WriteFinImage=0;
 	nLayers = atoi(argv[2]);
@@ -712,6 +715,7 @@ main(int argc, char *argv[])
 	char OutFileName[5024];
 	strcpy(OutFileName,OutFN);
 	fk = fopen(OutFileName,"wb");
+	if (fk == NULL) file_not_writable(OutFileName);
 
 	pixelvalue *Image, *Image2;
 	char FileName[1024];
@@ -722,6 +726,7 @@ main(int argc, char *argv[])
 	FILE *fb;
 	int SizeFile = sizeof(pixelvalue) * NrPixels * NrPixels;
 	fb = fopen(FileName,"rb");
+	if (fb == NULL) file_not_found(FileName);
 	fread(Image,SizeFile,1,fb);
 	fclose(fb);
 	int i,j,k;
@@ -811,6 +816,7 @@ main(int argc, char *argv[])
 		char OutFN2[1024];
 		sprintf(OutFN2,"%s/%s_FullImage_%06d.%s%d",direct,ReducedFileName,ImageNr,extReduced,nLayers-1);
 		fw = fopen(OutFN2,"wb");
+		if (fw == NULL) file_not_writable(OutFN2);
 		fwrite(FinalImage,SizeOutFile,1,fw);
 		fclose(fw);
 	}
