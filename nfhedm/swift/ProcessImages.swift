@@ -22,12 +22,10 @@ int NrFilesPerLayer = @toInt(@arg("NrFilesPerLayer","180"));
 foreach layer in [1:NrLayers] {
   file MedianOut<single_file_mapper; file=@strcat("logs/Median_",layer,".out")>;
   file MedianErr<single_file_mapper; file=@strcat("logs/Median_",layer,".err")>;
-  // Stage 1
   (MedianOut, MedianErr) = Medians(paramfile,layer);
   foreach FileNr in [0:(NrFilesPerLayer-1)]{
     file ImageOut<single_file_mapper; file=@strcat("logs/Images_",layer,FileNr,".out")>;
     file ImageErr<single_file_mapper; file=@strcat("logs/Images_",layer,FileNr,".err")>;
-    // Stage 2
     (ImageOut, ImageErr) = Images(paramfile, layer, FileNr, MedianOut);
   }
 }

@@ -1,0 +1,3 @@
+cluster fitorientation  /clhome/TOMO1/PeaksAnalysisHemant/NF_HEDM/FitOrientation.sh
+cluster runmedian  /clhome/TOMO1/PeaksAnalysisHemant/discovery-engines/nfhedm/swift/MedianImage.sh
+cluster runimageprocessing  /clhome/TOMO1/PeaksAnalysisHemant/discovery-engines/nfhedm/swift/ImageProcessing.sh
