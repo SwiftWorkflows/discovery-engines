@@ -608,13 +608,13 @@ void FindPeakPositions(
 static void
 usage(void)
 {
-    printf("ImageProcessing: usage: ./ImageProcessing <LayerNr> <ImageNr>\n");
+    printf("ImageProcessing: usage: ./ImageProcessing <ParameterFile> <LayerNr> <ImageNr>\n");
 }
 
 int
 main(int argc, char *argv[])
 {
-	if (argc < 3)
+	if (argc < 4)
     {
         usage();
         return 1;
@@ -708,7 +708,7 @@ main(int argc, char *argv[])
     fclose(fileParam);
     FILE *fk;
 	char OutFN[5024];
-	sprintf(OutFN,"%s_%06d.%s%d",ReducedFileName,ImageNr,extReduced,nLayers-1);
+	sprintf(OutFN,"%s/%s_%06d.%s%d",direct,ReducedFileName,ImageNr,extReduced,nLayers-1);
 	char OutFileName[5024];
 	strcpy(OutFileName,OutFN);
 	fk = fopen(OutFileName,"wb");
@@ -809,7 +809,7 @@ main(int argc, char *argv[])
 	if (WriteFinImage == 1){
 		FILE *fw;
 		char OutFN2[1024];
-		sprintf(OutFN2,"%s_FullImage_%06d.%s%d",ReducedFileName,ImageNr,extReduced,nLayers-1);
+		sprintf(OutFN2,"%s/%s_FullImage_%06d.%s%d",direct,ReducedFileName,ImageNr,extReduced,nLayers-1);
 		fw = fopen(OutFN2,"wb");
 		fwrite(FinalImage,SizeOutFile,1,fw);
 		fclose(fw);

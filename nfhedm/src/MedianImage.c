@@ -209,13 +209,13 @@ int CalcMedian(char fn[1000],
 static void
 usage(void)
 {
-    printf("MedianImage: usage: ./MedianImage <LayerNr>\n");
+    printf("MedianImage: usage: ./MedianImage <ParametersFile> <LayerNr>\n");
 }
 
 int
 main(int argc, char *argv[])
 {
-    if (argc < 2)
+    if (argc < 3)
     {
         usage();
         return 1;
