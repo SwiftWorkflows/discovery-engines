@@ -6,7 +6,7 @@ ${NFHEDM}/ImageProcessing $1 $2 $3
 RC=${?}
 if [[ $RC != 0 ]] 
 then 
-    echo "Warning: RC=0"
+    echo "Warning: RC!=0"
 fi
 exit 0
 
