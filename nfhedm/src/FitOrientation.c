@@ -207,8 +207,10 @@ FitOrientation(
 	f_datat = &f_data;
 	void* trp = (struct my_func_data *) f_datat;
 	// double tole = 1e-3;
+        printf("First NLOPT:\n");
 	nlopt_opt opt;
-	opt = nlopt_create(NLOPT_LN_SBPLX, n);	
+	opt = nlopt_create(NLOPT_LN_SBPLX, n);
+        printf("First NLOPT ok.\n");
 	nlopt_set_lower_bounds(opt, xl);
 	nlopt_set_upper_bounds(opt, xu);
 	nlopt_set_min_objective(opt, problem_function, trp);
@@ -333,7 +335,6 @@ int FitOrientationAll(const char *ParamFN, int rown)
            XY[2][0] =xs + gs;
            XY[2][1] =ys - y1;
        }
-    double GridSize=2*gs;
 
        //Read Orientations
        FILE *fd, *fk, *fo;
@@ -368,6 +369,7 @@ int FitOrientationAll(const char *ParamFN, int rown)
            int count = sscanf(line,"%lf %lf %lf",&SpotsMat[i][0],&SpotsMat[i][1],&SpotsMat[i][2]);
            assert(count == 3);
        }
+       printf("TotalDiffrSpots: done.\n");
        double **OrientationMatrix;
        OrientationMatrix = allocMatrix(NrOrientations,9);
        printf("reading: %s\n", fnOr);
@@ -465,7 +467,6 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         CalcFracOverlap(nrFiles,nLayers,NrSpotsThis,ThrSps,OmegaStart,OmegaStep,XG,YG,Lsd,SizeObsSpots,RotMatTilts,px,
                         ybc,zbc,
                         gs,P0,NrPixelsGrid,ObsSpotsInfo,OrientMatIn,&FracOverT);
-        if (i == 17) printf("FracOverT: %f\n", FracOverT);
         if (FracOverT >= minFracOverlap){
             for (int j=0;j<9;j++){
                 OrientMatrix[OrientationGoodID][j] = OrientationMatThis[j];
@@ -474,7 +475,10 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
             OrientationGoodID++;
         }
     }
-    double BestFrac, BestEuler[3];
+    double BestFrac = 0.0, BestEuler[3];
+    for (int i = 0; i < 3; i++)
+      BestEuler[i] = 0.0;
+    printf("Start fit...\n");
     if (OrientationGoodID>0){
 		int n_hkls = 0;
 		int hkls[5000][4];
@@ -487,9 +491,11 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
 			Thetas[i] = 0;
 		}
 		int rc;
+                printf("GenerateRingInfo...\n");
 		rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
 			LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
 			LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
+                printf("GenerateRingInfo done.\n");
         double Fractions, EulerIn[3], OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,OMTemp[9];
         BestFrac = -1;
         for (int i=0;i<OrientationGoodID;i++){
@@ -504,7 +510,9 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
 				ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,
 				&EulerOutC,&FracOut,hkls,Thetas,n_hkls);
             Fractions = 1-FracOut;
+            
             if (Fractions > BestFrac){
+              printf("Fractions %f %i %i\n", Fractions, i, OrientationGoodID);
                 BestFrac = Fractions;
                 BestEuler[0] = EulerOutA;
                 BestEuler[1] = EulerOutB;
