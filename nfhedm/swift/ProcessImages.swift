@@ -11,21 +11,23 @@ app (file oI, file eI) Images (string paramf, int layern, int filenr, file sr)
 }
 
 
-# Parameters to be modified ############
+// Parameters to be modified ############
 
 string paramfile = @arg("paramfile","/data/tomo1/NFTest/ParametersGoldApril14.txt");
-int NrLayers = @toInt(@arg("NrLayers","3"));
-int NrFilesPerLayer = @toInt(@arg("NrFilesPerLayer","180"));
+int NrLayers = @toInt(@arg("NrLayers","3")); // aka nDistances 
+int NrFilesPerLayer = @toInt(@arg("NrFilesPerLayer","180")); // 
+trace(paramfile, NrLayers, NrFilesPerLayer);
 
-# End parameters #######################
+// End parameters #######################
 
 foreach layer in [1:NrLayers] {
   file MedianOut<single_file_mapper; file=@strcat("logs/Median_",layer,".out")>;
   file MedianErr<single_file_mapper; file=@strcat("logs/Median_",layer,".err")>;
   (MedianOut, MedianErr) = Medians(paramfile,layer);
+
   foreach FileNr in [0:(NrFilesPerLayer-1)]{
     file ImageOut<single_file_mapper; file=@strcat("logs/Images_",layer,FileNr,".out")>;
     file ImageErr<single_file_mapper; file=@strcat("logs/Images_",layer,FileNr,".err")>;
     (ImageOut, ImageErr) = Images(paramfile, layer, FileNr, MedianOut);
-  }
+  } 
 }
