@@ -25,7 +25,7 @@ allocMatrix(int nrows, int ncols)
     double** arr;
     int i;
 
-    printf("allocMatrix: %ix%i\n", nrows, ncols);
+    // printf("allocMatrix: %ix%i\n", nrows, ncols);
     
     arr = malloc(nrows * sizeof(*arr));
     if (arr == NULL ) {
@@ -555,6 +555,15 @@ CalcPixels2(double Edges[3][2], int **Pixels, int *counter)
     }
 }
 
+void 
+printVector(const char* name, double* v, int count)
+{
+  for (int i = 0; i < count; i++)
+    printf("%s[%i]=%f\n", name, i, v[i]);
+}
+
+// #define PRINT_VECTOR()
+
 void
 CalcFracOverlap(
     const int NrOfFiles,
@@ -578,6 +587,17 @@ CalcFracOverlap(
     double OrientMatIn[3][3],
     double *FracOver)
 {
+  static bool printed = false;
+  if (! printed)
+  {
+    printf("CalcFracOverlap: NrOfFiles=%i nLayers=%i nTspots=%i "
+           "TheorSpots OmegaStart=%f OmegaStop=%f\n",
+           NrOfFiles, nLayers, nTspots, OmegaStart, OmegaStep);
+    printVector("XGrain", XGrain, 3);
+    printVector("YGrain", YGrain, 3);
+    printVector("Lsds", Lsds, nLayers);
+    printed = true;
+  }
     int j,OmeBin,OutofBounds,k,l;
     double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,
 		xyz[3],P1[3],ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3],
