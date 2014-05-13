@@ -2977,7 +2977,7 @@ int GenerateRingInfo(int SpaceGroup,double a,double b, double c,
 		}
 	}
 	double ThetaComp;
-	int NrFilled;
+	int NrFilled = 0;
 	for (i=0;i<NrUniqueThetas;i++){
 		ThetaComp = UniqueThetas[i];
 		for (j=0;j<TotPlanes;j++){
