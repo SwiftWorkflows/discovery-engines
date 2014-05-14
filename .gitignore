@@ -2,5 +2,7 @@
 *.o
 *.hdf
 *project
+# Emacs Tramp garbage: 
+*sshx*
 logs
 turbine-directory.txt
