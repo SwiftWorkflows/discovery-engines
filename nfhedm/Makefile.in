@@ -6,7 +6,7 @@ SHELL = bash
 INCLUDES = -I $(NLOPT)/include @TCL_INCLUDE_SPEC@ -I src
 
 CFLAGS += @CFLAGS@
-CFLAGS += $(INCLUDES) -O0 -g -Wall -fPIC -std=gnu99
+CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
 
 LDFLAGS += @LDFLAGS@
 
