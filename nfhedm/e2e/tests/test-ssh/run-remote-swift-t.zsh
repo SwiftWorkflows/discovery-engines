@@ -16,3 +16,4 @@ REMOTE_DATA=${REMOTE_HOME}/Au_Reduced2-converted
 REMOTE_PARAMS=${REMOTE_DATA}/ParametersGoldApril14.txt
 
 ssh ${REMOTE} ${REMOTE_SCRIPT}  ${REMOTE_DATA} ${REMOTE_PARAMS} ${START} ${STOP}
+ 
