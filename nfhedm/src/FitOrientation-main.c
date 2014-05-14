@@ -40,6 +40,9 @@ main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    printf("setvbuf...\n");
+    setvbuf(stdout, NULL, _IONBF, 0);
+    
     // Read params file.
     char *ParamFN;
     ParamFN = argv[1];

@@ -556,7 +556,7 @@ CalcPixels2(double Edges[3][2], int **Pixels, int *counter)
 }
 
 void 
-printVector(const char* name, double* v, int count)
+printVector(const char* name, const double* v, int count)
 {
   for (int i = 0; i < count; i++)
     printf("%s[%i]=%f\n", name, i, v[i]);
@@ -602,6 +602,8 @@ CalcFracOverlap(
     double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,
 		xyz[3],P1[3],ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3],
 		YZSpotsTemp[2],YZSpotsT[3][2];
+    YZSpotsTemp[0] = 0.0;
+    YZSpotsTemp[1] = 0.0;
     int **InPixels,NrInPixels, OverlapPixels,Layer;
     long long int BinNr;
     int MultY, MultZ, AllDistsFound, TotalPixels;
