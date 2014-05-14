@@ -3,10 +3,15 @@
 
 SHELL = bash
 
-INCLUDES = -I $(NLOPT)/include @TCL_INCLUDE_SPEC@ -I src
+INCLUDES = -I . -I src -I $(NLOPT)/include @TCL_INCLUDE_SPEC@ 
+
+ENABLE_OPENMP = @ENABLE_OPENMP@
 
 CFLAGS += @CFLAGS@
-CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
+CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99 
+ifeq ($(ENABLE_OPENMP),1)
+	CFLAGS += -fopenmp
+endif
 
 LDFLAGS += @LDFLAGS@
 
