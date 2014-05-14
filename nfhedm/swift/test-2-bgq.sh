@@ -23,16 +23,18 @@ fi
 
 export TURBINE_USER_LIB=${NFHEDM_INSTALL}/lib
 
-TEST=test-2
+TEST=FitOrientation-T
 
 stc -t checkpointing ${DIR}/${TEST}.swift
 
 export MODE=BGQ
+export PROCS=${PROCS:-3}
 export PROJECT=ExM
 export QUEUE=default
 export TURBINE_LOG=1
 export TURBINE_DEBUG=1
-export WALLTIME=${WT:-15}
+export WALLTIME=${WT:-60}
+export PPN=4
 
 cd ${DATA}
 echo "PWD: $(pwd)"
@@ -45,5 +47,5 @@ else
 fi
 set -x
 which turbine-cobalt-run.zsh
-turbine-cobalt-run.zsh -n 3 ${DIR}/${TEST}.tcl \
+turbine-cobalt-run.zsh -n ${PROCS} ${DIR}/${TEST}.tcl \
   -p=${PARAMETERS_PATH} ${START} ${END}
