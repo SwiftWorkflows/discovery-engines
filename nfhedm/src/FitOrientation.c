@@ -207,10 +207,8 @@ FitOrientation(
 	f_datat = &f_data;
 	void* trp = (struct my_func_data *) f_datat;
 	// double tole = 1e-3;
-        printf("First NLOPT:\n");
 	nlopt_opt opt;
 	opt = nlopt_create(NLOPT_LN_SBPLX, n);
-        printf("First NLOPT ok.\n");
 	nlopt_set_lower_bounds(opt, xl);
 	nlopt_set_upper_bounds(opt, xu);
 	nlopt_set_min_objective(opt, problem_function, trp);
@@ -478,7 +476,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     double BestFrac = 0.0, BestEuler[3];
     for (int i = 0; i < 3; i++)
       BestEuler[i] = 0.0;
-    printf("Start fit...\n");
+    // printf("Start fit...\n");
     if (OrientationGoodID>0){
 		int n_hkls = 0;
 		int hkls[5000][4];
@@ -491,11 +489,11 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
 			Thetas[i] = 0;
 		}
 		int rc;
-                printf("GenerateRingInfo...\n");
+                // printf("GenerateRingInfo...\n");
 		rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
 			LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
 			LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
-                printf("GenerateRingInfo done.\n");
+                // printf("GenerateRingInfo done.\n");
         double Fractions, EulerIn[3], OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,OMTemp[9];
         BestFrac = -1;
         for (int i=0;i<OrientationGoodID;i++){
@@ -512,7 +510,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
             Fractions = 1-FracOut;
             
             if (Fractions > BestFrac){
-              printf("Fractions %f %i %i\n", Fractions, i, OrientationGoodID);
+              // printf("Fractions %f %i %i\n", Fractions, i, OrientationGoodID);
                 BestFrac = Fractions;
                 BestEuler[0] = EulerOutA;
                 BestEuler[1] = EulerOutB;
