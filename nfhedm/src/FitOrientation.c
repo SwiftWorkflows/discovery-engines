@@ -1,4 +1,6 @@
 
+#include <config.h>
+
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
@@ -7,6 +9,10 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+
+#if HAVE_OPENMP == 1
+#include <omp.h>
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -473,10 +479,12 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
             OrientationGoodID++;
         }
     }
+
     double BestFrac = 0.0, BestEuler[3];
     for (int i = 0; i < 3; i++)
       BestEuler[i] = 0.0;
     // printf("Start fit...\n");
+
     if (OrientationGoodID>0){
 		int n_hkls = 0;
 		int hkls[5000][4];
@@ -496,9 +504,21 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                 // printf("GenerateRingInfo done.\n");
         double Fractions, EulerIn[3], OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,OMTemp[9];
         BestFrac = -1;
-        for (int i=0;i<OrientationGoodID;i++){
-            for (int j=0;j<9;j++){
-                OMTemp[j] = OrientMatrix[i][j];
+
+        // Parallel loop around FitOrientation...
+        int i;
+        for (i = 0; i < 3; i++)
+          BestEuler[i] = 0.0;
+
+        // #pragma omp parallel private(i,BestEuler,OMTemp,OrientIn,EulerIn,FracOut,Fractions)
+        {
+          // int num_threads = omp_get_num_threads();
+          // printf("num_threads: %i\n", num_threads);
+          // #pragma omp parallel for
+        for (i=0;i<OrientationGoodID;i++){
+          int k=0;
+            for (k=0;k<9;k++){
+                OMTemp[k] = OrientMatrix[i][k];
             }
             Convert9To3x3(OMTemp,OrientIn);
             OrientMat2Euler(OrientIn,EulerIn);
@@ -517,6 +537,8 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                 BestEuler[2] = EulerOutC;
             }
         }
+        } // End of parallel section
+        
     }else{
                 printf("No good ID found.\n");
         }
