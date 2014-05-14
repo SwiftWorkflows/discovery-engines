@@ -11,6 +11,8 @@ then
    SO_SUFFIX=dylib
 fi
 
+export CFLAGS=-O2
+
 # Checks for programs.
 AC_PROG_CC
 AC_CHECK_PROG(ZSH, zsh, zsh, "no")
