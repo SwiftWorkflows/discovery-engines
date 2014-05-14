@@ -4,5 +4,7 @@
 *project
 # Emacs Tramp garbage: 
 *sshx*
+*.kml
+*.swiftx
 logs
 turbine-directory.txt
