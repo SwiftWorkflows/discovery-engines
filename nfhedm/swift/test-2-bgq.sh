@@ -33,7 +33,7 @@ export PROJECT=ExM
 export QUEUE=default
 export TURBINE_LOG=1
 export TURBINE_DEBUG=1
-export WALLTIME=${WT:-60}
+export WALLTIME=${WT:-15}
 export PPN=4
 
 cd ${DATA}
