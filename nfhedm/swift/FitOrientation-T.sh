@@ -23,9 +23,9 @@ fi
 
 export TURBINE_USER_LIB=${NFHEDM_INSTALL}/lib
 
-TEST=FitOrientation-T
+SCRIPT=FitOrientation-T
 
-stc -t checkpointing ${DIR}/${TEST}.swift
+stc -t checkpointing ${DIR}/${SCRIPT}.swift
 
 export MODE=BGQ
 export PROCS=${PROCS:-3}
@@ -47,5 +47,5 @@ else
 fi
 set -x
 which turbine-cobalt-run.zsh
-turbine-cobalt-run.zsh -n ${PROCS} ${DIR}/${TEST}.tcl \
+turbine-cobalt-run.zsh -n ${PROCS} ${DIR}/${SCRIPT}.tcl \
   -p=${PARAMETERS_PATH} ${START} ${END}
