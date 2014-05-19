@@ -15,23 +15,43 @@ usage()
   echo   "Environment:"
 }
 
-while getopts "h" OPTION
+SETTINGS=0
+while getopts "hs:" OPTION
 do
   case ${OPTION} in
-    h)
-      usage
-      exit 0
-      ;;
+    h) usage ; exit 0     ;;
+    s) SETTINGS=${OPTARG} ;;
   esac
 done
+shift $((OPTIND-1))
+
+if [[ ${#*} != 3 ]]
+then
+  usage
+  exit 1
+fi
+
+PARAMETERS=$1
+START=$2
+STOP=$3
+
+crash()
+{
+  MSG=$1
+  echo ${MSG}
+  exit 1
+}
+
+if [[ ${SETTINGS} != 0 ]]
+then
+  source ${SETTINGS} || crash "Settings file failed: ${SETTINGS}"
+fi
 
 E2E_DIR=$(    cd $( dirname $0 )  ; /bin/pwd )
 NFHEDM_DIR=$( cd ${E2E_DIR}/..    ; /bin/pwd )
 NFHEDM_SWIFT_DIR=${NFHEDM_DIR}/swift
 
-
-
-${NFHEDM_SWIFT_DIR}/runImages.sh
+${NFHEDM_SWIFT_DIR}/runImages.sh ${PARAMETERS}
 
 # convert data endianism
 
