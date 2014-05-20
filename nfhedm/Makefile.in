@@ -169,8 +169,8 @@ install-libs:
 	cp -uv lib/*.so $(INSTALL_LIB)
 
 install-tcl: install-libs
-	@if [[ -f pkgIndex.tcl ]] ;                        \
-	 then cp -uv pkgIndex.tcl tcl/*.tcl $(INSTALL_LIB) \
+	@if [[ -f pkgIndex.tcl ]] ;                          \
+	 then cp -uv pkgIndex.tcl tcl/*.tcl $(INSTALL_LIB) ; \
 	else : ; fi
 
 install-tests: install
