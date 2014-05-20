@@ -37,6 +37,8 @@ PARAMETERS=$3       # E.g., ParametersGoldApril14.txt
 START=$4
 STOP=$5
 
+DATA_ROOT=$( dirname $( dirname ${DATA} ) )
+
 REMOTE_HOST=${REMOTE_HOST:-cetus.alcf.anl.gov}
 REMOTE_USER=${REMOTE_USER:-wozniak}
 REMOTE=${REMOTE_USER}@${REMOTE_HOST}
@@ -50,8 +52,11 @@ sed "s@DataDirectory.*@DataDirectory ${REMOTE_DATA}@" ${PARAMETERS} \
   > ${CONTROL_DIR}/parameters.txt
 sed -i "s@ReducedFileName.*@ReducedFileName Au@" ${CONTROL_DIR}/parameters.txt
 
-cd ${CONTROL_DIR}
+cd ${DATA_ROOT}
+FO_FILES=( grid.txt DiffractionSpots.txt Key.txt OrientMat.txt )
+rsync -a --stats ${FO_FILES[@]} ${REMOTE}:${REMOTE_DATA}
 
+cd ${CONTROL_DIR}
 rsync -az --stats ${DATA}/ parameters.txt ${REMOTE}:${REMOTE_DATA}
 
 REMOTE_LOG=${CONTROL_DIR}/remote.log
