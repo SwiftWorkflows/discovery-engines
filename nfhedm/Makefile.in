@@ -3,12 +3,12 @@
 
 SHELL = bash
 
-INCLUDES = -I . -I src -I $(NLOPT)/include @TCL_INCLUDE_SPEC@ 
+INCLUDES = -I . -I src -I $(NLOPT)/include @TCL_INCLUDE_SPEC@
 
 ENABLE_OPENMP = @ENABLE_OPENMP@
 
 CFLAGS += @CFLAGS@
-CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99 
+CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
 ifeq ($(ENABLE_OPENMP),1)
 	CFLAGS += -fopenmp
 endif
@@ -24,7 +24,7 @@ TCLSH = @USE_TCLSH@
 EXECUTABLES = bin/fo-nlopt \
               bin/fop-nlopt \
               bin/MedianImage bin/ImageProcessing \
-              bin/convert-bin-l2t
+              bin/convert-bin-l2t bin/convert-bin-l2n
 
 all: $(EXECUTABLES)
 
@@ -160,7 +160,7 @@ install: install-libs install-bin install-tcl
 
 install-bin:
 	@mkdir -pv bin $(INSTALL_BIN)
-	@if [[ `ls bin` != "" ]] ;          \
+	@if [[ `ls bin` != "" ]] ;             \
          then cp -uv bin/* -t $(INSTALL_BIN) ; \
         else : ; fi
 
@@ -169,8 +169,9 @@ install-libs:
 	cp -uv lib/*.so $(INSTALL_LIB)
 
 install-tcl: install-libs
-	cp -uv pkgIndex.tcl $(INSTALL_LIB)
-	cp -uv tcl/*.tcl $(INSTALL_LIB)
+	@if [[ -f pkgIndex.tcl ]] ;                        \
+	 then cp -uv pkgIndex.tcl tcl/*.tcl $(INSTALL_LIB) \
+	else : ; fi
 
 install-tests: install
 	mkdir -pv $(INSTALL_TESTS)
