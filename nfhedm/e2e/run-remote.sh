@@ -29,7 +29,7 @@ then
   exit 1
 fi
 
-DATA=$1   # E.g., /data/tomo1/NFTest/Au_Reduced2-converted
+DATA=$1   # E.g., /data/tomo1/NFTest/converted/Au_Reduced2
 START=$2
 STOP=$3
 
@@ -47,4 +47,5 @@ set -x
 
 rsync -avz ${DATA}/ ${REMOTE}:${REMOTE_DATA}
 
-ssh ${REMOTE} ${REMOTE_SCRIPT} ${REMOTE_DATA} ${REMOTE_PARAMS} ${START} ${STOP}
+ssh ${REMOTE} ${REMOTE_SCRIPT} ${REMOTE_DATA} ${REMOTE_PARAMS} ${START} ${STOP} > \
+  ${CONTROL_DIR}/remote.log

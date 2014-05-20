@@ -1,3 +1,6 @@
+
+<!-- Sites file for Orthros SGE cluster -->
+
 <config>
 
  <pool handle="localhost">

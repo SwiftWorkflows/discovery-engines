@@ -1,16 +1,22 @@
 #!/bin/bash -eu
 
-# PATH=~wilde/swift/rev/swift-0.94.1/bin:$PATH
+PATH=~wilde/swift/rev/swift-0.94.1/bin:$PATH
 
-PATH=/home/wozniak/Downloads/swift-0.94.1/bin:${PATH}
+# PATH=/home/wozniak/Downloads/swift-0.94.1/bin:${PATH}
 
-if [[ ${#*} != 1 ]]
+usage()
+{
+  echo "usage: runImages.sh <SWIFT SCRIPTS DIRECTORY> <PARAMETERS FILE>"
+}
+
+if [[ ${#*} != 2 ]]
 then
-  echo "Provide a parameters file!"
+  usage
   exit 1
 fi
 
-PARAMETERS_FILE=$1
+SWIFT_SCRIPTS_DIR=$1
+PARAMETERS_FILE=$2
 
 NDISTANCES=$( awk '$1 ~ /^nDistances/ { print $2 }' ${PARAMETERS_FILE} )
 NRFILESPERLAYER=$( awk '$1 ~ /^NrFilesPerLayer/ { print $2 }' ${PARAMETERS_FILE} )
@@ -20,9 +26,12 @@ echo "NDISTANCES:      ${NDISTANCES}"
 echo "NRFILESPERLAYER: ${NRFILESPERLAYER}"
 
 set -x
-swift -sites.file sites-etc.xml -tc.file tc -config cf ProcessImages.swift \
-  -paramfile=${PARAMETERS_FILE} \
-  -NrLayers=${NDISTANCES}       \
-  -NrFilesPerLayer=${NRFILESPERLAYER} 
+swift -sites.file ${SWIFT_SCRIPTS_DIR}/sites.xml             \
+      -tc.file    ${SWIFT_SCRIPTS_DIR}/tc                    \
+      -config     ${SWIFT_SCRIPTS_DIR}/cf                    \
+                  ${SWIFT_SCRIPTS_DIR}/ProcessImages.swift   \
+      -paramfile=${PARAMETERS_FILE}                          \
+      -NrLayers=${NDISTANCES}                                \
+      -NrFilesPerLayer=${NRFILESPERLAYER}
 
-# -sites.file sites-wozniak.xml 
+# -sites.file sites-wozniak.xml
