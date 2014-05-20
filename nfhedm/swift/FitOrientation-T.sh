@@ -5,10 +5,14 @@
 
 if [[ ${#*} != 4 ]]
 then
-  echo "usage: test-2 <DATA DIRECTORY> <PARAMETERS FILE> <START ROWN> <END ROWN>"
+  echo "usage: FitOrientation-T.sh <DATA DIRECTORY> <PARAMETERS FILE> <START ROWN> <END ROWN>"
   echo "The parameters file may be relative to the data directory or absolute."
   exit 1
 fi
+
+echo "FitOrientation-T.sh ..."
+
+set -x
 
 DATA=$1
 PARAMETERS=$2
@@ -50,5 +54,6 @@ else
 fi
 set -x
 which turbine-cobalt-run.zsh
+stc -u ${DIR}/${SCRIPT}.swift
 turbine-cobalt-run.zsh -n ${PROCS} ${DIR}/${SCRIPT}.tcl \
   -p=${PARAMETERS_PATH} ${START} ${END}
