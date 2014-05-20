@@ -8,9 +8,9 @@
 usage()
 {
   echo   ""
-  echo   "run-remote-swift-t.zsh: usage: "
+  echo   "run-remote.sh: usage: "
   echo   ""
-  printf "\t run-remote-swift-t.zsh <LOCAL DATA DIRECTORY> <START> <STOP>\n"
+  printf "\t run-remote.sh <LOCAL DATA DIRECTORY> <REMOTE DATA DIRECTORY> <PARAMETERS FILE NAME> <START> <STOP>\n"
   echo   ""
   echo   "Environment:"
   local W=-15 # Field width
@@ -23,15 +23,19 @@ usage()
   echo   ""
 }
 
-if [[ ${#*} != 3 ]]
+if [[ ${#*} != 5 ]]
 then
   usage
   exit 1
 fi
 
-DATA=$1   # E.g., /data/tomo1/NFTest/converted/Au_Reduced2
-START=$2
-STOP=$3
+set -x
+
+DATA=$1             # E.g., /data/tomo1/NFTest/converted/Au_Reduced2
+REMOTE_DATANAME=$2  # E.g., Au_Reduced2
+PARAMETERS=$3       # E.g., ParametersGoldApril14.txt
+START=$4
+STOP=$5
 
 REMOTE_HOST=${REMOTE_HOST:-cetus.alcf.anl.gov}
 REMOTE_USER=${REMOTE_USER:-wozniak}
@@ -39,13 +43,23 @@ REMOTE=${REMOTE_USER}@${REMOTE_HOST}
 
 REMOTE_HOME=/home/${REMOTE_USER}
 REMOTE_SCRIPT=${REMOTE_HOME}/proj/ppc64/d-e/nfhedm/swift/FitOrientation-T.sh
+REMOTE_DATA=${REMOTE_HOME}/${REMOTE_DATANAME}
+REMOTE_PARAMETERS=${REMOTE_DATA}/parameters.txt
 
-REMOTE_DATA=${REMOTE_DATA:-${REMOTE_HOME}/Au_Reduced2-converted}
-REMOTE_PARAMS=${REMOTE_PARAMS:-${REMOTE_DATA}/ParametersGoldApril14.txt}
+sed "s@DataDirectory.*@DataDirectory ${REMOTE_DATA}@" ${PARAMETERS} \
+  > ${CONTROL_DIR}/parameters.txt
+sed -i "s@ReducedFileName.*@ReducedFileName Au@" ${CONTROL_DIR}/parameters.txt
 
-set -x
+cd ${CONTROL_DIR}
 
-rsync -avz ${DATA}/ ${REMOTE}:${REMOTE_DATA}
+rsync -az --stats ${DATA}/ parameters.txt ${REMOTE}:${REMOTE_DATA}
 
-ssh ${REMOTE} ${REMOTE_SCRIPT} ${REMOTE_DATA} ${REMOTE_PARAMS} ${START} ${STOP} > \
-  ${CONTROL_DIR}/remote.log
+REMOTE_LOG=${CONTROL_DIR}/remote.log
+REMOTE_PARAMS=${REMOTE_DATA}/parameters.txt
+ssh ${REMOTE} ${REMOTE_SCRIPT} \
+  ${REMOTE_DATA} ${REMOTE_PARAMS} ${START} ${STOP} >& \
+  ${REMOTE_LOG}
+
+TURBINE_OUTPUT_LINE=$( grep TURBINE_OUTPUT ${REMOTE_LOG} )
+eval ${TURBINE_OUTPUT_LINE}
+scp ${REMOTE}:${TURBINE_OUTPUT}/output.txt remote-output.txt

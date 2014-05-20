@@ -61,6 +61,7 @@ echo "DATA=${DATA}"
 REDUCED=$( awk '$1 ~ /^ReducedFileName/ { print $2 }' ${PARAMETERS} )
 echo "REDUCED=${REDUCED}"
 REDUCED_DIR=$( dirname ${REDUCED} )
+REDUCED_CONVERTED_DIR=${DATA/NFTest/NFTest/converted}
 
 # Make a unique control directory
 CONTROL_ID=$( date "+%Y-%m-%d_%H:%M" )
@@ -106,4 +107,5 @@ run_stage()
 # run_stage 3:CONVERT ${NFHEDM_SWIFT_DIR}/convert-bin-l2n.sh \
 #   ${NFHEDM_SWIFT_DIR} ${DATA} ${REDUCED_DIR}
 
-run_stage 4:REMOTE ${E2E_DIR}/run-remote.sh ${DATA}/${REDUCED_DIR} ${START} ${STOP}
+run_stage 4:REMOTE ${E2E_DIR}/run-remote.sh \
+  ${REDUCED_CONVERTED_DIR} ${REDUCED_DIR} ${PARAMETERS} ${START} ${STOP}
