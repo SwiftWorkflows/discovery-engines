@@ -38,33 +38,36 @@ START=$4
 STOP=$5
 
 DATA_ROOT=$( dirname $( dirname ${DATA} ) )
-
 REMOTE_HOST=${REMOTE_HOST:-cetus.alcf.anl.gov}
 REMOTE_USER=${REMOTE_USER:-wozniak}
 REMOTE=${REMOTE_USER}@${REMOTE_HOST}
-
 REMOTE_HOME=/home/${REMOTE_USER}
 REMOTE_SCRIPT=${REMOTE_HOME}/proj/ppc64/d-e/nfhedm/swift/FitOrientation-T.sh
 REMOTE_DATA=${REMOTE_HOME}/${REMOTE_DATANAME}
 REMOTE_PARAMETERS=${REMOTE_DATA}/parameters.txt
 
+# Extract parameters from parameters file
 sed "s@DataDirectory.*@DataDirectory ${REMOTE_DATA}@" ${PARAMETERS} \
   > ${CONTROL_DIR}/parameters.txt
 sed -i "s@ReducedFileName.*@ReducedFileName Au@" ${CONTROL_DIR}/parameters.txt
 
+# Send the input data
 cd ${DATA_ROOT}
 FO_FILES=( grid.txt DiffractionSpots.txt Key.txt OrientMat.txt )
 rsync -a --stats ${FO_FILES[@]} ${REMOTE}:${REMOTE_DATA}
-
 cd ${CONTROL_DIR}
 rsync -az --stats ${DATA}/ parameters.txt ${REMOTE}:${REMOTE_DATA}
 
+# Execute Swift/T remotely
 REMOTE_LOG=${CONTROL_DIR}/remote.log
 REMOTE_PARAMS=${REMOTE_DATA}/parameters.txt
 ssh ${REMOTE} ${REMOTE_SCRIPT} \
   ${REMOTE_DATA} ${REMOTE_PARAMS} ${START} ${STOP} >& \
   ${REMOTE_LOG}
 
+# Extract Swift/T output directory:
 TURBINE_OUTPUT_LINE=$( grep TURBINE_OUTPUT ${REMOTE_LOG} )
 eval ${TURBINE_OUTPUT_LINE}
-scp ${REMOTE}:${TURBINE_OUTPUT}/output.txt remote-output.txt
+# Retrieve output data:
+rsync -az ${REMOTE}:${TURBINE_OUTPUT}/ .
+rsync -az ${REMOTE}:${REMOTE_DATA}/microstructure.mic .
