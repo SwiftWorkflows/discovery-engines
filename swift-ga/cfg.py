@@ -1,2 +1,2 @@
-individuals = 3
+individuals = 10
 ngenerations = 4

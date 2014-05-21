@@ -12,7 +12,7 @@ app (file o, file score) box(int individual, int generation, file winner_name)
 
 app (file winner_file) select(int generation, file population[])
 {
-  "python" "select.py" generation winner_file population ;
+  "python" "select.py" generation winner_file population;
 }
 
 main
@@ -39,4 +39,3 @@ main
     winners[generation] = winner_file;
   }
 }
-

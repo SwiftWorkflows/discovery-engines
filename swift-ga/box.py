@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+from time import *
 
 box_index = int(sys.argv[1])
 generation = int(sys.argv[2])
@@ -15,6 +16,8 @@ print ('box: ' + str(generation) + ':' + str(box_index) + ' previous winner: ' +
 
 with open(output_file, 'w') as f:
     f.write('box: generation: '+ str(generation) + ' individual: ' + str(box_index) + '\n')
+
+sleep(3)
 
 with open(score_file, 'w') as f:
     f.write(str(box_index+generation) + '\n')
