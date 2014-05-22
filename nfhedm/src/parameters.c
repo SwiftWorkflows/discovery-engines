@@ -226,6 +226,6 @@ ReadParameters(const char *filename, struct parameters *params)
             continue;
         }
     }
-    PROFILE_STOP(p);
+    PROFILE_END(p);
     return true;
 }

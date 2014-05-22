@@ -63,18 +63,18 @@ void debug_printf(const char *token, const char *format, ...);
 #if ENABLE_PROFILE
 #define PROFILE_CREATE(token,i ) int i = profile_create(#token)
 #define PROFILE_START(i)         profile_start(i)
-#define PROFILE_STOP(i)          profile_stop(i)
+#define PROFILE_END(i)           profile_end(i)
 #define PROFILE_REPORT           profile_report()
 #define PROFILE_RESET            profile_reset()
 int  profile_create(const char* token);
 void profile_start(int i);
-void profile_stop(int i);
+void profile_end(int i);
 void profile_report(void);
 void profile_reset(void);
 #else
 #define PROFILE_CREATE(token,i) // noop
 #define PROFILE_START(i)        // noop
-#define PROFILE_STOP(i)         // noop
+#define PROFILE_END(i)         // noop
 #define PROFILE_REPORT          // noop
 #define PROFILE_RESET           // noop
 #endif

@@ -466,7 +466,7 @@ static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***
         assert(n == 3);
     }
     fclose(fd);
-    PROFILE_STOP(p);
+    PROFILE_END(p);
 
     // Set outputs:
     *SpotsMat = M;
@@ -493,8 +493,8 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     // Go through each orientation and compare with observed spots.
 
     LOG("FitOrientation_Calc()...");
-    PROFILE_CREATE(FitOrientation_Calc, p);
-    PROFILE_START(p);
+    PROFILE_CREATE(FitOrientation_Calc, p1);
+    PROFILE_START(p1);
     int NrPixelsGrid=2*(ceil((gs*2)/px))*(ceil((gs*2)/px));
     int NrSpotsThis,StartingRowNr;
     double FracOverT;
@@ -520,7 +520,8 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         XG[j] = XY[j][0];
         YG[j] = XY[j][1];
     }
-    printf("%i: %i %f %f\n", nrFiles, nLayers, px, gs);
+    PROFILE_CREATE(Overlaps,p2);
+    PROFILE_START(p2);
     for (int i=0;i<NrOrientations;i++){
         NrSpotsThis = NrSpots[i][0];
         StartingRowNr = NrSpots[i][1];
@@ -552,7 +553,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
             OrientationGoodID++;
         }
     }
-
+    PROFILE_END(p2);
     double BestFrac = 0.0, BestEuler[3];
     for (int i = 0; i < 3; i++)
         BestEuler[i] = 0.0;
@@ -569,12 +570,10 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
             hkls[i][3] = 0;
             Thetas[i] = 0;
         }
-        // printf("GenerateRingInfo...\n");
         int rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
                                   LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
                                   LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
         assert(rc == 1);
-        // printf("GenerateRingInfo done.\n");
         double Fractions, EulerIn[3], OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,OMTemp[9];
         BestFrac = -1;
 
@@ -613,7 +612,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         } // End of parallel section
 
     }else{
-        printf("No good ID found.\n");
+        LOG("No good ID found.");
     }
     // Free memory
     //FreeMemMatrix(SpotsMat,TotalDiffrSpots);
@@ -638,7 +637,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         perror("result data file");
         exit(EXIT_FAILURE);
     }
-    PROFILE_STOP(p);
+    PROFILE_END(p1);
     LOG("FitOrientation_Calc() done.");
 
     return 1;

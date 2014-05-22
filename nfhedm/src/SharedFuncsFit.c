@@ -306,7 +306,7 @@ ReadBinFiles(
         }
         counter = 0;
     }
-    PROFILE_STOP(p);
+    PROFILE_END(p);
     LOG("ReadBinFiles: done.");
     // TODO: Check use of free() here:
 

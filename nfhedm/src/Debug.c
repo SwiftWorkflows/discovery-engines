@@ -90,7 +90,7 @@ profile_start(int i)
 }
 
 void
-profile_stop(int i)
+profile_end(int i)
 {
     if (!profile_enabled)
         return;
