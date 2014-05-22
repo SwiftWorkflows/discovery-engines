@@ -18,7 +18,8 @@ main
   start = toint(argp(1));
   end   = toint(argp(2));
 
-  printf("HI: %s %i %i", ParameterFileName, start, end);
+  printf("FitOrientation-T: parameters=%s rown=%i:%i",
+         ParameterFileName, start, end);
   foreach rown in [start:end] {
     printf("rown: %i", rown);
     FitOrientation_Swift(ParameterFileName, rown, MicrostructureFileName);
