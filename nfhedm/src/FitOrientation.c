@@ -431,7 +431,8 @@ static bool ReadKey(const char *DataDirectory,
     FILE *fk = fopen(fnKey,"r");
     if (fk == NULL) file_not_found(fnKey);
     fgets(line,1000,fk);
-    sscanf(line,"%d",NrOrientations);
+    int n = sscanf(line,"%d",NrOrientations);
+    assert(n == 1);
     int **M = allocMatrixInt(*NrOrientations,2);
     int tds=0;
     for (int i=0;i<*NrOrientations;i++){
