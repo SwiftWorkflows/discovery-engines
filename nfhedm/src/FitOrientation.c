@@ -508,8 +508,6 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     LOG("FitOrientation_Calc()...\n");
     PROFILE_CREATE(FitOrientation_Calc, p);
     PROFILE_START(p);
-    clock_t startthis2;
-    startthis2 = clock();
     int NrPixelsGrid=2*(ceil((gs*2)/px))*(ceil((gs*2)/px));
     int NrSpotsThis,StartingRowNr;
     double FracOverT;
@@ -637,14 +635,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     //FreeMemMatrix(XY,3);
     //FreeMemMatrix(OrientationMatrix,NrOrientations);
     //FreeMemMatrix(OrientMatrix,MAX_POINTS_GRID_GOOD);
-    clock_t end = clock();
-    //diftotal = ((double)(startthis-start))/CLOCKS_PER_SEC;
-    //printf("Time elapsed in reading bin files: %f [s]\n",diftotal);
-    //diftotal = ((double)(startthis2-startthis))/CLOCKS_PER_SEC;
-    //printf("Time elapsed in reading orientations: %f [s]\n",diftotal);
-    double diftotal = ((double)(end-startthis2))/CLOCKS_PER_SEC;
-    //printf("Time elapsed in comparing diffraction spots: %f [s]\n",diftotal);
-    printf("%d %d %f %f %f %f %f %f %f\n",rown, OrientationGoodID, diftotal,
+    printf("%d %d %f %f %f %f %f %f\n",rown, OrientationGoodID,
            xs, ys, BestEuler[0],BestEuler[1],BestEuler[2],BestFrac);
     double result[5];
     result[0] = (double) rown;
