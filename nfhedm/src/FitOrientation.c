@@ -269,6 +269,8 @@ static bool ReadKey(const char *DataDirectory,
 static bool ReadOrientations(const char *DataDirectory, int NrOrientations,
                              double ***OrientationMatrix);
 
+static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***SpotsMat);
+
 int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureFN)
 {
     printf("FitOrientationAll(%s,%i,%s)...\n", ParamFN, rown, MicrostructureFN);
@@ -281,13 +283,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
        //Read bin files
        char fn[1000];
-
-       char fnDS[1000];
-       sprintf(fnDS,"%s/DiffractionSpots.txt",params.direct);
-
-
        sprintf(fn,"%s/%s",params.direct,params.fn);
-       int i,nrFiles,nrPixels;
+       int nrFiles,nrPixels;
        int *ObsSpotsInfo;
        int ReadCode;
        nrFiles = params.EndNr - params.StartNr + 1;
@@ -309,47 +306,32 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
            return 0;
        }
 
-       char line[1024];
+       // Read *.txt files
+       bool b;
 
+       // Read Grid
        int TotalNrSpots;
        double **XY;
        double xs,ys,gs;
-       bool b = ReadGridFile(params.direct, rown, &TotalNrSpots, &XY, &xs, &ys, &gs);
+       b = ReadGridFile(params.direct, rown, &TotalNrSpots, &XY, &xs, &ys, &gs);
        assert(b);
-
-       int NrOrientations;
-
-       FILE *fd;
-       int TotalDiffrSpots;
-       fd = fopen(fnDS,"r");
 
        // Read Key
        int **NrSpots;
-       ReadKey(params.direct, &NrOrientations, &TotalDiffrSpots, &NrSpots);
+       int NrOrientations;
+       int TotalDiffrSpots;
+       b = ReadKey(params.direct, &NrOrientations, &TotalDiffrSpots, &NrSpots);
+       assert(b);
 
        // Read Orientations
        double **OrientationMatrix;
-       ReadOrientations(params.direct, NrOrientations, &OrientationMatrix);
+       b = ReadOrientations(params.direct, NrOrientations, &OrientationMatrix);
+       assert(b);
 
+       // Read Spots
        double **SpotsMat;
-       SpotsMat = allocMatrix(TotalDiffrSpots,3);
-       printf("reading: %s\n", fnDS);
-       printf("TotalDiffrSpots: %i\n", TotalDiffrSpots);
-       for (i=0;i<TotalDiffrSpots;i++){
-           char *t = fgets(line,1000,fd);
-           if (t == NULL)
-           {
-             printf("Error reading: %s\n", fnDS);
-             return 0;
-           }
-           // printf("read: %i: %s", i, line);
-           int count = sscanf(line,"%lf %lf %lf",&SpotsMat[i][0],&SpotsMat[i][1],&SpotsMat[i][2]);
-           assert(count == 3);
-       }
-       printf("TotalDiffrSpots: done.\n");
-
-
-       fclose(fd);
+       b = ReadSpots(params.direct, TotalDiffrSpots, &SpotsMat);
+       assert(b);
        
        int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
                          /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
@@ -470,6 +452,31 @@ static bool ReadOrientations(const char *DataDirectory, int NrOrientations, doub
     *OrientationMatrix = M;
     fclose(fo);
     LOG("closed: %s\n", fnOr);
+    return true;
+}
+
+static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***SpotsMat)
+{
+    char fnDS[1000];
+    sprintf(fnDS,"%s/DiffractionSpots.txt",params.direct);
+    LOG("reading: %s\n", fnDS);
+    FILE *fd = fopen(fnDS,"r");
+    if (fd == NULL) file_not_found(fnDS);
+    char line[1024];
+    double **M = allocMatrix(TotalDiffrSpots,3);
+    LOG("TotalDiffrSpots: %i\n", TotalDiffrSpots);
+    for (int i=0;i<TotalDiffrSpots;i++){
+        fgets(line,1000,fd);
+        // printf("read: %i: %s", i, line);
+        int count = sscanf(line,"%lf %lf %lf",&M[i][0],&M[i][1],&M[i][2]);
+        assert(count == 3);
+    }
+    LOG("TotalDiffrSpots: done.\n");
+    fclose(fd);
+
+    // Set outputs:
+    *SpotsMat = M;
+
     return true;
 }
 
