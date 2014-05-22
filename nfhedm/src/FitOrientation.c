@@ -358,7 +358,7 @@ static bool ReadGridFile(const char *DataDirectory, int rown,
     char line[1024];
 
     sprintf(fnG,"%s/grid.txt", DataDirectory);
-    LOG("reading: %s\n", fnG);
+    LOG("reading: %s", fnG);
     FILE *fp = fopen(fnG,"r");
     if (fp == NULL) file_not_found(fnG);
 
@@ -381,7 +381,6 @@ static bool ReadGridFile(const char *DataDirectory, int rown,
     n = sscanf(line,"%lf %lf %lf %lf %lf",&y1,&y2,&xs,&ys,&gs);
     assert(n == 5);
     fclose(fp);
-    LOG("closed: %s\n", fnG);
     if (y1>y2){
         M[0][0] =xs;
         M[0][1] =ys - y1;
@@ -413,7 +412,7 @@ static bool ReadKey(const char *DataDirectory,
     char line[1024];
     char fnKey[1024];
     sprintf(fnKey,"%s/Key.txt",DataDirectory);
-    LOG("reading: %s\n", fnKey);
+    LOG("reading: %s", fnKey);
     FILE *fk = fopen(fnKey,"r");
     if (fk == NULL) file_not_found(fnKey);
     fgets(line,1000,fk);
@@ -441,7 +440,7 @@ static bool ReadOrientations(const char *DataDirectory, int NrOrientations, doub
     char fnOr[1024];
     sprintf(fnOr,"%s/OrientMat.txt",params.direct);
     char line[1024];
-    LOG("reading: %s\n", fnOr);
+    LOG("reading: %s", fnOr);
     FILE *fo = fopen(fnOr,"r");
     if (fo == NULL) file_not_found(fnOr);
 
@@ -455,7 +454,6 @@ static bool ReadOrientations(const char *DataDirectory, int NrOrientations, doub
 
     *OrientationMatrix = M;
     fclose(fo);
-    LOG("closed: %s\n", fnOr);
     return true;
 }
 
@@ -463,23 +461,22 @@ static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***
 {
     char fnDS[1000];
     sprintf(fnDS,"%s/DiffractionSpots.txt",params.direct);
-    LOG("reading: %s\n", fnDS);
+    LOG("reading: %s", fnDS);
     PROFILE_CREATE(ReadSpots, p);
     PROFILE_START(p);
     FILE *fd = fopen(fnDS,"r");
     if (fd == NULL) file_not_found(fnDS);
     char line[1024];
     double **M = allocMatrix(TotalDiffrSpots,3);
-    LOG("TotalDiffrSpots: %i\n", TotalDiffrSpots);
+    LOG("TotalDiffrSpots: %i", TotalDiffrSpots);
     for (int i=0;i<TotalDiffrSpots;i++){
         fgets(line,1000,fd);
         // printf("read: %i: %s", i, line);
-        int count = sscanf(line,"%lf %lf %lf",&M[i][0],&M[i][1],&M[i][2]);
-        assert(count == 3);
+        int n = sscanf(line,"%lf %lf %lf",&M[i][0],&M[i][1],&M[i][2]);
+        assert(n == 3);
     }
-    PROFILE_STOP(p);
-    LOG("TotalDiffrSpots: done.\n");
     fclose(fd);
+    PROFILE_STOP(p);
 
     // Set outputs:
     *SpotsMat = M;
@@ -505,7 +502,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
 {
     // Go through each orientation and compare with observed spots.
 
-    LOG("FitOrientation_Calc()...\n");
+    LOG("FitOrientation_Calc()...");
     PROFILE_CREATE(FitOrientation_Calc, p);
     PROFILE_START(p);
     int NrPixelsGrid=2*(ceil((gs*2)/px))*(ceil((gs*2)/px));
@@ -644,7 +641,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     result[3] = BestEuler[2];
     result[4] = BestFrac;
     // fwrite(result, sizeof(double), 5, result_fd);
-    printf("FitOrientation_Calc() pwrite: rown=%i\n",rown-1);
+    DEBUG("FitOrientation_Calc() pwrite: rown=%i",rown-1);
     int rc = pwrite(result_fd, result, 5*sizeof(double), (rown-1)*5*sizeof(double));
     if (rc < 0)
     {
@@ -652,7 +649,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         exit(EXIT_FAILURE);
     }
     PROFILE_STOP(p);
-    LOG("FitOrientation_Calc() done.\n");
+    LOG("FitOrientation_Calc() done.");
 
     return 1;
 }
