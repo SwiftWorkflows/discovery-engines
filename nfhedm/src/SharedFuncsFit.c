@@ -601,119 +601,120 @@ CalcFracOverlap(
     printVector("Lsds", Lsds, nLayers);
     printed = true;
   }
-    int j,OmeBin,OutofBounds,k,l;
-    double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,
-		xyz[3],P1[3],ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3],
-		YZSpotsTemp[2],YZSpotsT[3][2];
-    YZSpotsTemp[0] = 0.0;
-    YZSpotsTemp[1] = 0.0;
-    int **InPixels,NrInPixels, OverlapPixels,Layer;
-    long long int BinNr;
-    int MultY, MultZ, AllDistsFound, TotalPixels;
-    *FracOver = 0;
-    InPixels = allocMatrixInt(NrPixelsGrid,2);
-	OverlapPixels = 0;
-	TotalPixels=0;
-    for (j=0;j<nTspots;j++){
-		ythis = TheorSpots[j][0];
-		zthis = TheorSpots[j][1];
-		OmegaThis = TheorSpots[j][2];
-		OmeBin = (int) floor((-OmegaStart+OmegaThis)/OmegaStep);
-		for (k=0;k<3;k++){
-            P0[k] = P0All[0][k];
-        }
-		Lsd = Lsds[0];
-		ybc = ybcs[0];
-		zbc = zbcs[0];
-		OutofBounds = 0;
-		for (k=0;k<3;k++){
-			XGT = XGrain[k];
-			YGT = YGrain[k];
-			DisplacementSpots(XGT,YGT,Lsd,ythis,zthis,OmegaThis,&Displ_Y,&Displ_Z);
-			ytemp = Displ_Y;
-			ztemp = Displ_Z;
-			xyz[0] = 0;
-			xyz[1] = ytemp;
-			xyz[2] = ztemp;
-			MatrixMultF(RotMatTilts,xyz,P1);
-			for (l=0;l<3;l++){
-				ABC[l] = P1[l]-P0[l];
-			}
-			outxyz[0] = 0;
-			outxyz[1] = P0[1] -(ABC[1]*P0[0])/(ABC[0]);
-			outxyz[2] = P0[2] -(ABC[2]*P0[0])/(ABC[0]);
-			YZSpotsT[k][0] = (outxyz[1])/px + ybc;
-			YZSpotsT[k][1] = (outxyz[2])/px + zbc;
-			if (YZSpotsT[k][0] > 2048 || YZSpotsT[k][0] < 0 || YZSpotsT[k][1] > 2048 || YZSpotsT[k][1] < 0){
-				OutofBounds = 1;
-				break;
-			}
-			if (k==2){
-				xyz[0] = 0;
-				xyz[1] = ythis;
-				xyz[2] = zthis;
-				MatrixMultF(RotMatTilts,xyz,P1);
-				for (l=0;l<3;l++){
-					ABC[l] = P1[l]-P0[l];
-				}
-				outxyz[0] = 0;
-				outxyz[1] = P0[1] -(ABC[1]*P0[0])/(ABC[0]);
-				outxyz[2] = P0[2] -(ABC[2]*P0[0])/(ABC[0]);
-				YZSpotsTemp[0] = (outxyz[1])/px + ybc;
-				YZSpotsTemp[1] = (outxyz[2])/px + zbc;
-				for (l=0;l<3;l++){
-					YZSpots[l][0] = YZSpotsT[l][0] - YZSpotsTemp[0];
-					YZSpots[l][1] = YZSpotsT[l][1] - YZSpotsTemp[1];
-					//printf("%f %f %f %f %f %f\n",YZSpots[l][0],YZSpotsT[l][0],YZSpotsTemp[0],YZSpots[l][1],YZSpotsT[l][1],YZSpotsTemp[1]);
-				}
-			}
-		}
-		if (OutofBounds == 1){
-			continue;
-		}
-		if (gs*2 > px){
-			CalcPixels2(YZSpots,InPixels,&NrInPixels);
-		}else{
-			InPixels[0][0] = (int) round((YZSpots[0][0]+YZSpots[1][0]+YZSpots[2][0])/3);
-			InPixels[0][1] = (int) round((YZSpots[0][1]+YZSpots[1][1]+YZSpots[2][1])/3);
-			NrInPixels = 1;
-		}
-		for (k=0;k<NrInPixels;k++){
-			AllDistsFound = 1;
-			for (Layer=0;Layer<nLayers;Layer++){
-				MultY = (int) floor(((((double)(YZSpotsTemp[0]-ybc))*px)*(Lsds[Layer]/Lsd))/px + ybcs[Layer]) + InPixels[k][0];
-				MultZ = (int) floor(((((double)(YZSpotsTemp[1]-zbc))*px)*(Lsds[Layer]/Lsd))/px + zbcs[Layer]) + InPixels[k][1];
-				if (MultY > 2048 || MultY < 0 || MultZ > 2048 || MultZ < 0){
-					OutofBounds = 1;
-					break;
-				}
-				BinNr = Layer*NrOfFiles;
-				BinNr *= 2048;
-				BinNr *= 2048;
-				BinNr += OmeBin*2048*2048;
-				BinNr += 2048*MultY;
-				BinNr += MultZ;
-				if (TestBit(ObsSpotsInfo,BinNr)){
-					if (AllDistsFound == 1){
-						AllDistsFound = 1;
-					}
-				}else{
-					AllDistsFound = 0;
-				}
-			}
-			if (OutofBounds == 1){
-				continue;
-			}
-			if (AllDistsFound == 1){
-				OverlapPixels += 1;
-			}
-			TotalPixels+=1;
-		}
-	}
-	if (TotalPixels > 0){
-		*FracOver = (double)((double)OverlapPixels)/((double)TotalPixels);
-	}
-    FreeMemMatrixInt(InPixels,NrPixelsGrid);
+
+  int j,OmeBin,OutofBounds,k,l;
+  double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,
+  xyz[3],P1[3],ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3],
+  YZSpotsTemp[2],YZSpotsT[3][2];
+  YZSpotsTemp[0] = 0.0;
+  YZSpotsTemp[1] = 0.0;
+  int **InPixels,NrInPixels, OverlapPixels,Layer;
+  long long int BinNr;
+  int MultY, MultZ, AllDistsFound, TotalPixels;
+  *FracOver = 0;
+  InPixels = allocMatrixInt(NrPixelsGrid,2);
+  OverlapPixels = 0;
+  TotalPixels=0;
+  for (j=0;j<nTspots;j++){
+      ythis = TheorSpots[j][0];
+      zthis = TheorSpots[j][1];
+      OmegaThis = TheorSpots[j][2];
+      OmeBin = (int) floor((-OmegaStart+OmegaThis)/OmegaStep);
+      for (k=0;k<3;k++){
+          P0[k] = P0All[0][k];
+      }
+      Lsd = Lsds[0];
+      ybc = ybcs[0];
+      zbc = zbcs[0];
+      OutofBounds = 0;
+      for (k=0;k<3;k++){
+          XGT = XGrain[k];
+          YGT = YGrain[k];
+          DisplacementSpots(XGT,YGT,Lsd,ythis,zthis,OmegaThis,&Displ_Y,&Displ_Z);
+          ytemp = Displ_Y;
+          ztemp = Displ_Z;
+          xyz[0] = 0;
+          xyz[1] = ytemp;
+          xyz[2] = ztemp;
+          MatrixMultF(RotMatTilts,xyz,P1);
+          for (l=0;l<3;l++){
+              ABC[l] = P1[l]-P0[l];
+          }
+          outxyz[0] = 0;
+          outxyz[1] = P0[1] -(ABC[1]*P0[0])/(ABC[0]);
+          outxyz[2] = P0[2] -(ABC[2]*P0[0])/(ABC[0]);
+          YZSpotsT[k][0] = (outxyz[1])/px + ybc;
+          YZSpotsT[k][1] = (outxyz[2])/px + zbc;
+          if (YZSpotsT[k][0] > 2048 || YZSpotsT[k][0] < 0 || YZSpotsT[k][1] > 2048 || YZSpotsT[k][1] < 0){
+              OutofBounds = 1;
+              break;
+          }
+          if (k==2){
+              xyz[0] = 0;
+              xyz[1] = ythis;
+              xyz[2] = zthis;
+              MatrixMultF(RotMatTilts,xyz,P1);
+              for (l=0;l<3;l++){
+                  ABC[l] = P1[l]-P0[l];
+              }
+              outxyz[0] = 0;
+              outxyz[1] = P0[1] -(ABC[1]*P0[0])/(ABC[0]);
+              outxyz[2] = P0[2] -(ABC[2]*P0[0])/(ABC[0]);
+              YZSpotsTemp[0] = (outxyz[1])/px + ybc;
+              YZSpotsTemp[1] = (outxyz[2])/px + zbc;
+              for (l=0;l<3;l++){
+                  YZSpots[l][0] = YZSpotsT[l][0] - YZSpotsTemp[0];
+                  YZSpots[l][1] = YZSpotsT[l][1] - YZSpotsTemp[1];
+                  //printf("%f %f %f %f %f %f\n",YZSpots[l][0],YZSpotsT[l][0],YZSpotsTemp[0],YZSpots[l][1],YZSpotsT[l][1],YZSpotsTemp[1]);
+              }
+          }
+      }
+      if (OutofBounds == 1){
+          continue;
+      }
+      if (gs*2 > px){
+          CalcPixels2(YZSpots,InPixels,&NrInPixels);
+      }else{
+          InPixels[0][0] = (int) round((YZSpots[0][0]+YZSpots[1][0]+YZSpots[2][0])/3);
+          InPixels[0][1] = (int) round((YZSpots[0][1]+YZSpots[1][1]+YZSpots[2][1])/3);
+          NrInPixels = 1;
+      }
+      for (k=0;k<NrInPixels;k++){
+          AllDistsFound = 1;
+          for (Layer=0;Layer<nLayers;Layer++){
+              MultY = (int) floor(((((double)(YZSpotsTemp[0]-ybc))*px)*(Lsds[Layer]/Lsd))/px + ybcs[Layer]) + InPixels[k][0];
+              MultZ = (int) floor(((((double)(YZSpotsTemp[1]-zbc))*px)*(Lsds[Layer]/Lsd))/px + zbcs[Layer]) + InPixels[k][1];
+              if (MultY > 2048 || MultY < 0 || MultZ > 2048 || MultZ < 0){
+                  OutofBounds = 1;
+                  break;
+              }
+              BinNr = Layer*NrOfFiles;
+              BinNr *= 2048;
+              BinNr *= 2048;
+              BinNr += OmeBin*2048*2048;
+              BinNr += 2048*MultY;
+              BinNr += MultZ;
+              if (TestBit(ObsSpotsInfo,BinNr)){
+                  if (AllDistsFound == 1){
+                      AllDistsFound = 1;
+                  }
+              }else{
+                  AllDistsFound = 0;
+              }
+          }
+          if (OutofBounds == 1){
+              continue;
+          }
+          if (AllDistsFound == 1){
+              OverlapPixels += 1;
+          }
+          TotalPixels+=1;
+      }
+  }
+  if (TotalPixels > 0){
+      *FracOver = (double)((double)OverlapPixels)/((double)TotalPixels);
+  }
+  FreeMemMatrixInt(InPixels,NrPixelsGrid);
 }
 
 void
