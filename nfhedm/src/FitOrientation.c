@@ -279,71 +279,71 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     Init_FitOrientation(ParamFN);
     printf("Init_FitOrientation() OK.\n");
     fflush(stdout);
-    
+
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
-       //Read bin files
-       char fn[1000];
-       sprintf(fn,"%s/%s",params.direct,params.fn);
-       int nrFiles,nrPixels;
-       int *ObsSpotsInfo;
-       int ReadCode;
-       nrFiles = params.EndNr - params.StartNr + 1;
-       nrPixels = params.NrPixels*params.NrPixels;
-       long long int SizeObsSpots;
-       SizeObsSpots = (params.nLayers);
-       SizeObsSpots*=nrPixels;
-       SizeObsSpots*=nrFiles;
-       SizeObsSpots/=32;
-       ObsSpotsInfo = malloc(SizeObsSpots*sizeof(ObsSpotsInfo));
-       if (ObsSpotsInfo==NULL){
-           printf("Could not allocate ObsSpotsInfo.\n");
-           return 0;
-       }
-       ReadCode = ReadBinFiles(fn,params.ext,params.StartNr,params.EndNr,ObsSpotsInfo,
+    //Read bin files
+    char fn[1000];
+    sprintf(fn,"%s/%s",params.direct,params.fn);
+    int nrFiles,nrPixels;
+    int *ObsSpotsInfo;
+    int ReadCode;
+    nrFiles = params.EndNr - params.StartNr + 1;
+    nrPixels = params.NrPixels*params.NrPixels;
+    long long int SizeObsSpots;
+    SizeObsSpots = (params.nLayers);
+    SizeObsSpots*=nrPixels;
+    SizeObsSpots*=nrFiles;
+    SizeObsSpots/=32;
+    ObsSpotsInfo = malloc(SizeObsSpots*sizeof(ObsSpotsInfo));
+    if (ObsSpotsInfo==NULL){
+        printf("Could not allocate ObsSpotsInfo.\n");
+        return 0;
+    }
+    ReadCode = ReadBinFiles(fn,params.ext,params.StartNr,params.EndNr,ObsSpotsInfo,
                             params.nLayers,SizeObsSpots);
-       if (ReadCode == 0){
-           printf("Reading bin files did not go well. Please check.\n");
-           return 0;
-       }
+    if (ReadCode == 0){
+        printf("Reading bin files did not go well. Please check.\n");
+        return 0;
+    }
 
-       // Read *.txt files
-       bool b;
+    // Read *.txt files
+    bool b;
 
-       // Read Grid
-       int TotalNrSpots;
-       double **XY;
-       double xs,ys,gs;
-       b = ReadGridFile(params.direct, rown, &TotalNrSpots, &XY, &xs, &ys, &gs);
-       assert(b);
+    // Read Grid
+    int TotalNrSpots;
+    double **XY;
+    double xs,ys,gs;
+    b = ReadGridFile(params.direct, rown, &TotalNrSpots, &XY, &xs, &ys, &gs);
+    assert(b);
 
-       // Read Key
-       int **NrSpots;
-       int NrOrientations;
-       int TotalDiffrSpots;
-       b = ReadKey(params.direct, &NrOrientations, &TotalDiffrSpots, &NrSpots);
-       assert(b);
+    // Read Key
+    int **NrSpots;
+    int NrOrientations;
+    int TotalDiffrSpots;
+    b = ReadKey(params.direct, &NrOrientations, &TotalDiffrSpots, &NrSpots);
+    assert(b);
 
-       // Read Orientations
-       double **OrientationMatrix;
-       b = ReadOrientations(params.direct, NrOrientations, &OrientationMatrix);
-       assert(b);
+    // Read Orientations
+    double **OrientationMatrix;
+    b = ReadOrientations(params.direct, NrOrientations, &OrientationMatrix);
+    assert(b);
 
-       // Read Spots
-       double **SpotsMat;
-       b = ReadSpots(params.direct, TotalDiffrSpots, &SpotsMat);
-       assert(b);
-       
-       int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
-                         /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
-                         /*11*/NrSpots, OrientationMatrix, SpotsMat,
-                         /*14*/nrFiles, params.OmegaStart, params.OmegaStep, SizeObsSpots,
-                         /*18*/params.ybc, params.zbc, ObsSpotsInfo, params.minFracOverlap,
-                         /*22*/params.LatticeConstant, params.Wavelength, params.SpaceGroup, params.ExcludePoleAngle,
-                         /*26*/params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
-                         params.tol, TotalDiffrSpots, xs, ys, MaxTtheta);
+    // Read Spots
+    double **SpotsMat;
+    b = ReadSpots(params.direct, TotalDiffrSpots, &SpotsMat);
+    assert(b);
 
-       assert(rc == 1);
-       return 1;
+    int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
+                                 /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
+                                 /*11*/NrSpots, OrientationMatrix, SpotsMat,
+                                 /*14*/nrFiles, params.OmegaStart, params.OmegaStep, SizeObsSpots,
+                                 /*18*/params.ybc, params.zbc, ObsSpotsInfo, params.minFracOverlap,
+                                 /*22*/params.LatticeConstant, params.Wavelength, params.SpaceGroup, params.ExcludePoleAngle,
+                                 /*26*/params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
+                                 params.tol, TotalDiffrSpots, xs, ys, MaxTtheta);
+
+    assert(rc == 1);
+    return 1;
 }
 
 static bool ReadGridFile(const char *DataDirectory, int rown,
