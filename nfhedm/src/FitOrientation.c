@@ -263,6 +263,9 @@ static bool ReadGridFile(const char *DataDirectory, int rown,
                          int *TotalNrSpots, double ***XY,
                          double *xs_out, double *ys_out, double *gs_out);
 
+static bool ReadKey(const char *DataDirectory,
+                    int *NrOrientations, int *TotalDiffrSpots, int ***NrSpots);
+
 static bool ReadOrientations(const char *DataDirectory, int NrOrientations,
                              double ***OrientationMatrix);
 
@@ -280,9 +283,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
        char fn[1000];
 
        char fnDS[1000];
-       char fnKey[1000];
        sprintf(fnDS,"%s/DiffractionSpots.txt",params.direct);
-       sprintf(fnKey,"%s/Key.txt",params.direct);
+
 
        sprintf(fn,"%s/%s",params.direct,params.fn);
        int i,nrFiles,nrPixels;
@@ -315,25 +317,15 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
        bool b = ReadGridFile(params.direct, rown, &TotalNrSpots, &XY, &xs, &ys, &gs);
        assert(b);
 
-
        int NrOrientations;
 
-       FILE *fd, *fk;
+       FILE *fd;
        int TotalDiffrSpots;
        fd = fopen(fnDS,"r");
-       fk = fopen(fnKey,"r");
-       fgets(line,1000,fk);
-       sscanf(line,"%d",&NrOrientations);
+
+       // Read Key
        int **NrSpots;
-       NrSpots = allocMatrixInt(NrOrientations,2);
-       TotalDiffrSpots=0;
-       printf("reading: %s\n", fnKey);
-       for (i=0;i<NrOrientations;i++){
-           fgets(line,1000,fk);
-           sscanf(line,"%d",&NrSpots[i][0]);
-           TotalDiffrSpots+=NrSpots[i][0];
-           NrSpots[i][1] = TotalDiffrSpots - NrSpots[i][0];
-       }
+       ReadKey(params.direct, &NrOrientations, &TotalDiffrSpots, &NrSpots);
 
        // Read Orientations
        double **OrientationMatrix;
@@ -358,7 +350,6 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
 
 
        fclose(fd);
-       fclose(fk);
        
        int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
                          /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
@@ -421,10 +412,40 @@ static bool ReadGridFile(const char *DataDirectory, int rown,
         M[2][0] =xs + gs;
         M[2][1] =ys - y1;
     }
+
+    // Set outputs...
     *XY = M;
     *xs_out = xs;
     *ys_out = ys;
     *gs_out = gs;
+    return true;
+}
+
+static bool ReadKey(const char *DataDirectory,
+                    int *NrOrientations, int *TotalDiffrSpots, int ***NrSpots)
+{
+    char line[1024];
+    char fnKey[1024];
+    sprintf(fnKey,"%s/Key.txt",DataDirectory);
+    LOG("reading: %s\n", fnKey);
+    FILE *fk = fopen(fnKey,"r");
+    if (fk == NULL) file_not_found(fnKey);
+    fgets(line,1000,fk);
+    sscanf(line,"%d",NrOrientations);
+    int **M = allocMatrixInt(*NrOrientations,2);
+    int tds=0;
+    for (int i=0;i<*NrOrientations;i++){
+        fgets(line,1000,fk);
+        int n = sscanf(line,"%d",&M[i][0]);
+        assert(n == 1);
+        tds+=M[i][0];
+        M[i][1] = tds - M[i][0];
+    }
+    fclose(fk);
+
+    // Set outputs...
+    *TotalDiffrSpots = tds;
+    *NrSpots = M;
     return true;
 }
 
