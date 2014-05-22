@@ -1,5 +1,8 @@
 #!/bin/bash -eu
 
+# FitOrientation-T
+# Runs FitOrientation-T.swift on the BG/Q
+
 if [[ ${#*} != 4 ]]
 then
   echo "usage: test-2 <DATA DIRECTORY> <PARAMETERS FILE> <START ROWN> <END ROWN>"
