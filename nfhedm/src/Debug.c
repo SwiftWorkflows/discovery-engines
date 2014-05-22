@@ -61,8 +61,6 @@ profile_create(const char* token)
     if (!profile_enabled)
         return 0;
 
-    printf("creating profile: %s\n", token);
-
     if (strlen(token) > PROFILE_TOKEN_LENGTH-1)
     {
         printf("Profile token too long (max %i): %s\n",
@@ -75,18 +73,17 @@ profile_create(const char* token)
         exit(1);
     }
 
-    int idx = profile_index;
-    strcpy(profile_array[idx].token, token);
-    profile_array[idx].start = 0.0;
-    profile_array[idx].stop  = 0.0;
+    int i = profile_index;
+    strcpy(profile_array[i].token, token);
+    profile_array[i].start = 0.0;
+    profile_array[i].stop  = 0.0;
     profile_index++;
-    return idx;
+    return i;
 }
 
 void
 profile_start(int i)
 {
-    printf("start: %i\n", i);
     if (!profile_enabled)
         return;
     profile_array[i].start = time_double();
