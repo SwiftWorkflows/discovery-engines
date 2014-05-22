@@ -11,6 +11,7 @@
 #include <nlopt.h>
 #include <stdint.h>
 
+#include "Debug.h"
 #include "SharedFuncsFit.h"
 #include "FitOrientation.h"
 
@@ -51,5 +52,6 @@ main(int argc, char *argv[])
 
     FitOrientationAll(ParamFN, rown, MicrostructureFN);
 
+    PROFILE_REPORT;
     return 0;
 }
