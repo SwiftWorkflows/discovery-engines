@@ -13,6 +13,8 @@
 #include <ctype.h>
 #include <stdint.h>
 
+#include "Debug.h"
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -2942,6 +2944,8 @@ int GenerateRingInfo(int SpaceGroup,double a,double b, double c,
 	double TthetaMax, double ThetasSorted[5000],
 	int HKLs[5000][4], int *NPs)
 {
+        PROFILE_CREATE(GenerateRingInfo, p);
+        PROFILE_START(p);
 	int i,j;
 	double ThetaMax = TthetaMax/2;
 	int PlanesOut[14000][3];
@@ -2993,5 +2997,6 @@ int GenerateRingInfo(int SpaceGroup,double a,double b, double c,
 	}
 	
 	*NPs = TotPlanes;
+	PROFILE_END(p);
 	return 1;
 }
