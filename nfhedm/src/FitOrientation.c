@@ -494,20 +494,20 @@ struct output_result
 };
 
 int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, double tz,
-                       /*7*/int nLayers, double *Lsd, double **XY, int NrOrientations,
-                       /*11*/int **NrSpots, double **OrientationMatrix, double **SpotsMat,
-                       /*14*/int nrFiles, double OmegaStart, double OmegaStep, long long int SizeObsSpots,
-                       /*18*/double *ybc, double *zbc, int *ObsSpotsInfo, double minFracOverlap,
-                       double LatticeConstant[6], double Wavelength, int SpaceGroup, double ExcludePoleAngle,
-                       double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
-                       double BoxSizes[MAX_N_OMEGA_RANGES][4],
-                       double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta)
+                        /*7*/int nLayers, double *Lsd, double **XY, int NrOrientations,
+                        /*11*/int **NrSpots, double **OrientationMatrix, double **SpotsMat,
+                        /*14*/int nrFiles, double OmegaStart, double OmegaStep, long long int SizeObsSpots,
+                        /*18*/double *ybc, double *zbc, int *ObsSpotsInfo, double minFracOverlap,
+                        double LatticeConstant[6], double Wavelength, int SpaceGroup, double ExcludePoleAngle,
+                        double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
+                        double BoxSizes[MAX_N_OMEGA_RANGES][4],
+                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta)
 {
-   // Go through each orientation and compare with observed spots.
+    // Go through each orientation and compare with observed spots.
 
-  LOG("FitOrientation_Calc()...\n");
-  PROFILE_CREATE(FitOrientation_Calc, p);
-  PROFILE_START(p);
+    LOG("FitOrientation_Calc()...\n");
+    PROFILE_CREATE(FitOrientation_Calc, p);
+    PROFILE_START(p);
     clock_t startthis2;
     startthis2 = clock();
     int NrPixelsGrid=2*(ceil((gs*2)/px))*(ceil((gs*2)/px));
@@ -542,9 +542,9 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         int m = 0;
         for (m=0;m<9;m++){
             OrientationMatThisUnNorm[m] = OrientationMatrix[i][m];
-                        if (OrientationMatThisUnNorm[m] == -0.0){
-                                OrientationMatThisUnNorm[m] = 0;
-                        }
+            if (OrientationMatThisUnNorm[m] == -0.0){
+                OrientationMatThisUnNorm[m] = 0;
+            }
         }
         m=0;
         NormalizeMat(OrientationMatThisUnNorm,OrientationMatThis);
@@ -570,66 +570,66 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
 
     double BestFrac = 0.0, BestEuler[3];
     for (int i = 0; i < 3; i++)
-      BestEuler[i] = 0.0;
+        BestEuler[i] = 0.0;
     // printf("Start fit...\n");
 
     if (OrientationGoodID>0){
-		int n_hkls = 0;
-		int hkls[5000][4];
-		double Thetas[5000];
-		for (int i=0;i<5000;i++){
-			hkls[i][0] = 0;
-			hkls[i][1] = 0;
-			hkls[i][2] = 0;
-			hkls[i][3] = 0;
-			Thetas[i] = 0;
-		}
-                // printf("GenerateRingInfo...\n");
-		int rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
-			     LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
-			     LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
-		assert(rc == 1);
-                // printf("GenerateRingInfo done.\n");
+        int n_hkls = 0;
+        int hkls[5000][4];
+        double Thetas[5000];
+        for (int i=0;i<5000;i++){
+            hkls[i][0] = 0;
+            hkls[i][1] = 0;
+            hkls[i][2] = 0;
+            hkls[i][3] = 0;
+            Thetas[i] = 0;
+        }
+        // printf("GenerateRingInfo...\n");
+        int rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
+                                  LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
+                                  LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
+        assert(rc == 1);
+        // printf("GenerateRingInfo done.\n");
         double Fractions, EulerIn[3], OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,OMTemp[9];
         BestFrac = -1;
 
         // Parallel loop around FitOrientation...
         int i;
         for (i = 0; i < 3; i++)
-          BestEuler[i] = 0.0;
+            BestEuler[i] = 0.0;
 
         // #pragma omp parallel private(i,BestEuler,OMTemp,OrientIn,EulerIn,FracOut,Fractions)
         {
-          // int num_threads = omp_get_num_threads();
-          // printf("num_threads: %i\n", num_threads);
-          // #pragma omp parallel for
-        for (i=0;i<OrientationGoodID;i++){
-          int k=0;
-            for (k=0;k<9;k++){
-                OMTemp[k] = OrientMatrix[i][k];
+            // int num_threads = omp_get_num_threads();
+            // printf("num_threads: %i\n", num_threads);
+            // #pragma omp parallel for
+            for (i=0;i<OrientationGoodID;i++){
+                int k=0;
+                for (k=0;k<9;k++){
+                    OMTemp[k] = OrientMatrix[i][k];
+                }
+                Convert9To3x3(OMTemp,OrientIn);
+                OrientMat2Euler(OrientIn,EulerIn);
+                FitOrientation(nrFiles,nLayers,ExcludePoleAngle,Lsd,SizeObsSpots,
+                               XG,YG,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,
+                               OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
+                               ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,
+                               &EulerOutC,&FracOut,hkls,Thetas,n_hkls);
+                Fractions = 1-FracOut;
+
+                if (Fractions > BestFrac){
+                    // printf("Fractions %f %i %i\n", Fractions, i, OrientationGoodID);
+                    BestFrac = Fractions;
+                    BestEuler[0] = EulerOutA;
+                    BestEuler[1] = EulerOutB;
+                    BestEuler[2] = EulerOutC;
+                }
             }
-            Convert9To3x3(OMTemp,OrientIn);
-            OrientMat2Euler(OrientIn,EulerIn);
-            FitOrientation(nrFiles,nLayers,ExcludePoleAngle,Lsd,SizeObsSpots,
-				XG,YG,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,
-				OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
-				ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,
-				&EulerOutC,&FracOut,hkls,Thetas,n_hkls);
-            Fractions = 1-FracOut;
-            
-            if (Fractions > BestFrac){
-              // printf("Fractions %f %i %i\n", Fractions, i, OrientationGoodID);
-                BestFrac = Fractions;
-                BestEuler[0] = EulerOutA;
-                BestEuler[1] = EulerOutB;
-                BestEuler[2] = EulerOutC;
-            }
-        }
         } // End of parallel section
-        
+
     }else{
-                printf("No good ID found.\n");
-        }
+        printf("No good ID found.\n");
+    }
     // Free memory
     //FreeMemMatrix(SpotsMat,TotalDiffrSpots);
     //FreeMemMatrixInt(NrSpots,NrOrientations);
@@ -662,6 +662,6 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     }
     PROFILE_STOP(p);
     LOG("FitOrientation_Calc() done.\n");
-    
+
     return 1;
 }
