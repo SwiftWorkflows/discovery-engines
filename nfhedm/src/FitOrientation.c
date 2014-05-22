@@ -263,6 +263,9 @@ static bool ReadGridFile(const char *DataDirectory, int rown,
                          int *TotalNrSpots, double ***XY,
                          double *xs_out, double *ys_out, double *gs_out);
 
+static bool ReadOrientations(const char *DataDirectory, int NrOrientations,
+                             double ***OrientationMatrix);
+
 int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureFN)
 {
     printf("FitOrientationAll(%s,%i,%s)...\n", ParamFN, rown, MicrostructureFN);
@@ -278,10 +281,9 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
 
        char fnDS[1000];
        char fnKey[1000];
-       char fnOr[1000];
        sprintf(fnDS,"%s/DiffractionSpots.txt",params.direct);
        sprintf(fnKey,"%s/Key.txt",params.direct);
-       sprintf(fnOr,"%s/OrientMat.txt",params.direct);
+
        sprintf(fn,"%s/%s",params.direct,params.fn);
        int i,nrFiles,nrPixels;
        int *ObsSpotsInfo;
@@ -313,12 +315,13 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
        bool b = ReadGridFile(params.direct, rown, &TotalNrSpots, &XY, &xs, &ys, &gs);
        assert(b);
 
-       //Read Orientations
-       FILE *fd, *fk, *fo;
-       int NrOrientations,TotalDiffrSpots;
+
+       int NrOrientations;
+
+       FILE *fd, *fk;
+       int TotalDiffrSpots;
        fd = fopen(fnDS,"r");
        fk = fopen(fnKey,"r");
-       fo = fopen(fnOr,"r");
        fgets(line,1000,fk);
        sscanf(line,"%d",&NrOrientations);
        int **NrSpots;
@@ -331,6 +334,11 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
            TotalDiffrSpots+=NrSpots[i][0];
            NrSpots[i][1] = TotalDiffrSpots - NrSpots[i][0];
        }
+
+       // Read Orientations
+       double **OrientationMatrix;
+       ReadOrientations(params.direct, NrOrientations, &OrientationMatrix);
+
        double **SpotsMat;
        SpotsMat = allocMatrix(TotalDiffrSpots,3);
        printf("reading: %s\n", fnDS);
@@ -347,17 +355,10 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
            assert(count == 3);
        }
        printf("TotalDiffrSpots: done.\n");
-       double **OrientationMatrix;
-       OrientationMatrix = allocMatrix(NrOrientations,9);
-       printf("reading: %s\n", fnOr);
-       for (i=0;i<NrOrientations;i++){
-           fgets(line,1000,fo);
-           sscanf(line,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",&OrientationMatrix[i][0],&OrientationMatrix[i][1],&OrientationMatrix[i][2],&OrientationMatrix[i][3],&OrientationMatrix[i][4],&OrientationMatrix[i][5],&OrientationMatrix[i][6],&OrientationMatrix[i][7],&OrientationMatrix[i][8]);
-       }
+
 
        fclose(fd);
        fclose(fk);
-       fclose(fo);
        
        int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
                          /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
@@ -424,6 +425,29 @@ static bool ReadGridFile(const char *DataDirectory, int rown,
     *xs_out = xs;
     *ys_out = ys;
     *gs_out = gs;
+    return true;
+}
+
+static bool ReadOrientations(const char *DataDirectory, int NrOrientations, double ***OrientationMatrix)
+{
+    char fnOr[1024];
+    sprintf(fnOr,"%s/OrientMat.txt",params.direct);
+    char line[1024];
+    LOG("reading: %s\n", fnOr);
+    FILE *fo = fopen(fnOr,"r");
+    if (fo == NULL) file_not_found(fnOr);
+
+    double **M = allocMatrix(NrOrientations,9);
+
+    for (int i=0;i<NrOrientations;i++){
+        fgets(line,1000,fo);
+        int n = sscanf(line,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",&M[i][0],&M[i][1],&M[i][2],&M[i][3],&M[i][4],&M[i][5],&M[i][6],&M[i][7],&M[i][8]);
+        assert(n == 9);
+    }
+
+    *OrientationMatrix = M;
+    fclose(fo);
+    LOG("closed: %s\n", fnOr);
     return true;
 }
 
@@ -524,11 +548,11 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
 			hkls[i][3] = 0;
 			Thetas[i] = 0;
 		}
-		int rc;
                 // printf("GenerateRingInfo...\n");
-		rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
-			LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
-			LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
+		int rc = GenerateRingInfo(SpaceGroup,LatticeConstant[0],LatticeConstant[1],
+			     LatticeConstant[2],LatticeConstant[3],LatticeConstant[4],
+			     LatticeConstant[5],Wavelength,MaxTtheta,Thetas,hkls,&n_hkls);
+		assert(rc == 1);
                 // printf("GenerateRingInfo done.\n");
         double Fractions, EulerIn[3], OrientIn[3][3], FracOut, EulerOutA, EulerOutB,EulerOutC,OMTemp[9];
         BestFrac = -1;
