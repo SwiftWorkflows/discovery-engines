@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 
 #include "checks.h"
+#include "Debug.h"
 #include "SharedFuncsFit.h"
 #include "CalcDiffractionSpots.h"
 
@@ -245,7 +246,7 @@ ReadBinFiles(
     for (k=0;k<nLayers;k++){
         for (i=StartNr;i<=EndNr;i++){
             sprintf(FileName,"%s_%06d.%s%d",FileStem,i,ext,k);
-            printf("Reading file : %s\n",FileName);
+            DEBUG("Reading file : %s\n",FileName);
             fp = fopen(FileName,"r");
             if (fp == NULL)
                 file_not_found(FileName);
@@ -299,12 +300,12 @@ ReadBinFiles(
                 SetBit(ObsSpotsMat,BinNr);
             }
             fclose(fp);
-            printf("Closed file : %s\n",FileName);
+            DEBUG("Closed file : %s\n",FileName);
             counter+=1;
         }
         counter = 0;
     }
-    printf("ReadBinFiles: done.\n");
+    LOG("ReadBinFiles: done.\n");
     // TODO: Check use of free() here:
 
 //    free(ys);

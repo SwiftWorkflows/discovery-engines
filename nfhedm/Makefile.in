@@ -47,18 +47,19 @@ RPATHS = @RPATHS@ \
 
 lib: $(LIBNFHEDM)
 
-NFHEDM_NLOPT_OBJS = src/FitOrientationParametersNLOpt.o \
+NFHEDM_NLOPT_OBJS =                                     \
+                 src/FitOrientationParametersNLOpt.o    \
                  src/FitOrientation.o                   \
                  src/GenerateRingInfo.o                 \
                  src/SharedFuncsFit.o                   \
                  src/CalcDiffractionSpots.o             \
                  src/swift-bindings.o                   \
                  src/placebo.o                          \
-                 src/parameters.o
-
+                 src/parameters.o                       \
+                 src/Debug.o
 
 HEADERS = src/checks.h src/SharedFuncsFit.h src/CalcDiffractionSpots.h \
-           src/swift-bindings.h
+           src/swift-bindings.h src/Debug.h
 
 src/CalcDiffractionSpots.o: src/CalcDiffractionSpots.c $(HEADERS)
 
@@ -113,14 +114,14 @@ bin/convert-bin-l2n:  $(LIBNFHEDM)                                           \
 bin/ImageProcessing: src/ImageProcessing.c
 	$(CC) -o bin/ImageProcessing src/ImageProcessing.c -lm
 
-$(LIBNFHEDM): sanity $(NFHEDM_NLOPT_OBJS)
+$(LIBNFHEDM): $(NFHEDM_NLOPT_OBJS)
 	@mkdir -pv lib
 	$(CC) -shared -o $(@)       \
 		$(NFHEDM_NLOPT_OBJS) \
 	        $(LDFLAGS)
 		$(RPATH_NLOPT)
 
-$(LIBTCLNFHEDM): sanity src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
+$(LIBTCLNFHEDM): src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
 	@mkdir -pv lib
 	$(CC) -shared -o $(@)         \
 		src/nfhedm_wrap.o  \
@@ -156,7 +157,9 @@ clean:
 	@echo
 
 install: install-libs install-bin install-tcl
-	@echo $(INSTALL_PREFIX) > install.txt
+	@echo SOURCE=$(PWD)                    >  install.txt
+	@echo INSTALL_PREFIX=$(INSTALL_PREFIX) >> install.txt
+	cp -uv install.txt $(INSTALL_PREFIX)
 
 install-bin:
 	@mkdir -pv bin $(INSTALL_BIN)
@@ -181,6 +184,6 @@ install-swift: install-libs install-tcl
 	mkdir -pv $(INSTALL_SWIFT)
 	cp -uv swift/* $(INSTALL_SWIFT)
 
-.PHONY: sanity clean all                        \
+.PHONY: clean all                        \
    install install-bin install-libs install-tcl \
    install-test install-swift

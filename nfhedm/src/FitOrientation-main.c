@@ -28,13 +28,13 @@
 static void
 usage()
 {
-    printf("usage: fo-nlopt <PARAMETERS> <GRID-POINT-NUMBER>\n");
+    printf("usage: fo-nlopt <PARAMETERS> <GRID-POINT-NUMBER> <MICROSTRUCTURE>\n");
 }
 
 int
 main(int argc, char *argv[])
 {
-    if (argc < 3)
+    if (argc < 4)
     {
         usage();
         return EXIT_FAILURE;
@@ -44,13 +44,12 @@ main(int argc, char *argv[])
     setvbuf(stdout, NULL, _IONBF, 0);
     
     // Read params file.
-    char *ParamFN;
-    ParamFN = argv[1];
+    char *ParamFN = argv[1];
     //Read position.
     int rown=atoi(argv[2]);
-    //	double result[4];
+    char *MicrostructureFN = argv[3];
 
-    FitOrientationAll(ParamFN, rown);
+    FitOrientationAll(ParamFN, rown, MicrostructureFN);
 
     return 0;
 }

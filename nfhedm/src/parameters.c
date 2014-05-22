@@ -9,12 +9,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "Debug.h"
 #include "checks.h"
 #include "parameters.h"
 
 int
 parameters_read(const char *filename, struct parameters *params)
 {
+    PROFILE_CREATE(parameters_read, profile);
+    PROFILE_START(profile);
     FILE *fileParam;
     char aline[1000];
 //    struct TParam * Param1;
@@ -228,5 +231,6 @@ parameters_read(const char *filename, struct parameters *params)
     // int rc = fclose(fileParam);
     // printf("fclose2 OK. %i\n", rc);
     fflush(stdout);
+    PROFILE_STOP(profile);
     return 1;
 }

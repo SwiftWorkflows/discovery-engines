@@ -22,6 +22,7 @@
 #include <nlopt.h>
 
 #include "checks.h"
+#include "Debug.h"
 #include "parameters.h"
 #include "SharedFuncsFit.h"
 #include "FitOrientation.h"
@@ -254,11 +255,13 @@ Init_FitOrientation(const char *ParamFN)
       file_not_writable(result_filename);
     }
     fit_orientation_initialized = true;
+    PROFILE_REPORT;
+    PROFILE_RESET;
 }
 
-int FitOrientationAll(const char *ParamFN, int rown)
+int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureFN)
 {
-    printf("FitOrientationAll(%s,%i)...\n", ParamFN, rown);
+    printf("FitOrientationAll(%s,%i,%s)...\n", ParamFN, rown, MicrostructureFN);
 
    
     Init_FitOrientation(ParamFN);

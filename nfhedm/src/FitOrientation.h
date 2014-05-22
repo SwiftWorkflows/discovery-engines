@@ -13,7 +13,7 @@
 /**
    @return 1 on success, 0 on failure
  */
-int FitOrientationAll(const char *ParameterFileName, int rown);
+int FitOrientationAll(const char *ParameterFileName, int rown, const char *MicrostructureFN);
 
 int GenerateRingInfo(int SpaceGroup,double a,double b, double c,
 	double alpha, double beta, double gamma, double wavelength,
@@ -29,6 +29,5 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                        double OmegaRanges[MAX_N_OMEGA_RANGES][2],
                        int NoOfOmegaRanges, double BoxSizes[MAX_N_OMEGA_RANGES][4],
                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta);
-
 
 #endif
