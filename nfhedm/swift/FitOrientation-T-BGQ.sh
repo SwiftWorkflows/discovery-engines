@@ -3,9 +3,9 @@
 # FitOrientation-T
 # Runs FitOrientation-T.swift on the BG/Q
 
-if [[ ${#*} != 4 ]]
+if [[ ${#*} != 5 ]]
 then
-  echo "usage: test-2 <DATA DIRECTORY> <PARAMETERS FILE> <START ROWN> <END ROWN>"
+  echo "usage: test-2 <DATA DIRECTORY> <PARAMETERS FILE> <START ROWN> <END ROWN> <MICROSTRUCTURE>"
   echo "The parameters file may be relative to the data directory or absolute."
   exit 1
 fi
@@ -14,6 +14,7 @@ DATA=$1
 PARAMETERS=$2
 START=$3
 END=$4
+MICROSTRUCTURE=$5
 
 DIR=$( cd $(dirname $0) ; /bin/pwd )
 NFHEDM_INSTALL=${HOME}/sfw/ppc64/nfhedm
@@ -51,4 +52,4 @@ fi
 set -x
 which turbine-cobalt-run.zsh
 turbine-cobalt-run.zsh -n ${PROCS} ${DIR}/${SCRIPT}.tcl \
-  -p=${PARAMETERS_PATH} ${START} ${END}
+  -p=${PARAMETERS_PATH} -m=${MICROSTRUCTURE} ${START} ${END}
