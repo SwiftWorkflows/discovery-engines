@@ -602,9 +602,6 @@ CalcFracOverlap(
     printed = true;
   }
 
-  PROFILE_CREATE(CalcFracOverlap, p);
-  PROFILE_START(p);
-
   int j,OmeBin,OutofBounds,k,l;
   double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,
   xyz[3],P1[3],ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3],
@@ -718,7 +715,6 @@ CalcFracOverlap(
       *FracOver = (double)((double)OverlapPixels)/((double)TotalPixels);
   }
   FreeMemMatrixInt(InPixels,NrPixelsGrid);
-  PROFILE_STOP(p);
 }
 
 void
