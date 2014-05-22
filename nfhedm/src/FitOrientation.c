@@ -259,6 +259,10 @@ Init_FitOrientation(const char *ParamFN)
     PROFILE_RESET;
 }
 
+static bool ReadGridFile(const char *DataDirectory, int rown,
+                         int *TotalNrSpots, double ***XY,
+                         double *xs_out, double *ys_out, double *gs_out);
+
 int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureFN)
 {
     printf("FitOrientationAll(%s,%i,%s)...\n", ParamFN, rown, MicrostructureFN);
@@ -270,8 +274,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
        //Read bin files
-       char fnG[1000], fn[1000];
-       sprintf(fnG,"%s/grid.txt",params.direct);
+       char fn[1000];
+
        char fnDS[1000];
        char fnKey[1000];
        char fnOr[1000];
@@ -301,47 +305,13 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
            return 0;
        }
 
-       printf("reading: %s\n", fnG);
-       
-       FILE *fp;
-       fp = fopen(fnG,"r");
-       if (fp == NULL)
-           file_not_found(fnG);
        char line[1024];
-       fgets(line,1000,fp);
-       int TotalNrSpots=0;
-       sscanf(line,"%d",&TotalNrSpots);
-       if (rown > TotalNrSpots){
-           printf("Error: Grid point number greater than total number of grid points.\n");
-           return 0;
-       }
-       int counter=0;
-       double y1,y2,xs,ys,gs;
+
+       int TotalNrSpots;
        double **XY;
-       XY = allocMatrix(3,3);
-       while(counter<rown){
-           fgets(line,1000,fp);
-           counter+=1;
-       }
-       sscanf(line,"%lf %lf %lf %lf %lf",&y1,&y2,&xs,&ys,&gs);
-       fclose(fp);
-       printf("closed: %s\n", fnG);
-       if (y1>y2){
-           XY[0][0] =xs;
-           XY[0][1] =ys - y1;
-           XY[1][0] =xs - gs;
-           XY[1][1] =ys + y2;
-           XY[2][0] =xs + gs;
-           XY[2][1] =ys + y2;
-       }
-       else{
-           XY[0][0] =xs;
-           XY[0][1] =ys + y2;
-           XY[1][0] =xs - gs;
-           XY[1][1] =ys - y1;
-           XY[2][0] =xs + gs;
-           XY[2][1] =ys - y1;
-       }
+       double xs,ys,gs;
+       bool b = ReadGridFile(params.direct, rown, &TotalNrSpots, &XY, &xs, &ys, &gs);
+       assert(b);
 
        //Read Orientations
        FILE *fd, *fk, *fo;
@@ -400,6 +370,61 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
 
        assert(rc == 1);
        return 1;
+}
+
+static bool ReadGridFile(const char *DataDirectory, int rown,
+                         int *TotalNrSpots, double ***XY,
+                         double *xs_out, double *ys_out, double *gs_out)
+{
+    char fnG[1024];
+    char line[1024];
+
+    sprintf(fnG,"%s/grid.txt", DataDirectory);
+    LOG("reading: %s\n", fnG);
+    FILE *fp = fopen(fnG,"r");
+    if (fp == NULL) file_not_found(fnG);
+
+    fgets(line,1000,fp);
+    int n;
+    n = sscanf(line,"%d",TotalNrSpots);
+    assert(n == 1);
+    if (rown > *TotalNrSpots){
+        printf("Error: Grid point number greater than total number of grid points.\n");
+        return false;
+    }
+    int counter=0;
+    double y1,y2,xs,ys,gs;
+
+    double **M = allocMatrix(3,3);
+    while(counter<rown){
+        fgets(line,1000,fp);
+        counter+=1;
+    }
+    n = sscanf(line,"%lf %lf %lf %lf %lf",&y1,&y2,&xs,&ys,&gs);
+    assert(n == 5);
+    fclose(fp);
+    LOG("closed: %s\n", fnG);
+    if (y1>y2){
+        M[0][0] =xs;
+        M[0][1] =ys - y1;
+        M[1][0] =xs - gs;
+        M[1][1] =ys + y2;
+        M[2][0] =xs + gs;
+        M[2][1] =ys + y2;
+    }
+    else{
+        M[0][0] =xs;
+        M[0][1] =ys + y2;
+        M[1][0] =xs - gs;
+        M[1][1] =ys - y1;
+        M[2][0] =xs + gs;
+        M[2][1] =ys - y1;
+    }
+    *XY = M;
+    *xs_out = xs;
+    *ys_out = ys;
+    *gs_out = gs;
+    return true;
 }
 
 struct output_result
