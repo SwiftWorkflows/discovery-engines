@@ -1,21 +1,27 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-set -e
+usage()
+{
+  echo "usage: <PARAMETERS> <MICROSTRUCTURE>"
+}
 
-if [[ ${#*} != 1 ]]
+if [[ ${#*} != 2 ]]
 then
-  echo "Not given: PARAMETERS"
+  usage
   exit 1
 fi
 
 PARAMETERS=$1
+MICROSTRUCTURE=$2
 
 NFHEDM_HOME=$( cd $(dirname $0)/.. ; /bin/pwd )
 
 # DATA=${NFHEDM_HOME}/data
-DATA=${HOME}/wozniak/data
+# DATA=${HOME}/wozniak/data
 
-cd ${DATA}
+# cd ${DATA}
+
+VALGRIND=${VALGRIND:-}
 
 echo "PWD: $(pwd)"
-${VALGRIND} ${NFHEDM_HOME}/bin/fo-nlopt ${PARAMETERS} 135
+${VALGRIND} ${NFHEDM_HOME}/bin/fo-nlopt ${PARAMETERS} 135 ${MICROSTRUCTURE}

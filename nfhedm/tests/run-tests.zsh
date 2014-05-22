@@ -21,3 +21,6 @@ source install.txt
 export TURBINE_USER_LIB=${INSTALL_PREFIX}/lib
 turbine tests/test-placebo.tcl
 
+tests/test-1.sh Au_Reduced2/ParametersGoldApril14.txt
+
+
