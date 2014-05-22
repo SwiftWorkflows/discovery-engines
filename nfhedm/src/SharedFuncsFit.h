@@ -183,7 +183,7 @@ realloc_buffers(int nElements, int nElements_previous,
 }
 
 void 
-printVector(const char* name, const double* v, int count);
+PrintVector(const char* name, const double* v, int count);
 
 void PrintUint16s(  FILE *fp, uint16_t  *data, int count);
 void PrintUint32s(  FILE *fp, uint32_t  *data, int count);

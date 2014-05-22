@@ -30,7 +30,7 @@ main(int argc, char *argv[])
     // Read params file.
     char *ParamFN = argv[1];
     struct parameters params;
-    parameters_read(ParamFN, &params);
+    ReadParameters(ParamFN, &params);
 
     //Read bin files
     int i,j,m,nrFiles,nrPixels;

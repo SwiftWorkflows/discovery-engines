@@ -235,7 +235,7 @@ ReadBinFiles(
     float32_t *intensity=NULL;
     int counter=0;
 
-    LOG("ReadBinFiles: Start: %i End: %i Total: %i\n",
+    LOG("ReadBinFiles: Start: %i End: %i Total: %i",
            StartNr, EndNr, EndNr-StartNr+1);
     PROFILE_CREATE(ReadBinFiles, p);
     PROFILE_START(p);
@@ -559,7 +559,7 @@ CalcPixels2(double Edges[3][2], int **Pixels, int *counter)
 }
 
 void 
-printVector(const char* name, const double* v, int count)
+PrintVector(const char* name, const double* v, int count)
 {
   for (int i = 0; i < count; i++)
     printf("%s[%i]=%f\n", name, i, v[i]);
@@ -596,11 +596,14 @@ CalcFracOverlap(
     printf("CalcFracOverlap: NrOfFiles=%i nLayers=%i nTspots=%i "
            "TheorSpots OmegaStart=%f OmegaStop=%f\n",
            NrOfFiles, nLayers, nTspots, OmegaStart, OmegaStep);
-    printVector("XGrain", XGrain, 3);
-    printVector("YGrain", YGrain, 3);
-    printVector("Lsds", Lsds, nLayers);
+    PrintVector("XGrain", XGrain, 3);
+    PrintVector("YGrain", YGrain, 3);
+    PrintVector("Lsds", Lsds, nLayers);
     printed = true;
   }
+
+  PROFILE_CREATE(CalcFracOverlap, p);
+  PROFILE_START(p);
 
   int j,OmeBin,OutofBounds,k,l;
   double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,
@@ -715,6 +718,7 @@ CalcFracOverlap(
       *FracOver = (double)((double)OverlapPixels)/((double)TotalPixels);
   }
   FreeMemMatrixInt(InPixels,NrPixelsGrid);
+  PROFILE_STOP(p);
 }
 
 void

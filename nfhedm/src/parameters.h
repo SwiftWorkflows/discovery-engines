@@ -8,6 +8,8 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+#include <stdbool.h>
+
 #include "CalcDiffractionSpots.h"
 
 struct parameters
@@ -27,8 +29,8 @@ struct parameters
 };
 
 /**
-   @return 1 on success, 0 on failure.
+   @return True on success, false on failure.
  */
-int parameters_read(const char *filename, struct parameters *params);
+bool ReadParameters(const char *filename, struct parameters *params);
 
 #endif

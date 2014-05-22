@@ -47,6 +47,7 @@ void debug_printf(const char *token, const char *format, ...);
 #define LOG(format, args...) // noop
 #endif
 
+#define LOG_INT(token) LOG("%s: %i", #token, token)
 
 #if ENABLE_DEBUG && !defined(NDEBUG)
 #define DEBUG(format, args...)                                        \

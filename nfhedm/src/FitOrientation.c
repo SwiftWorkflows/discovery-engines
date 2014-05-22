@@ -233,30 +233,22 @@ static int result_fd = -1;
 static struct parameters params;
 
 static inline void
-Init_FitOrientation(const char *ParamFN)
+Init_FitOrientation(const char *ParamFN, const char *MicrostructureFN)
 {
     if (fit_orientation_initialized)
         return;
 
-    int result = parameters_read(ParamFN, &params);
-    printf("parameters_read() OK. %i\n", result);
-    fflush(stdout);
+    int result = ReadParameters(ParamFN, &params);
+    assert(result);
     
-    char result_filename[1024];
-    sprintf(result_filename, "%s/%s",
-                             params.direct, "microstructure.mic");
-    printf("Init_FitOrientation (result_filename=%s)\n",
-                                 result_filename);
-    result_fd = open(result_filename, O_CREAT|O_WRONLY,
+    result_fd = open(MicrostructureFN, O_CREAT|O_WRONLY,
                                       S_IRUSR|S_IWUSR);
     if (result_fd <= 0)
     {
-      perror(result_filename);
-      file_not_writable(result_filename);
+      perror(MicrostructureFN);
+      file_not_writable(MicrostructureFN);
     }
     fit_orientation_initialized = true;
-    PROFILE_REPORT;
-    PROFILE_RESET;
 }
 
 static bool ReadGridFile(const char *DataDirectory, int rown,
@@ -273,12 +265,9 @@ static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***
 
 int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureFN)
 {
-    printf("FitOrientationAll(%s,%i,%s)...\n", ParamFN, rown, MicrostructureFN);
-
+    LOG("FitOrientationAll(rown=%i)", rown);
    
-    Init_FitOrientation(ParamFN);
-    printf("Init_FitOrientation() OK.\n");
-    fflush(stdout);
+    Init_FitOrientation(ParamFN, MicrostructureFN);
 
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
     //Read bin files
@@ -418,6 +407,7 @@ static bool ReadKey(const char *DataDirectory,
     fgets(line,1000,fk);
     int n = sscanf(line,"%d",NrOrientations);
     assert(n == 1);
+    LOG("NrOrientations: %i", *NrOrientations);
     int **M = allocMatrixInt(*NrOrientations,2);
     int tds=0;
     for (int i=0;i<*NrOrientations;i++){

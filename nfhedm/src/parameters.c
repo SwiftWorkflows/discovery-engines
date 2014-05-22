@@ -13,16 +13,15 @@
 #include "checks.h"
 #include "parameters.h"
 
-int
-parameters_read(const char *filename, struct parameters *params)
+bool
+ReadParameters(const char *filename, struct parameters *params)
 {
-    PROFILE_CREATE(parameters_read, profile);
-    PROFILE_START(profile);
-    FILE *fileParam;
+    PROFILE_CREATE(parameters_read, p);
+    PROFILE_START(p);
+
     char aline[1000];
-//    struct TParam * Param1;
-    printf("Parameters: %s\n", filename);
-    fileParam = fopen(filename,"r");
+    LOG("reading parameters: %s", filename);
+    FILE *fileParam = fopen(filename,"r");
     if (fileParam == NULL) file_not_found(filename);
     char *str, dummy[1000];
     int LowNr;
@@ -227,6 +226,6 @@ parameters_read(const char *filename, struct parameters *params)
             continue;
         }
     }
-    PROFILE_STOP(profile);
-    return 1;
+    PROFILE_STOP(p);
+    return true;
 }
