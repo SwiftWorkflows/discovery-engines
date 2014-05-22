@@ -17,7 +17,7 @@
 
 #define ENABLE_LOG     1
 #define ENABLE_PROFILE 1
-#define ENABLE_DEBUG   1
+#define ENABLE_DEBUG   0
 
 extern bool log_enabled;
 extern bool profile_enabled;
@@ -58,7 +58,7 @@ void debug_printf(const char *token, const char *format, ...);
 #define DEBUG(format, args...) // noop
 #endif
 
-#define PROFILE_TOKEN_LENGTH 16
+#define PROFILE_TOKEN_LENGTH 32
 #if ENABLE_PROFILE
 #define PROFILE_CREATE(token,i ) int i = profile_create(#token)
 #define PROFILE_START(i)         profile_start(i)

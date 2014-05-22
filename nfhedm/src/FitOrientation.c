@@ -343,6 +343,10 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
                                  params.tol, TotalDiffrSpots, xs, ys, MaxTtheta);
 
     assert(rc == 1);
+
+    PROFILE_REPORT;
+    PROFILE_RESET;
+
     return 1;
 }
 
@@ -460,6 +464,8 @@ static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***
     char fnDS[1000];
     sprintf(fnDS,"%s/DiffractionSpots.txt",params.direct);
     LOG("reading: %s\n", fnDS);
+    PROFILE_CREATE(ReadSpots, p);
+    PROFILE_START(p);
     FILE *fd = fopen(fnDS,"r");
     if (fd == NULL) file_not_found(fnDS);
     char line[1024];
@@ -471,6 +477,7 @@ static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***
         int count = sscanf(line,"%lf %lf %lf",&M[i][0],&M[i][1],&M[i][2]);
         assert(count == 3);
     }
+    PROFILE_STOP(p);
     LOG("TotalDiffrSpots: done.\n");
     fclose(fd);
 
@@ -498,9 +505,9 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
 {
    // Go through each orientation and compare with observed spots.
 
-  printf("FitOrientation_Calc()...\n");
-       
-
+  LOG("FitOrientation_Calc()...\n");
+  PROFILE_CREATE(FitOrientation_Calc, p);
+  PROFILE_START(p);
     clock_t startthis2;
     startthis2 = clock();
     int NrPixelsGrid=2*(ceil((gs*2)/px))*(ceil((gs*2)/px));
@@ -653,7 +660,8 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         perror("result data file");
         exit(EXIT_FAILURE);
     }
-    printf("FitOrientation_Calc() done.\n");
+    PROFILE_STOP(p);
+    LOG("FitOrientation_Calc() done.\n");
     
     return 1;
 }
