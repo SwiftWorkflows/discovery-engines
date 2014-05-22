@@ -104,6 +104,18 @@ profile_report()
         return;
     for (int i = 0; i < profile_index; i++)
     {
+        if (profile_array[i].start == 0.0)
+        {
+            printf("PROFILE: %-*s: DID_NOT_START\n",
+                   PROFILE_TOKEN_LENGTH, profile_array[i].token);
+            continue;
+        }
+        if (profile_array[i].stop == 0.0)
+        {
+            printf("PROFILE: %-*s: DID_NOT_STOP\n",
+                   PROFILE_TOKEN_LENGTH, profile_array[i].token);
+            continue;
+        }
         double duration =
                 profile_array[i].stop - profile_array[i].start;
         printf("PROFILE: %-*s: %0.6f\n",
