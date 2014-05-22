@@ -1,27 +1,22 @@
 #!/bin/bash -eu
 
 # FitOrientation-T
-# Runs FitOrientation-T.swift on the local machine
+# Runs FitOrientation-T.swift on the BG/Q
 
-if [[ ${#*} != 5 ]]
+if [[ ${#*} != 4 ]]
 then
-  echo "usage: FitOrientation-T <DATA DIRECTORY> <PARAMETERS FILE> <START ROWN> <END ROWN> <MICROSTRUCTURE>"
+  echo "usage: test-2 <DATA DIRECTORY> <PARAMETERS FILE> <START ROWN> <END ROWN>"
   echo "The parameters file may be relative to the data directory or absolute."
   exit 1
 fi
-
-echo "FitOrientation-T.sh ..."
-
-set -x
 
 DATA=$1
 PARAMETERS=$2
 START=$3
 END=$4
-MICROSTRUCTURE=$5
 
 DIR=$( cd $(dirname $0) ; /bin/pwd )
-NFHEDM_INSTALL=${HOME}/sfw/nfhedm
+NFHEDM_INSTALL=${HOME}/sfw/ppc64/nfhedm
 
 if [[ ! -f ${NFHEDM_INSTALL}/lib/pkgIndex.tcl ]]
 then
@@ -33,7 +28,7 @@ export TURBINE_USER_LIB=${NFHEDM_INSTALL}/lib
 
 SCRIPT=FitOrientation-T
 
-stc -u -t checkpointing ${DIR}/${SCRIPT}.swift
+stc -t checkpointing ${DIR}/${SCRIPT}.swift
 
 export MODE=BGQ
 export PROCS=${PROCS:-3}
@@ -54,5 +49,6 @@ else
   PARAMETERS_PATH=${DATA}/${PARAMETERS}
 fi
 set -x
-turbine -n ${PROCS} ${DIR}/${SCRIPT}.tcl \
-  -p=${PARAMETERS_PATH} -m=${MICROSTRUCTURE} ${START} ${END}
+which turbine-cobalt-run.zsh
+turbine-cobalt-run.zsh -n ${PROCS} ${DIR}/${SCRIPT}.tcl \
+  -p=${PARAMETERS_PATH} ${START} ${END}
