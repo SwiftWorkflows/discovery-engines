@@ -235,9 +235,10 @@ ReadBinFiles(
     float32_t *intensity=NULL;
     int counter=0;
 
-    printf("ReadBinFiles: Start: %i End: %i Total: %i\n",
+    LOG("ReadBinFiles: Start: %i End: %i Total: %i\n",
            StartNr, EndNr, EndNr-StartNr+1);
-    
+    PROFILE_CREATE(ReadBinFiles, p);
+    PROFILE_START(p);
     NrOfFiles = EndNr - StartNr + 1;
     NrOfPixels = 2048*2048;
     for (k=0;k<ObsSpotsSize;k++){
@@ -305,6 +306,7 @@ ReadBinFiles(
         }
         counter = 0;
     }
+    PROFILE_STOP(p);
     LOG("ReadBinFiles: done.\n");
     // TODO: Check use of free() here:
 
