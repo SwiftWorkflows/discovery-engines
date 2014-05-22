@@ -227,10 +227,6 @@ parameters_read(const char *filename, struct parameters *params)
             continue;
         }
     }
-    fflush(stdout);
-    // int rc = fclose(fileParam);
-    // printf("fclose2 OK. %i\n", rc);
-    fflush(stdout);
     PROFILE_STOP(profile);
     return 1;
 }
