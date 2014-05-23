@@ -7,6 +7,8 @@ INCLUDES = -I . -I src -I $(NLOPT)/include @TCL_INCLUDE_SPEC@
 
 ENABLE_OPENMP = @ENABLE_OPENMP@
 
+CC = @CC@
+
 CFLAGS += @CFLAGS@
 CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
 ifeq ($(ENABLE_OPENMP),1)
