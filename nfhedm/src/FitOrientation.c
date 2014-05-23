@@ -126,6 +126,8 @@ double problem_function(
     return (1 - FracOverlap);
 }
 
+static int profile_nlopt = -1;
+
 void
 FitOrientation(
     const int NrOfFiles,
@@ -212,8 +214,10 @@ FitOrientation(
 	f_data.NrPixelsGrid = NrPixelsGrid;
 	struct my_func_data *f_datat;
 	f_datat = &f_data;
+	// What does trp stand for? -Justin
 	void* trp = (struct my_func_data *) f_datat;
 	// double tole = 1e-3;
+	PROFILE_START(profile_nlopt);
 	nlopt_opt opt;
 	opt = nlopt_create(NLOPT_LN_SBPLX, n);
 	nlopt_set_lower_bounds(opt, xl);
@@ -222,6 +226,7 @@ FitOrientation(
 	double minf=1;
 	nlopt_optimize(opt, x, &minf);
 	nlopt_destroy(opt);
+	PROFILE_END(profile_nlopt);
     *ResultFracOverlap = minf;
     *EulerOutA = x[0];
     *EulerOutB = x[1];
@@ -268,6 +273,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     LOG("FitOrientationAll(rown=%i)", rown);
    
     Init_FitOrientation(ParamFN, MicrostructureFN);
+
+    PROFILE_ASSIGN(nlopt, profile_nlopt);
 
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
     //Read bin files
@@ -321,6 +328,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     double **SpotsMat;
     b = ReadSpots(params.direct, TotalDiffrSpots, &SpotsMat);
     assert(b);
+
+
 
     int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
                                  /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
