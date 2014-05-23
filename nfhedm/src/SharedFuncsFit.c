@@ -213,7 +213,7 @@ void PrintFloat32s(
     fwrite(p, sizeof(char), q-p, fp);
 }
 
-int
+bool
 ReadBinFiles(
     char FileStem[1000],
     char *ext,
@@ -251,13 +251,13 @@ ReadBinFiles(
             fp = fopen(FileName,"r");
             if (fp == NULL)
                 file_not_found(FileName);
-            fread(&dummy,sizeof(float32_t),1,fp);
+            READ(&dummy,sizeof(float32_t),1,fp);
             ReadHeader(fp,&Header1);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
-            fread(&dummy2,sizeof(uint32_t),1,fp);
+            READ(&dummy2,sizeof(uint32_t),1,fp);
+            READ(&dummy2,sizeof(uint32_t),1,fp);
+            READ(&dummy2,sizeof(uint32_t),1,fp);
+            READ(&dummy2,sizeof(uint32_t),1,fp);
+            READ(&dummy2,sizeof(uint32_t),1,fp);
             ReadHeader(fp,&Header1);
             nElements_previous = nElements;
             nElements = (Header1.DataSize - Header1.NameSize)/2;
@@ -266,28 +266,28 @@ ReadBinFiles(
             zs = malloc(nElements*sizeof(*zs));
             peakID = malloc(nElements*sizeof(*peakID));
             intensity = malloc(nElements*sizeof(*intensity));*/
-            fread(ys,sizeof(uint16_t)*nElements,1,fp);
+            READ(ys,sizeof(uint16_t)*nElements,1,fp);
             ReadHeader(fp,&Header1);
             nCheck = (Header1.DataSize - Header1.NameSize)/2;
             if (nCheck!=nElements){
                 printf("Number of elements mismatch. (1)\n");
-                return 0;
+                return false;
             }
-            fread(zs,sizeof(uint16_t)*nElements,1,fp);
+            READ(zs,sizeof(uint16_t)*nElements,1,fp);
             ReadHeader(fp,&Header1);
             nCheck = (Header1.DataSize - Header1.NameSize)/4;
             if (nCheck!=nElements){
                 printf("Number of elements mismatch. (2)\n");
-                return 0;
+                return false;
             }
-            fread(intensity,sizeof(float32_t)*nElements,1,fp);
+            READ(intensity,sizeof(float32_t)*nElements,1,fp);
             ReadHeader(fp,&Header1);
             nCheck = (Header1.DataSize - Header1.NameSize)/2;
             if (nCheck!=nElements){
                 printf("Number of elements mismatch. (3)\n");
-                return 0;
+                return false;
             }
-            fread(peakID,sizeof(uint16_t)*nElements,1,fp);
+            READ(peakID,sizeof(uint16_t)*nElements,1,fp);
             for (j=0;j<nElements;j++){
                 ythis=(int)ys[j];
                 zthis=(int)zs[j];
@@ -314,7 +314,7 @@ ReadBinFiles(
 //    free(zs);
 //    free(peakID);
 //    free(intensity);
-    return 1;
+    return true;
 }
 
 double sin_cos_to_angle (double s, double c)

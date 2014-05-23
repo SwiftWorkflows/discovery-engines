@@ -25,13 +25,17 @@ typedef double RealType;
 #define float32_t float
 
 #define CHECK(condition, msg) \
-{ if (!condition) { printf("%s\n", msg); return false; } }
+{ if (!(condition)) { printf("%s\n", msg); return false; } }
 
 #define READ(data, size, count, fp)           \
  { int actual = fread(data, size, count, fp); \
-   if (actual != count) {                     \
-        printf("short read!\n");              \
-        return false;        }}
+   CHECK(actual == count, "short read!");     \
+ }
+
+#define FGETS(string, count, fp)           \
+    { char* t = fgets(string, count, fp);  \
+      CHECK(t != NULL, "fgets failed!");   \
+    }
 
 struct Theader {
     uint32_t uBlockHeader;
@@ -74,7 +78,10 @@ FreeMemMatrix(RealType **mat,int nrows);
 void
 FreeMemMatrixInt(int **mat,int nrows);
 
-int
+/**
+   @return True on success, false on failure
+ */
+bool
 ReadBinFiles(
     char FileStem[1000],
     char *ext,

@@ -50,8 +50,13 @@ main(int argc, char *argv[])
     int rown=atoi(argv[2]);
     char *MicrostructureFN = argv[3];
 
-    FitOrientationAll(ParamFN, rown, MicrostructureFN);
+    bool result = FitOrientationAll(ParamFN, rown, MicrostructureFN);
+    if (!result)
+    {
+        printf("FitOrientation failed!\n");
+        exit(EXIT_FAILURE);
+    }
 
     PROFILE_REPORT;
-    return 0;
+    return EXIT_SUCCESS;
 }

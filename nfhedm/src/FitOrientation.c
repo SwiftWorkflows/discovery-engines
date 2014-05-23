@@ -290,7 +290,6 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     sprintf(fn,"%s/%s",params.direct,params.fn);
     int nrFiles,nrPixels;
     int *ObsSpotsInfo;
-    int ReadCode;
     nrFiles = params.EndNr - params.StartNr + 1;
     nrPixels = params.NrPixels*params.NrPixels;
     long long int SizeObsSpots;
@@ -303,9 +302,9 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
         printf("Could not allocate ObsSpotsInfo.\n");
         return 0;
     }
-    ReadCode = ReadBinFiles(fn,params.ext,params.StartNr,params.EndNr,ObsSpotsInfo,
+    bool ReadCode = ReadBinFiles(fn,params.ext,params.StartNr,params.EndNr,ObsSpotsInfo,
                             params.nLayers,SizeObsSpots);
-    if (ReadCode == 0){
+    if (!ReadCode){
         printf("Reading bin files did not go well. Please check.\n");
         return 0;
     }
@@ -368,7 +367,7 @@ static bool ReadGridFile(const char *DataDirectory, int rown,
     FILE *fp = fopen(fnG,"r");
     if (fp == NULL) file_not_found(fnG);
 
-    fgets(line,1000,fp);
+    FGETS(line,1000,fp);
     int n;
     n = sscanf(line,"%d",TotalNrSpots);
     assert(n == 1);
@@ -381,7 +380,7 @@ static bool ReadGridFile(const char *DataDirectory, int rown,
 
     double **M = allocMatrix(3,3);
     while(counter<rown){
-        fgets(line,1000,fp);
+        FGETS(line,1000,fp);
         counter+=1;
     }
     n = sscanf(line,"%lf %lf %lf %lf %lf",&y1,&y2,&xs,&ys,&gs);
@@ -421,14 +420,14 @@ static bool ReadKey(const char *DataDirectory,
     LOG("reading: %s", fnKey);
     FILE *fk = fopen(fnKey,"r");
     if (fk == NULL) file_not_found(fnKey);
-    fgets(line,1000,fk);
+    FGETS(line,1000,fk);
     int n = sscanf(line,"%d",NrOrientations);
     assert(n == 1);
     LOG("NrOrientations: %i", *NrOrientations);
     int **M = allocMatrixInt(*NrOrientations,2);
     int tds=0;
     for (int i=0;i<*NrOrientations;i++){
-        fgets(line,1000,fk);
+        FGETS(line,1000,fk);
         int n = sscanf(line,"%d",&M[i][0]);
         assert(n == 1);
         tds+=M[i][0];
@@ -454,7 +453,7 @@ static bool ReadOrientations(const char *DataDirectory, int NrOrientations, doub
     double **M = allocMatrix(NrOrientations,9);
 
     for (int i=0;i<NrOrientations;i++){
-        fgets(line,1000,fo);
+        FGETS(line,1000,fo);
         int n = sscanf(line,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",&M[i][0],&M[i][1],&M[i][2],&M[i][3],&M[i][4],&M[i][5],&M[i][6],&M[i][7],&M[i][8]);
         assert(n == 9);
     }
@@ -477,7 +476,7 @@ static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***
     double **M = allocMatrix(TotalDiffrSpots,3);
     LOG("TotalDiffrSpots: %i", TotalDiffrSpots);
     for (int i=0;i<TotalDiffrSpots;i++){
-        fgets(line,1000,fd);
+        FGETS(line,1000,fd);
         // printf("read: %i: %s", i, line);
         int n = sscanf(line,"%lf %lf %lf",&M[i][0],&M[i][1],&M[i][2]);
         assert(n == 3);
