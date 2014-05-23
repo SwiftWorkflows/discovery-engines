@@ -6,6 +6,7 @@
  *      Author: wozniak
  */
 
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -49,8 +50,10 @@ static int profile_index = 0;
 
 typedef struct {
     char token[PROFILE_TOKEN_LENGTH];
+    uint64_t count;
     double start;
     double stop;
+    double duration;
 } profile_entry;
 
 static profile_entry profile_array[PROFILE_ENTRIES];
@@ -75,8 +78,10 @@ profile_create(const char* token)
 
     int i = profile_index;
     strcpy(profile_array[i].token, token);
-    profile_array[i].start = 0.0;
-    profile_array[i].stop  = 0.0;
+    profile_array[i].count    = 0;
+    profile_array[i].start    = 0.0;
+    profile_array[i].stop     = 0.0;
+    profile_array[i].duration = 0.0;
     profile_index++;
     return i;
 }
@@ -95,7 +100,12 @@ profile_end(int i)
     if (!profile_enabled)
         return;
     profile_array[i].stop = time_double();
+    profile_array[i].count++;
+    profile_array[i].duration +=
+            profile_array[i].stop - profile_array[i].start;
 }
+
+#define llu(x) ((long long unsigned) x)
 
 void
 profile_report()
@@ -116,10 +126,9 @@ profile_report()
                    PROFILE_TOKEN_LENGTH, profile_array[i].token);
             continue;
         }
-        double duration =
-                profile_array[i].stop - profile_array[i].start;
-        printf("PROFILE: %-*s: %0.6f\n",
-               PROFILE_TOKEN_LENGTH, profile_array[i].token, duration);
+        printf("PROFILE: %-*s: %10.6f %6llu\n",
+               PROFILE_TOKEN_LENGTH, profile_array[i].token,
+               profile_array[i].duration, llu(profile_array[i].count));
     }
 }
 
