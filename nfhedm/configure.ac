@@ -11,8 +11,6 @@ then
    SO_SUFFIX=dylib
 fi
 
-export CFLAGS=-O2
-
 # Checks for programs.
 AC_PROG_CC
 AC_CHECK_PROG(ZSH, zsh, zsh, "no")
@@ -70,7 +68,7 @@ AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
 # Checks for library functions...
-# Fix autoconf malloc weirdness 
+# Fix autoconf malloc weirdness
 # (http://wiki.buici.com/xwiki/bin/view/Programing+C+and+C%2B%2B/Autoconf+and+RPL_MALLOC):
 export ac_cv_func_malloc_0_nonnull=yes
 AC_FUNC_MALLOC
@@ -80,14 +78,14 @@ AC_CHECK_FUNCS([floor memset pow sqrt strchr strstr])
 AC_SUBST(RPATHS)
 
 ENABLE_OPENMP=0
-AC_ARG_ENABLE(openmp, 
+AC_ARG_ENABLE(openmp,
               AS_HELP_STRING([--enable-openmp], [Use OpenMP?]),
               [], [enable_openmp="no"])
 echo "Enable OpenMP: ${enable_openmp}"
-if [[ "${enable_openmp}" == "yes" ]]       
-then   
+if [[ "${enable_openmp}" == "yes" ]]
+then
     ENABLE_OPENMP=1
-else 
+else
     ENABLE_OPENMP=0
 fi
 AC_SUBST(ENABLE_OPENMP)
