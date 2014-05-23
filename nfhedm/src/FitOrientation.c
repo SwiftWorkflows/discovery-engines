@@ -559,6 +559,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         BestEuler[i] = 0.0;
     // printf("Start fit...\n");
 
+    LOG_INT(OrientationGoodID);
     if (OrientationGoodID>0){
         int n_hkls = 0;
         int hkls[5000][4];
