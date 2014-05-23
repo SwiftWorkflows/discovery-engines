@@ -53,6 +53,8 @@ struct my_func_data{
     double *zbc;
 };
 
+static profile_index profile_problem_function;
+
 static
 double problem_function(
     unsigned n,
@@ -80,6 +82,9 @@ double problem_function(
     int hkls[5000][4];
     int n_hkls = f_data->n_hkls;
     double Thetas[5000];
+
+    PROFILE_START(profile_problem_function);
+
     for (i=0;i<5000;i++){
 		hkls[i][0] = f_data->hkls[i][0];
 		hkls[i][1] = f_data->hkls[i][1];
@@ -123,10 +128,12 @@ double problem_function(
 		YGrain,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,hkls,n_hkls,
 		Thetas,OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
 		ObsSpotsInfo,OrientMatIn,&FracOverlap);
+
+    PROFILE_END(profile_problem_function);
     return (1 - FracOverlap);
 }
 
-static int profile_nlopt = -1;
+static profile_index profile_nlopt = -1;
 
 void
 FitOrientation(
@@ -274,7 +281,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
    
     Init_FitOrientation(ParamFN, MicrostructureFN);
 
-    PROFILE_ASSIGN(nlopt, profile_nlopt);
+    PROFILE_ASSIGN(nlopt,            profile_nlopt);
+    PROFILE_ASSIGN(problem_function, profile_problem_function);
 
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
     //Read bin files

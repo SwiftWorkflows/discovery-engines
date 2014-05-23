@@ -12,7 +12,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void crash(const char* format, ...)
+#define UNUSED __attribute__((unused))
+
+UNUSED
+static void
+crash(const char* format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -21,15 +25,18 @@ static void crash(const char* format, ...)
     exit(EXIT_FAILURE);
 }
 
-static void file_not_found(const char* filename)
+UNUSED
+static void
+file_not_found(const char* filename)
 {
     printf("Could not find file: %s\n", filename);
     fflush(NULL);
     exit(EXIT_FAILURE);
 }
 
-__attribute__((unused))
-static void file_not_writable(const char* filename)
+UNUSED
+static void
+file_not_writable(const char* filename)
 {
     printf("Could not write to file: %s\n", filename);
     fflush(NULL);

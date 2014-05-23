@@ -9,6 +9,7 @@
 #ifndef DEBUG_H_
 #define DEBUG_H_
 
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -61,15 +62,16 @@ void debug_printf(const char *token, const char *format, ...);
 
 #define PROFILE_TOKEN_LENGTH 32
 #if ENABLE_PROFILE
-#define PROFILE_CREATE(token,i)  int i = profile_create(#token)
+typedef uint16_t profile_index;
+#define PROFILE_CREATE(token,i)  profile_index i = profile_create(#token)
 #define PROFILE_ASSIGN(token,i)  i = profile_create(#token)
 #define PROFILE_START(i)         profile_start(i)
 #define PROFILE_END(i)           profile_end(i)
 #define PROFILE_REPORT           profile_report()
 #define PROFILE_RESET            profile_reset()
-int  profile_create(const char* token);
-void profile_start(int i);
-void profile_end(int i);
+profile_index profile_create(const char* token);
+void profile_start(profile_index i);
+void profile_end(profile_index i);
 void profile_report(void);
 void profile_reset(void);
 #else

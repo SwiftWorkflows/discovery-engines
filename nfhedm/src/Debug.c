@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "checks.h"
 #include "Debug.h"
 
 bool debug_enabled   = true;
@@ -42,7 +43,7 @@ debug_printf(const char *token, const char *format, ...)
     va_end(ap);
 }
 
-static int profile_index = 0;
+static profile_index profile_index_next = 0;
 
 #if ENABLE_PROFILE
 
@@ -58,7 +59,7 @@ typedef struct {
 
 static profile_entry profile_array[PROFILE_ENTRIES];
 
-int
+profile_index
 profile_create(const char* token)
 {
     if (!profile_enabled)
@@ -70,35 +71,39 @@ profile_create(const char* token)
                PROFILE_TOKEN_LENGTH, token);
         exit(1);
     }
-    if (profile_index == PROFILE_ENTRIES)
+    if (profile_index_next == PROFILE_ENTRIES)
     {
         printf("Too many profile entries!\n");
         exit(1);
     }
 
-    int i = profile_index;
+    profile_index i = profile_index_next;
     strcpy(profile_array[i].token, token);
     profile_array[i].count    = 0;
     profile_array[i].start    = 0.0;
     profile_array[i].stop     = 0.0;
     profile_array[i].duration = 0.0;
-    profile_index++;
+    profile_index_next++;
     return i;
 }
 
 void
-profile_start(int i)
+profile_start(profile_index i)
 {
     if (!profile_enabled)
         return;
+    if (i >= profile_index_next)
+        crash("profile index out of range: %i", i);
     profile_array[i].start = time_double();
 }
 
 void
-profile_end(int i)
+profile_end(profile_index i)
 {
     if (!profile_enabled)
         return;
+    if (i >= profile_index_next)
+        crash("profile index out of range: %i", i);
     profile_array[i].stop = time_double();
     profile_array[i].count++;
     profile_array[i].duration +=
@@ -112,7 +117,7 @@ profile_report()
 {
     if (!profile_enabled)
         return;
-    for (int i = 0; i < profile_index; i++)
+    for (int i = 0; i < profile_index_next; i++)
     {
         if (profile_array[i].start == 0.0)
         {
@@ -137,7 +142,7 @@ profile_reset()
 {
     if (!profile_enabled)
         return;
-    profile_index = 0;
+    profile_index_next = 0;
 }
 
 #endif // ENABLE_PROFILE
