@@ -240,9 +240,13 @@ FitOrientation(
     *EulerOutC = x[2];
 }
 
+// BEGIN CACHED DATA
+// This data is cached among Swift tasks- use carefully
 static bool fit_orientation_initialized = false;
 static int result_fd = -1;
 static struct parameters params;
+double **SpotsMat = NULL;
+// END CACHED DATA
 
 static inline void
 Init_FitOrientation(const char *ParamFN, const char *MicrostructureFN)
@@ -332,11 +336,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     assert(b);
 
     // Read Spots
-    double **SpotsMat;
     b = ReadSpots(params.direct, TotalDiffrSpots, &SpotsMat);
     assert(b);
-
-
 
     int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
                                  /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
@@ -467,6 +468,10 @@ static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***
 {
     char fnDS[1000];
     sprintf(fnDS,"%s/DiffractionSpots.txt",params.direct);
+    if (*SpotsMat != NULL){
+        LOG("using cached data for: %s", fnDS);
+        return true;
+    }
     LOG("reading: %s", fnDS);
     PROFILE_CREATE(ReadSpots, p);
     PROFILE_START(p);
