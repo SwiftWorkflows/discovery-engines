@@ -1,0 +1,19 @@
+
+Greeting example from: http://pythonhosted.org//Pyro4/intro.html
+
+Usage example:
+
+ ~/proj/d-e/nexpyro/greeting> python greeting.py &
+[3] 19702
+
+ Ready. Object uri = PYRO:obj_9f1a5ad18a264b49bb95d52d6b2377a2@localhost:56348
+
+
+ ~/proj/d-e/nexpyro/greeting> python client.py
+What is the Pyro uri of the greeting object? PYRO:obj_9f1a5ad18a264b49bb95d52d6b2377a2@localhost:56348
+What is your name? justin
+Hello, justin. Here is your fortune message:
+Behold the warranty -- the bold print giveth and the fine print taketh away.
+
+
+ ~/proj/d-e/nexpyro/greeting> kill %3
