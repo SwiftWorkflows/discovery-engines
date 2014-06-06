@@ -14,8 +14,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define HAVE_INLINE
+// #define HAVE_INLINE
 // #define GSL_RANGE_CHECK_OFF
+#include <gsl/gsl_blas.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_integration.h>
 
@@ -111,7 +112,8 @@ CalcOverlapAccOrient(
     const long long int SizeObsSpots,
     const double XGrain[3],
     const double YGrain[3],
-    double RotMatTilts[3][3],
+    // double RotMatTilts[3][3],
+    gsl_matrix *RotMatTilts,
     const double OmegaStart,
     const double OmegaStep,
     const double px,
@@ -143,7 +145,8 @@ CalcFracOverlap(
     double YGrain[3],
     const double Lsds[nLayers],
     const long long int SizeObsSpots,
-    double RotMatTilts[3][3],
+    //double RotMatTilts[3][3],
+    gsl_matrix *RotMatTilts,
     const double px,
     const double ybcs[nLayers],
     const double zbcs[nLayers],
@@ -204,8 +207,23 @@ static inline int orient2d(struct Point2D a, struct Point2D b, struct Point2D c)
     return (b.x-a.x)*(c.y-a.y) - (b.y-a.y)*(c.x-a.x);
 }
 
-void 
-PrintVector(const char* name, const double* v, int count);
+/** Matrix-vector multiply */
+static void inline
+nfhedm_mvm(const gsl_matrix *A, const gsl_vector *x,
+             /*OUT*/ gsl_vector * y)
+{
+    gsl_blas_dgemv(CblasNoTrans, 1.0, A, x, 0.0, y);
+}
+
+void PrintVector(const char* name, const double* v, int count);
+
+void PrintMatrixLinear(const char* name, const double* A, int m, int n);
+
+void PrintMatrix(const char* name, int m, int n, const double A[m][n]);
+
+void gsl_vector_print(const char *name, gsl_vector *v);
+
+void gsl_matrix_print(const char *name, gsl_matrix *A);
 
 void PrintUint16s(  FILE *fp, uint16_t  *data, int count);
 void PrintUint32s(  FILE *fp, uint32_t  *data, int count);

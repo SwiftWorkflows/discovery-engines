@@ -113,7 +113,7 @@ int CalcMedian(char fn[1000],
 	char extReduced[1024],
 	int BlnketSubtraction)
 {
-	int i,j,k,FileNr;
+	int i,j=0,k,FileNr;
 	char FileName[1024];
 	DIP_FN_DECLARE("CalcMedian");
 	DIPXJ(dip_Initialise());

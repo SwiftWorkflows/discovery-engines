@@ -100,8 +100,10 @@ double problem_function(
     EulIn[1] = x[1];
     EulIn[2] = x[2];
     Euler2OrientMat(EulIn,OrientMatIn);
-    double Lsd[nLayers], ybc[nLayers], zbc[nLayers],tx,ty,tz,RotMatTilts[3][3];
-    tx = x[3]; ty = x[4]; tz = x[5]; RotationTilts(tx,ty,tz,RotMatTilts);
+    double Lsd[nLayers], ybc[nLayers], zbc[nLayers],tx,ty,tz,RotMatTiltsData[3*3];
+    tx = x[3]; ty = x[4]; tz = x[5]; RotationTilts(tx,ty,tz,RotMatTiltsData);
+    gsl_matrix_view RotMatTiltsView = gsl_matrix_view_array(RotMatTiltsData,3,3);
+    gsl_matrix *RotMatTilts = &RotMatTiltsView.matrix;
     Lsd[0] = x[6];
     for (i=1;i<nLayers;i++){
         Lsd[i] = Lsd[i-1] + x[6+i];

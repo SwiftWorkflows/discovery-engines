@@ -555,6 +555,50 @@ PrintVector(const char* name, const double* v, int count)
     printf("%s[%i]=%f\n", name, i, v[i]);
 }
 
+void
+PrintMatrixLinear(const char* name, const double* A, int m, int n)
+{
+  for (int i = 0; i < m; i++)
+      for (int j = 0; j < n; j++)
+      {
+          printf("%s[%i][%i]", name, i, j);
+          fflush(stdout);
+          printf("=%0.4f\n", A[i*m+j]);
+          fflush(stdout);
+      }
+}
+
+void
+PrintMatrix(const char* name, int m, int n, const double A[m][n])
+{
+  for (int i = 0; i < m; i++)
+      for (int j = 0; j < n; j++)
+      {
+          printf("%s[%i][%i]", name, i, j);
+          fflush(stdout);
+          printf("=%0.4f\n", A[i][j]);
+          fflush(stdout);
+      }
+}
+
+void gsl_vector_print(const char *name, gsl_vector *v)
+{
+    for (int i = 0; i < 3; i++)
+        printf("%s[%i]: %0.3f\n", name, i, gsl_vector_get(v, i));
+}
+
+void gsl_matrix_print(const char *name, gsl_matrix *A)
+{
+    for (int i = 0; i < A->size1; i++)
+        for (int j = 0; j < A->size2; j++)
+        {
+            printf("%s[%i][%i]: ", name, i, j);
+            fflush(stdout);
+            printf("%0.3f\n", gsl_matrix_get(A, i, j));
+            fflush(stdout);
+        }
+}
+
 // #define PRINT_VECTOR()
 
 void
@@ -570,7 +614,8 @@ CalcFracOverlap(
     double YGrain[3],
     const double Lsds[nLayers],
     const long long int SizeObsSpots,
-    double RotMatTilts[3][3],
+    // double RotMatTilts[3][3],
+    gsl_matrix *RotMatTilts,
     const double px,
     const double ybcs[nLayers],
     const double zbcs[nLayers],
@@ -595,8 +640,16 @@ CalcFracOverlap(
 
   int j,OmeBin,OutofBounds,k,l;
   double OmegaThis,ythis,zthis,XGT,YGT,Displ_Y,Displ_Z,ytemp,ztemp,
-  xyz[3],P1[3],ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3],
+  // xyz[3],
+  // P1[3],
+  ABC[3],outxyz[3],YZSpots[3][2],Lsd,ybc,zbc,P0[3],
   YZSpotsTemp[2],YZSpotsT[3][2];
+  double xyzData[3];
+  gsl_vector_view xyzView = gsl_vector_view_array(xyzData, 3);
+  gsl_vector *xyz = &xyzView.vector;
+  double P1Data[3] = { 0.0, 0.0, 0.0 };
+  gsl_vector_view P1View = gsl_vector_view_array(P1Data, 3);
+  gsl_vector *P1 = &P1View.vector;
   YZSpotsTemp[0] = 0.0;
   YZSpotsTemp[1] = 0.0;
   int **InPixels,NrInPixels, OverlapPixels,Layer;
@@ -627,12 +680,22 @@ CalcFracOverlap(
           DisplacementSpots(XGT,YGT,Lsd,ythis,zthis,OmegaThis,&Displ_Y,&Displ_Z);
           ytemp = Displ_Y;
           ztemp = Displ_Z;
-          xyz[0] = 0;
-          xyz[1] = ytemp;
-          xyz[2] = ztemp;
-          MatrixMultF(RotMatTilts,xyz,P1);
+          //          xyz[0] = 0;
+          //          xyz[1] = ytemp;
+          //          xyz[2] = ztemp;
+          gsl_vector_set(xyz, 0, 0);
+          gsl_vector_set(xyz, 1, ytemp);
+          gsl_vector_set(xyz, 2, ztemp);
+          // MatrixMultF(RotMatTilts,xyz,P1);
+          // gsl_vector_print("xyz", xyz);
+          // gsl_matrix_print("RotMatTilts", RotMatTilts);
+          nfhedm_mvm(RotMatTilts,xyz,P1);
+          // printf("dgemv ok.\n");
+          // gsl_vector_print("P1", P1);
           for (l=0;l<3;l++){
-              ABC[l] = P1[l]-P0[l];
+              // ABC[l] = P1[l]-P0[l];
+              double P1l = gsl_vector_get(P1, l);
+              ABC[l] = P1l-P0[l];
           }
           outxyz[0] = 0;
           outxyz[1] = P0[1] -(ABC[1]*P0[0])/(ABC[0]);
@@ -644,12 +707,18 @@ CalcFracOverlap(
               break;
           }
           if (k==2){
-              xyz[0] = 0;
-              xyz[1] = ythis;
-              xyz[2] = zthis;
-              MatrixMultF(RotMatTilts,xyz,P1);
+              //              xyz[0] = 0;
+              //              xyz[1] = ythis;
+              //              xyz[2] = zthis;
+              gsl_vector_set(xyz, 0, 0);
+              gsl_vector_set(xyz, 1, ythis);
+              gsl_vector_set(xyz, 2, zthis);
+              // MatrixMultF(RotMatTilts,xyz,P1);
+              nfhedm_mvm(RotMatTilts,xyz,P1);
               for (l=0;l<3;l++){
-                  ABC[l] = P1[l]-P0[l];
+                  // ABC[l] = P1[l]-P0[l];
+                  double P1l = gsl_vector_get(P1, l);
+                  ABC[l] = P1l-P0[l];
               }
               outxyz[0] = 0;
               outxyz[1] = P0[1] -(ABC[1]*P0[0])/(ABC[0]);
@@ -720,7 +789,8 @@ CalcOverlapAccOrient(
     const long long int SizeObsSpots,
     const double XGrain[3],
     const double YGrain[3],
-    double RotMatTilts[3][3],
+    // double RotMatTilts[3][3],
+    gsl_matrix *RotMatTilts,
     const double OmegaStart,
     const double OmegaStep,
     const double px,

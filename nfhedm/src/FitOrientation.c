@@ -115,10 +115,13 @@ double problem_function(
 			BoxSizes[i][j] = f_data->BoxSizes[i][j];
 		}
 	}
-	double RotMatTilts[3][3];
+	// double RotMatTilts[3][3];
+	double RotMatTiltsData[3*3];
+	gsl_matrix_view RotMatTiltsView = gsl_matrix_view_array(RotMatTiltsData, 3, 3);
+	gsl_matrix *RotMatTilts = &RotMatTiltsView.matrix;
 	for (i=0;i<3;i++){
 		for (j=0;j<3;j++){
-			RotMatTilts[i][j] = f_data->RotMatTilts[i][j];
+			gsl_matrix_set(RotMatTilts, i, j, f_data->RotMatTilts[i][j]);
 		}
 	}
     double OrientMatIn[3][3], FracOverlap, x2[3];
@@ -144,7 +147,7 @@ FitOrientation(
     const long long int SizeObsSpots,
     const double XGrain[3],
     const double YGrain[3],
-    double RotMatTilts[3][3],
+    gsl_matrix *RotMatTilts,
     const double OmegaStart,
     const double OmegaStep,
     const double px,
@@ -198,7 +201,7 @@ FitOrientation(
 			f_data.P0[j][i] = P0[j][i];
 		}
 		for (j=0;j<3;j++){
-			f_data.RotMatTilts[i][j] = RotMatTilts[i][j];
+			f_data.RotMatTilts[i][j] = gsl_matrix_get(RotMatTilts, i, j);
 		}
 	}
 	for (i=0;i<MAX_N_OMEGA_RANGES;i++){
@@ -519,25 +522,41 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     int NrPixelsGrid=2*(ceil((gs*2)/px))*(ceil((gs*2)/px));
     int NrSpotsThis,StartingRowNr;
     double FracOverT;
-    double RotMatTilts[3][3], OrientationMatThis[9], OrientationMatThisUnNorm[9];
-    RotationTilts(tx,ty,tz,RotMatTilts);
+    double RotMatTiltsData[3][3];
+    double OrientationMatThis[9], OrientationMatThisUnNorm[9];
+    RotationTilts(tx,ty,tz,RotMatTiltsData);
+    // PrintMatrixLinear("RotMatTiltsData", (double*) RotMatTiltsData, 3, 3);
+    gsl_matrix_view RotMatTiltsView = gsl_matrix_view_array((double*) RotMatTiltsData, 3, 3);
+    gsl_matrix *RotMatTilts = &RotMatTiltsView.matrix;
+    // gsl_matrix_print("RotMatTilts", RotMatTilts);
     double **OrientMatrix;
     OrientMatrix = allocMatrix(MAX_POINTS_GRID_GOOD,10);
     int OrientationGoodID=0;
-    double MatIn[3],P0[nLayers][3],P0T[3];
+    // double MatIn[3];
+    double MatInData[3];
+    gsl_vector_view MatInView = gsl_vector_view_array(MatInData, 3);
+    gsl_vector *MatIn = &MatInView.vector;
+    double P0[nLayers][3];
+    // double P0T[3];
+    double P0TData[3];
+    gsl_vector_view P0TView = gsl_vector_view_array(P0TData, 3);
+    gsl_vector *P0T = &P0TView.vector;
     double OrientMatIn[3][3],XG[3],YG[3];
     // double ThrSps[MAX_N_SPOTS][3];
     double ThrSpsData[MAX_N_SPOTS*3];
     gsl_matrix_view ThrSpsView = gsl_matrix_view_array(ThrSpsData, MAX_N_SPOTS, 3);
     gsl_matrix *ThrSps = &ThrSpsView.matrix;
-    MatIn[0]=0;
-    MatIn[1]=0;
-    MatIn[2]=0;
+    //    MatIn[0]=0;
+    //    MatIn[1]=0;
+    //    MatIn[2]=0;
+    gsl_vector_set_zero(MatIn);
     for (int i=0;i<nLayers;i++){
-        MatIn[0] = -Lsd[i];
-        MatrixMultF(RotMatTilts,MatIn,P0T);
+        gsl_vector_set(MatIn, 0, -Lsd[i]);
+        // MatrixMultF(RotMatTilts,MatIn,P0T);
+        nfhedm_mvm(RotMatTilts,MatIn,P0T);
         for (int j=0;j<3;j++){
-            P0[i][j] = P0T[j];
+            // P0[i][j] = P0T[j];
+            P0[i][j] = gsl_vector_get(P0T, j);
         }
     }
     for (int j=0;j<3;j++){
