@@ -473,18 +473,7 @@ DisplacementSpots(
     *Displ_z = t*zi;
 }
 
-
-struct Point2D {
-    int x, y;
-};
-
-
-int orient2d(struct Point2D a, struct Point2D b, struct Point2D c)
-{
-    return (b.x-a.x)*(c.y-a.y) - (b.y-a.y)*(c.x-a.x);
-}
-
-double len2d(struct Point2D a, struct Point2D b, struct Point2D c)
+static inline double len2d(struct Point2D a, struct Point2D b, struct Point2D c)
 {
     return fabs(((b.x-a.x)*(c.y-a.y) - (b.y-a.y)*(c.x-a.x)))/sqrt(((a.y-b.y)*(a.y-b.y))+((b.x-a.x)*(b.x-a.x)));
 }
@@ -512,7 +501,7 @@ CalcPixels2(double Edges[3][2], int **Pixels, int *counter)
             maxY = Edges[i][1];
         }
     }
-    *counter = 0;
+    int c = 0;
     int A01 = Edges[0][1] - Edges[1][1], B01 = Edges[1][0] - Edges[0][0];
     int A12 = Edges[1][1] - Edges[2][1], B12 = Edges[2][0] - Edges[1][0];
     int A20 = Edges[2][1] - Edges[0][1], B20 = Edges[0][0] - Edges[2][0];
@@ -529,24 +518,24 @@ CalcPixels2(double Edges[3][2], int **Pixels, int *counter)
         int w2 = w2_row;
         for (p.x = minX; p.x <= maxX; p.x++) {
             if (w0 >= 0 && w1 >= 0 && w2 >= 0){
-                Pixels[*counter][0] = p.x;
-                Pixels[*counter][1] = p.y;
-                *counter+=1;
+                Pixels[c][0] = p.x;
+                Pixels[c][1] = p.y;
+                c+=1;
             }
             else if(len2d(v1,v2,p)<0.99){
-                Pixels[*counter][0] = p.x;
-                Pixels[*counter][1] = p.y;
-                *counter+=1;
+                Pixels[c][0] = p.x;
+                Pixels[c][1] = p.y;
+                c+=1;
             }
             else if(len2d(v2,v0,p)<0.99){
-                Pixels[*counter][0] = p.x;
-                Pixels[*counter][1] = p.y;
-                *counter+=1;
+                Pixels[c][0] = p.x;
+                Pixels[c][1] = p.y;
+                c+=1;
             }
             else if(len2d(v0,v1,p)<0.99){
-                Pixels[*counter][0] = p.x;
-                Pixels[*counter][1] = p.y;
-                *counter+=1;
+                Pixels[c][0] = p.x;
+                Pixels[c][1] = p.y;
+                c+=1;
             }
             w0 += A12;
             w1 += A20;
@@ -556,6 +545,7 @@ CalcPixels2(double Edges[3][2], int **Pixels, int *counter)
         w1_row += B20;
         w2_row += B01;
     }
+    *counter = c;
 }
 
 void 

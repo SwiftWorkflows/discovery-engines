@@ -195,6 +195,15 @@ realloc_buffers(int nElements, int nElements_previous,
     }
 }
 
+struct Point2D {
+    int x, y;
+};
+
+static inline int orient2d(struct Point2D a, struct Point2D b, struct Point2D c)
+{
+    return (b.x-a.x)*(c.y-a.y) - (b.y-a.y)*(c.x-a.x);
+}
+
 void 
 PrintVector(const char* name, const double* v, int count);
 
