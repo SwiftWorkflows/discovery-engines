@@ -15,6 +15,7 @@
 #include <stdint.h>
 
 #include "SharedFuncsFit.h"
+#include "FitOrientation.h"
 
 #define deg2rad 0.0174532925199433
 #define rad2deg 57.2957795130823
@@ -269,6 +270,7 @@ CalcDiffractionSpots(double Distance,
 	double OrientMatr[3][3], 
 	double **TheorSpots)
 {
+    PROFILE_START(profile_calc_diff_spots);
     *nTspots = 0;
     int nTsps;
     if (TheorSpots == NULL ) {
@@ -278,5 +280,6 @@ CalcDiffractionSpots(double Distance,
     CalcDiffrSpots_Furnace(OrientMatr, Distance, OmegaRanges, BoxSizes,
 		NoOfOmegaRanges, hkls, n_hkls, Thetas, ExcludePoleAngle, TheorSpots, &nTsps);
     *nTspots = nTsps;
+    PROFILE_END(profile_calc_diff_spots);
     return 0;
 }

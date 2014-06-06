@@ -12,6 +12,7 @@
 #include "Debug.h"
 #include "SharedFuncsFit.h"
 #include "CalcDiffractionSpots.h"
+#include "FitOrientation.h"
 
 #define RealType double
 #define SetBit(A,k)   (A[(k/32)] |=  (1 << (k%32)))
@@ -478,8 +479,8 @@ static inline double len2d(struct Point2D a, struct Point2D b, struct Point2D c)
     return fabs(((b.x-a.x)*(c.y-a.y) - (b.y-a.y)*(c.x-a.x)))/sqrt(((a.y-b.y)*(a.y-b.y))+((b.x-a.x)*(b.x-a.x)));
 }
 
-void
-CalcPixels2(double Edges[3][2], int **Pixels, int *counter)
+static inline void
+CalcPixels2(double Edges[3][2], int m, int *Pixels, int *counter)
 {
     int i;
     double minX=10000000,maxX=-10000000,minY=100000000,maxY=-100000000;
@@ -518,23 +519,23 @@ CalcPixels2(double Edges[3][2], int **Pixels, int *counter)
         int w2 = w2_row;
         for (p.x = minX; p.x <= maxX; p.x++) {
             if (w0 >= 0 && w1 >= 0 && w2 >= 0){
-                Pixels[c][0] = p.x;
-                Pixels[c][1] = p.y;
+                Pixels[2*c+0] = p.x;
+                Pixels[2*c+1] = p.y;
                 c+=1;
             }
             else if(len2d(v1,v2,p)<0.99){
-                Pixels[c][0] = p.x;
-                Pixels[c][1] = p.y;
+                Pixels[2*c+0] = p.x;
+                Pixels[2*c+1] = p.y;
                 c+=1;
             }
             else if(len2d(v2,v0,p)<0.99){
-                Pixels[c][0] = p.x;
-                Pixels[c][1] = p.y;
+                Pixels[2*c+0] = p.x;
+                Pixels[2*c+1] = p.y;
                 c+=1;
             }
             else if(len2d(v0,v1,p)<0.99){
-                Pixels[c][0] = p.x;
-                Pixels[c][1] = p.y;
+                Pixels[2*c+0] = p.x;
+                Pixels[2*c+1] = p.y;
                 c+=1;
             }
             w0 += A12;
@@ -626,6 +627,7 @@ CalcFracOverlap(
     double OrientMatIn[3][3],
     /*OUT*/ double *FracOver)
 {
+  PROFILE_START(profile_calc_frac_overlap);
   static bool printed = false;
   if (! printed)
   {
@@ -652,11 +654,14 @@ CalcFracOverlap(
   gsl_vector *P1 = &P1View.vector;
   YZSpotsTemp[0] = 0.0;
   YZSpotsTemp[1] = 0.0;
-  int **InPixels,NrInPixels, OverlapPixels,Layer;
+  // int **InPixels;
+  int NrInPixels, OverlapPixels,Layer;
   long long int BinNr;
   int MultY, MultZ, AllDistsFound, TotalPixels;
   *FracOver = 0;
-  InPixels = allocMatrixInt(NrPixelsGrid,2);
+  // InPixels = allocMatrixInt(NrPixelsGrid,2);
+  int InPixels[NrPixelsGrid*2];
+
   OverlapPixels = 0;
   TotalPixels=0;
   for (j=0;j<nTspots;j++){
@@ -736,17 +741,17 @@ CalcFracOverlap(
           continue;
       }
       if (gs*2 > px){
-          CalcPixels2(YZSpots,InPixels,&NrInPixels);
+          CalcPixels2(YZSpots, NrPixelsGrid, &InPixels[0],&NrInPixels);
       }else{
-          InPixels[0][0] = (int) round((YZSpots[0][0]+YZSpots[1][0]+YZSpots[2][0])/3);
-          InPixels[0][1] = (int) round((YZSpots[0][1]+YZSpots[1][1]+YZSpots[2][1])/3);
+          InPixels[0] = (int) round((YZSpots[0][0]+YZSpots[1][0]+YZSpots[2][0])/3);
+          InPixels[1] = (int) round((YZSpots[0][1]+YZSpots[1][1]+YZSpots[2][1])/3);
           NrInPixels = 1;
       }
       for (k=0;k<NrInPixels;k++){
           AllDistsFound = 1;
           for (Layer=0;Layer<nLayers;Layer++){
-              MultY = (int) floor(((((double)(YZSpotsTemp[0]-ybc))*px)*(Lsds[Layer]/Lsd))/px + ybcs[Layer]) + InPixels[k][0];
-              MultZ = (int) floor(((((double)(YZSpotsTemp[1]-zbc))*px)*(Lsds[Layer]/Lsd))/px + zbcs[Layer]) + InPixels[k][1];
+              MultY = (int) floor(((((double)(YZSpotsTemp[0]-ybc))*px)*(Lsds[Layer]/Lsd))/px + ybcs[Layer]) + InPixels[2*k+0];
+              MultZ = (int) floor(((((double)(YZSpotsTemp[1]-zbc))*px)*(Lsds[Layer]/Lsd))/px + zbcs[Layer]) + InPixels[2*k+1];
               if (MultY > 2048 || MultY < 0 || MultZ > 2048 || MultZ < 0){
                   OutofBounds = 1;
                   break;
@@ -777,7 +782,8 @@ CalcFracOverlap(
   if (TotalPixels > 0){
       *FracOver = (double)((double)OverlapPixels)/((double)TotalPixels);
   }
-  FreeMemMatrixInt(InPixels,NrPixelsGrid);
+  PROFILE_END(profile_calc_frac_overlap);
+  // FreeMemMatrixInt(InPixels,NrPixelsGrid);
 }
 
 void

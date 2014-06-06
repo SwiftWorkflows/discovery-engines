@@ -54,6 +54,8 @@ struct my_func_data{
 };
 
 static profile_index profile_problem_function;
+profile_index profile_calc_diff_spots;
+profile_index profile_calc_frac_overlap;
 
 static
 double problem_function(
@@ -290,6 +292,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
 
     PROFILE_ASSIGN(nlopt,            profile_nlopt);
     PROFILE_ASSIGN(problem_function, profile_problem_function);
+    PROFILE_ASSIGN(problem_calc_diff_spots, profile_calc_diff_spots);
+    PROFILE_ASSIGN(problem_calc_frac_overlap, profile_calc_frac_overlap);
 
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
     //Read bin files

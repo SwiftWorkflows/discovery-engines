@@ -9,6 +9,7 @@
 #define FITORIENTATION_H
 
 #include "SharedFuncsFit.h"
+#include "Debug.h"
 
 /**
    @return 1 on success, 0 on failure
@@ -19,6 +20,9 @@ int GenerateRingInfo(int SpaceGroup,double a,double b, double c,
 	double alpha, double beta, double gamma, double wavelength,
 	double TthetaMax, double ThetasSorted[5000],
 	int HKLs[5000][4], int *NPs);
+
+extern profile_index profile_calc_diff_spots;
+extern profile_index profile_calc_frac_overlap;
 
 int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, double tz,
                        int nLayers, double *Lsd, double **XY, int NrOrientations,

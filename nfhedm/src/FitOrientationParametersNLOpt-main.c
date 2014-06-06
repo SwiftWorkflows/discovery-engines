@@ -184,9 +184,10 @@ main(int argc, char *argv[])
             m++;
         }
         Convert9To3x3(OrientationMatThis,OrientMatIn);
+        assert(0); // Fix the error below:
         CalcFracOverlap(nrFiles,params.nLayers,NrSpotsThis,ThrSps,
-                        params.OmegaStart,params.OmegaStep,XG,YG,
-                        params.Lsd,SizeObsSpots,RotMatTilts,params.px,params.ybc,params.zbc,
+                        /*5*/params.OmegaStart,params.OmegaStep,XG,YG,
+                        /*9*/params.Lsd,SizeObsSpots,RotMatTilts,params.px,params.ybc,params.zbc,
 			gs,P0,NrPixelsGrid,ObsSpotsInfo,OrientMatIn,&FracOverT);
         if (FracOverT >= params.minFracOverlap){
             for (j=0;j<9;j++){
