@@ -526,7 +526,10 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     int OrientationGoodID=0;
     double MatIn[3],P0[nLayers][3],P0T[3];
     double OrientMatIn[3][3],XG[3],YG[3];
-    double ThrSps[MAX_N_SPOTS][3];
+    // double ThrSps[MAX_N_SPOTS][3];
+    double ThrSpsData[MAX_N_SPOTS*3];
+    gsl_matrix_view ThrSpsView = gsl_matrix_view_array(ThrSpsData, MAX_N_SPOTS, 3);
+    gsl_matrix *ThrSps = &ThrSpsView.matrix;
     MatIn[0]=0;
     MatIn[1]=0;
     MatIn[2]=0;
@@ -556,9 +559,12 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         m=0;
         NormalizeMat(OrientationMatThisUnNorm,OrientationMatThis);
         for (int j=StartingRowNr;j<(StartingRowNr+NrSpotsThis);j++){
-            ThrSps[m][0] = SpotsMat[j][0];
-            ThrSps[m][1] = SpotsMat[j][1];
-            ThrSps[m][2] = SpotsMat[j][2];
+//            ThrSps[m][0] = SpotsMat[j][0];
+//            ThrSps[m][1] = SpotsMat[j][1];
+//            ThrSps[m][2] = SpotsMat[j][2];
+            gsl_matrix_set(ThrSps, m, 0, SpotsMat[j][0]);
+            gsl_matrix_set(ThrSps, m, 1, SpotsMat[j][1]);
+            gsl_matrix_set(ThrSps, m, 2, SpotsMat[j][2]);
             // printf("ThrSps: %f %f %f\n", ThrSps[m][0], ThrSps[m][1], ThrSps[m][2]);
             m++;
         }

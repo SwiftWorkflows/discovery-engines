@@ -14,6 +14,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define HAVE_INLINE
+// #define GSL_RANGE_CHECK_OFF
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_integration.h>
+
 #define MAX_POINTS_GRID_GOOD 200000
 #define MAX_N_SPOTS 200
 #define MAX_N_OMEGA_RANGES 20
@@ -130,7 +135,8 @@ CalcFracOverlap(
     const int NrOfFiles,
     const int nLayers,
     const int nTspots,
-    double TheorSpots[MAX_N_SPOTS][3],
+    // double TheorSpots[MAX_N_SPOTS][3],
+    gsl_matrix *TheorSpots,
     double OmegaStart,
     double OmegaStep,
     double XGrain[3],

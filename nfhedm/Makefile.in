@@ -17,7 +17,7 @@ LDFLAGS += @LDFLAGS@
 
 LIBDIRS += -L $(NLOPT)/lib
 
-LIBS += $(LIBDIRS) -lnlopt -lm
+LIBS += $(LIBDIRS) -lnlopt -lgsl -lgslcblas -lm 
 
 TCLSH = @USE_TCLSH@
 
@@ -118,7 +118,8 @@ $(LIBNFHEDM): $(NFHEDM_NLOPT_OBJS)
 	@mkdir -pv lib
 	$(CC) -shared -o $(@)       \
 		$(NFHEDM_NLOPT_OBJS) \
-	        $(LDFLAGS)
+	        $(LDFLAGS) \
+		$(LIBS) \
 		$(RPATH_NLOPT)
 
 $(LIBTCLNFHEDM): src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
@@ -127,6 +128,7 @@ $(LIBTCLNFHEDM): src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
 		src/nfhedm_wrap.o  \
 		$(NFHEDM_NLOPT_OBJS)   \
 	        $(LDFLAGS) \
+		$(LIBS)    \
                 $(RPATHS)
 
 src/nfhedm_wrap.c: src/nfhedm.i

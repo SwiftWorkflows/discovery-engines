@@ -1,11 +1,11 @@
 #!/bin/bash
 
-set -e
+set -eux
 
 DIR=$( cd $(dirname $0) ; /bin/pwd )
 NFHEDM_INSTALL=$( cd ${DIR}/.. ; /bin/pwd )
 
-if [[ ! -f ${NFHEDM_INSTALL}/lib/pkgIndex.tcl ]]
+if [[ ! -f ${NFHEDM_INSTALL}/pkgIndex.tcl ]]
 then
   echo "Swift NFHEDM package does not exist!"
   exit 1

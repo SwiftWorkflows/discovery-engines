@@ -572,7 +572,8 @@ CalcFracOverlap(
     const int NrOfFiles,
     const int nLayers,
     const int nTspots,
-    double TheorSpots[MAX_N_SPOTS][3],
+    // double TheorSpots[MAX_N_SPOTS][3],
+    gsl_matrix *TheorSpots,
     double OmegaStart,
     double OmegaStep,
     double XGrain[3],
@@ -588,7 +589,7 @@ CalcFracOverlap(
     const int NrPixelsGrid,
     const int ObsSpotsInfo[SizeObsSpots],
     double OrientMatIn[3][3],
-    double *FracOver)
+    /*OUT*/ double *FracOver)
 {
   static bool printed = false;
   if (! printed)
@@ -616,9 +617,12 @@ CalcFracOverlap(
   OverlapPixels = 0;
   TotalPixels=0;
   for (j=0;j<nTspots;j++){
-      ythis = TheorSpots[j][0];
-      zthis = TheorSpots[j][1];
-      OmegaThis = TheorSpots[j][2];
+      // ythis = TheorSpots[j][0];
+      // zthis = TheorSpots[j][1];
+      // OmegaThis = TheorSpots[j][2];
+      ythis = gsl_matrix_get(TheorSpots, j, 0);
+      zthis = gsl_matrix_get(TheorSpots, j, 1);
+      OmegaThis = gsl_matrix_get(TheorSpots, j, 2);
       OmeBin = (int) floor((-OmegaStart+OmegaThis)/OmegaStep);
       for (k=0;k<3;k++){
           P0[k] = P0All[0][k];
@@ -751,15 +755,19 @@ CalcOverlapAccOrient(
     CalcDiffractionSpots(Lsd0, ExcludePoleAngle, OmegaRanges, NoOfOmegaRanges,
 		hkls, n_hkls, Thetas, BoxSizes, &nTspots, OrientMatIn,TheorSpots);
     double FracOver;
-    double XG[3],YG[3],ThrSps[nTspots][3];
+    double XG[3],YG[3];
+    // double ThrSps[nTspots][3];
+    double ThrSpsData[nTspots*3];
+    gsl_matrix_view ThrSpsView = gsl_matrix_view_array(ThrSpsData, nTspots, 3);
+    gsl_matrix *ThrSps = &ThrSpsView.matrix;
     for (i=0;i<3;i++){
         XG[i] = XGrain[i];
         YG[i] = YGrain[i];
     }
     for (i=0;i<nTspots;i++){
-        ThrSps[i][0] = TheorSpots[i][0];
-        ThrSps[i][1] = TheorSpots[i][1];
-        ThrSps[i][2] = TheorSpots[i][2];
+        gsl_matrix_set(ThrSps, i, 0, TheorSpots[i][0]);
+        gsl_matrix_set(ThrSps, i, 1, TheorSpots[i][1]);
+        gsl_matrix_set(ThrSps, i, 2, TheorSpots[i][2]);
     }
     CalcFracOverlap(NrOfFiles,nLayers,nTspots,ThrSps,OmegaStart,
 		OmegaStep,XG,YG,Lsd,SizeObsSpots,RotMatTilts,px,ybc,zbc,gs,
