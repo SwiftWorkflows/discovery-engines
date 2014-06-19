@@ -227,11 +227,12 @@ FitOrientation(
 	struct my_func_data *f_datat;
 	f_datat = &f_data;
 	// What does trp stand for? -Justin
+	// Its a temporary void pointer I create to pass the strcut to the fitting function. - Hemant
 	void* trp = (struct my_func_data *) f_datat;
 	// double tole = 1e-3;
 	PROFILE_START(profile_nlopt);
 	nlopt_opt opt;
-	opt = nlopt_create(NLOPT_LN_SBPLX, n);
+	opt = nlopt_create(NLOPT_LN_NELDERMEAD, n);
 	nlopt_set_lower_bounds(opt, xl);
 	nlopt_set_upper_bounds(opt, xu);
 	nlopt_set_min_objective(opt, problem_function, trp);

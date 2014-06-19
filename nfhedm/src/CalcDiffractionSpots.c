@@ -36,6 +36,7 @@
 
 #define CalcLength(x,y,z) sqrt((x)*(x) + (y)*(y) + (z)*(z))
 
+static inline
 void
 MatrixMult(
            RealType m[3][3],
@@ -50,6 +51,7 @@ MatrixMult(
     }
 }
 
+static inline
 void
 QuatToOrientMat(
                 double Quat[4],
@@ -76,6 +78,7 @@ QuatToOrientMat(
     OrientMat[2][2] = 1 - 2*(Q1_2+Q2_2);
 }
 
+static inline
 void
 CalcEtaAngle(
              RealType y,
@@ -85,6 +88,7 @@ CalcEtaAngle(
     if (y > 0)    *alpha = -*alpha;
 }
 
+static inline
 void
 CalcSpotPosition(
                  RealType RingRadius,
@@ -97,6 +101,7 @@ CalcSpotPosition(
     *zl =   cos(etaRad)*RingRadius;
 }
 
+static inline
 void
 CalcOmega(
           RealType x,
@@ -192,6 +197,7 @@ CalcOmega(
     }
 }
 
+static inline
 void
 CalcDiffrSpots_Furnace(
                        RealType OrientMatrix[3][3],
