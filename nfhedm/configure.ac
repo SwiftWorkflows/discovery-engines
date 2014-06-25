@@ -1,7 +1,7 @@
 
 AC_PREREQ([2.63])
 AC_INIT([NFHEDM], [0.0], [wozniak@mcs.anl.gov])
-AC_CONFIG_SRCDIR([src/MakeHexGrid.c])
+AC_CONFIG_SRCDIR([src/FitOrientation.c])
 AC_CONFIG_HEADERS([config.h])
 
 # Set shared object suffix (.so on Linux, .dylib on Mac)
