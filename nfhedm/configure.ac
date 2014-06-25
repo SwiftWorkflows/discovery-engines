@@ -18,6 +18,14 @@ AC_CHECK_PROG(ZSH, zsh, zsh, "no")
 
 LDFLAGS="${LDFLAGS} -lm"
 
+COMPILER=GCC
+AC_ARG_ENABLE(xlc,
+    AS_HELP_STRING([--with-xlc], [use IBM XLC. You must still set CC.]),
+    [
+      COMPILER=XLC
+    ])
+AC_SUBST(COMPILER)
+
 USE_DIP=0
 AC_ARG_WITH(dip,
     AS_HELP_STRING([--with-dip], [location of DIP]),

@@ -9,8 +9,23 @@ ENABLE_OPENMP = @ENABLE_OPENMP@
 
 CC = @CC@
 
+COMPILER = @COMPILER@
+
+ifeq ($(COMPILER),GCC)
+	PIC    = -fPIC
+	SHARED = -shared
+	STD    = -std=gnu99
+	WARNS  = -Wall
+endif
+ifeq ($(COMPILER),XLC)
+	PIC    = -qpic
+	SHARED = -qmkshrobj
+	STD    =
+	WARNS  =
+endif
+
 CFLAGS += @CFLAGS@
-CFLAGS += $(INCLUDES) -g -Wall -fPIC -std=gnu99
+CFLAGS += $(INCLUDES) -g $(WARNS) $(PIC) $(STD)
 ifeq ($(ENABLE_OPENMP),1)
 	CFLAGS += -fopenmp
 endif
@@ -118,7 +133,7 @@ bin/ImageProcessing: src/ImageProcessing.c
 
 $(LIBNFHEDM): $(NFHEDM_NLOPT_OBJS)
 	@mkdir -pv lib
-	$(CC) -shared -o $(@)       \
+	$(CC) $(SHARED) -o $(@)       \
 		$(NFHEDM_NLOPT_OBJS) \
 	        $(LDFLAGS) \
 		$(LIBS) \
@@ -126,7 +141,7 @@ $(LIBNFHEDM): $(NFHEDM_NLOPT_OBJS)
 
 $(LIBTCLNFHEDM): src/nfhedm_wrap.o $(NFHEDM_NLOPT_OBJS)
 	@mkdir -pv lib
-	$(CC) -shared -o $(@)         \
+	$(CC) $(SHARED) -o $(@)         \
 		src/nfhedm_wrap.o  \
 		$(NFHEDM_NLOPT_OBJS)   \
 	        $(LDFLAGS) \
