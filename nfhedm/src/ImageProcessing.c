@@ -145,6 +145,7 @@ void FindPeakPositions(
 	printf("Detecting edges.\n");
 	int *ImageEdges; //Edges in LoG filtered image, but just binarized!
 	ImageEdges = malloc((NrPixels*NrPixels*sizeof(*ImageEdges))/32);
+	memset(ImageEdges,0,(NrPixels*NrPixels*sizeof(*ImageEdges))/32);
 	for (i=NrPixels+1;i<((NrPixels*NrPixels)-(NrPixels+1));i++){
 		if (Image2[i]!=0 && ((Image3[i] < 0 && Image3[i-1] >= 0)
 			|| (Image3[i] >= 0 && Image3[i-1] < 0)
@@ -823,10 +824,10 @@ main(int argc, char *argv[])
 	printf("Total number of pixels with intensity: %d\n",TotPixelsInt);
 	pixelvalue *ys, *zs, *peakID;
 	float32_t *intensity;
-	ys = malloc(TotPixelsInt*sizeof(*ys));
-	zs = malloc(TotPixelsInt*sizeof(*zs));
-	peakID = malloc(TotPixelsInt*sizeof(*peakID));
-	intensity = malloc(TotPixelsInt*sizeof(*intensity));
+	ys = malloc(TotPixelsInt*2*sizeof(*ys));
+	zs = malloc(TotPixelsInt*2*sizeof(*zs));
+	peakID = malloc(TotPixelsInt*2*sizeof(*peakID));
+	intensity = malloc(TotPixelsInt*2*sizeof(*intensity));
 	int PeaksFilledCounter=0;
 	int RowNr, ColNr;
 	for (i=0;i<NrPixels*NrPixels;i++){
