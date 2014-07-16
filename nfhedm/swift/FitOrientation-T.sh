@@ -36,7 +36,7 @@ SCRIPT=FitOrientation-T
 stc -u -t checkpointing ${DIR}/${SCRIPT}.swift
 
 export MODE=BGQ
-export PROCS=${PROCS:-2}
+export PROCS=3
 export PROJECT=ExM
 export QUEUE=default
 export TURBINE_LOG=1
