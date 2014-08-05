@@ -17,7 +17,7 @@ END=$4
 MICROSTRUCTURE=$5
 
 DIR=$( cd $(dirname $0) ; /bin/pwd )
-NFHEDM_INSTALL=${HOME}/sfw/ppc64/nfhedm
+NFHEDM_INSTALL=$( cd ${DIR}/.. ; /bin/pwd )
 
 if [[ ! -f ${NFHEDM_INSTALL}/lib/pkgIndex.tcl ]]
 then
@@ -38,7 +38,8 @@ export QUEUE=default
 export TURBINE_LOG=1
 export TURBINE_DEBUG=1
 export WALLTIME=${WT:-15}
-export PPN=4
+export PPN=${PPN:-4}
+export ADLB_PRINT_TIME=1
 
 cd ${DATA}
 echo "PWD: $(pwd)"
