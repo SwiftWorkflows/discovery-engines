@@ -43,6 +43,23 @@ AC_ARG_WITH(dip,
         RPATHS="${RPATHS} -Wl,-rpath -Wl,${withval}/lib"
     ])
 
+USE_GSL=0
+AC_ARG_WITH(gsl,
+    AS_HELP_STRING([--with-gsl], [location of GSL]),
+    [
+        GSL_HEADER=${withval}/include/gsl/gsl_vector.h
+        AC_MSG_CHECKING([${GSL_HEADER}])
+        [[ -r ${GSL_HEADER} ]] && USE_GSL=1
+        if [[ ${USE_GSL} == 0 ]]
+        then
+            AC_MSG_ERROR([Could not find GSL!])
+        fi
+        AC_MSG_RESULT([ok])
+        CFLAGS="${CFLAGS} -I ${withval}/include"
+        LDFLAGS="${LDFLAGS} -L ${withval}/lib -lgsl -lgslcblas"
+        RPATHS="${RPATHS} -Wl,-rpath -Wl,${withval}/lib"
+    ])
+
 USE_NLOPT=0
 AC_ARG_WITH(nlopt,
     AS_HELP_STRING([--with-nlopt], [location of NLopt]),
@@ -62,6 +79,7 @@ AC_ARG_WITH(nlopt,
 
 # Checks for libraries.
 AC_CHECK_LIB([dip], [dip_Initialise])
+AC_CHECK_LIB([gsl], [gsl_vector])
 AC_CHECK_LIB([nlopt], [nlopt_create])
 
 # Checks for header files.
