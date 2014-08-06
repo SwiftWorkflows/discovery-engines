@@ -16,8 +16,8 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define ENABLE_LOG     1
-#define ENABLE_PROFILE 1
+#define ENABLE_LOG     0
+#define ENABLE_PROFILE 0
 #define ENABLE_DEBUG   0
 
 extern bool log_enabled;
@@ -61,8 +61,8 @@ void debug_printf(const char *token, const char *format, ...);
 #endif
 
 #define PROFILE_TOKEN_LENGTH 32
-#if ENABLE_PROFILE
 typedef uint16_t profile_index;
+#if ENABLE_PROFILE
 #define PROFILE_CREATE(token,i)  profile_index i = profile_create(#token)
 #define PROFILE_ASSIGN(token,i)  i = profile_create(#token)
 #define PROFILE_START(i)         profile_start(i)
