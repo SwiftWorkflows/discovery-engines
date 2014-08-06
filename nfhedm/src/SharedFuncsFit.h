@@ -31,7 +31,9 @@ typedef double RealType;
 #define float32_t float
 
 #define CHECK(condition, msg) \
-{ if (!(condition)) { printf("%s\n", msg); return false; } }
+{ if (!(condition)) { printf("%s\n", msg); \
+                      printf("\t At: %s:%i\n", __FILE__, __LINE__); \
+                    return false; } }
 
 #define READ(data, size, count, fp)           \
  { int actual = fread(data, size, count, fp); \
