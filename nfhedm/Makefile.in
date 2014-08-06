@@ -199,9 +199,10 @@ install-tests: install
 	mkdir -pv $(INSTALL_TESTS)
 	cp -uv tests/* $(INSTALL_TESTS)
 
+SWIFT_FILES = $(shell ls swift/*.{sh,swift,tcl})
 install-swift: install-libs install-tcl
 	mkdir -pv $(INSTALL_SWIFT)
-	cp -uv swift/* $(INSTALL_SWIFT)
+	cp -uv $(SWIFT_FILES) $(INSTALL_SWIFT)
 
 .PHONY: clean all                        \
    install install-bin install-libs install-tcl \
