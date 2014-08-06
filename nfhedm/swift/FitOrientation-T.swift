@@ -21,7 +21,7 @@ main
   printf("FitOrientation-T: parameters=%s rown=%i:%i",
          ParameterFileName, start, end);
   foreach rown in [start:end] {
-    printf("rown: %i", rown);
+    // printf("rown: %i", rown);
     FitOrientation_Swift(ParameterFileName, rown, MicrostructureFileName);
   }
 }
