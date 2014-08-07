@@ -1,0 +1,14 @@
+High-energy diffraction microscopy (HEDM) is an important method for
+determining the grain structure of metals.  It is performed at
+specialized light sources that produce .  Typically, the scientist
+applies for a week of beam time and spends that time gathering data.
+High-performance computing (HPC) is rarely if ever applied during the
+week of beam time.  Applying HPC has the potential to greatly reduce
+errors.  It may provide feedback to the scientist during the run, to
+improve the quality of results and the utility of precious beam time.
+Most importantly, it will speed the process of scientific discovery,
+even if the HPC is applied after beam time. In this work, we present
+an HEDM application that spans a small cluster and the Blue Gene/Q at
+ANL.  It uses up to 64K cores of the BG/Q to provide near real-time
+feedback to APS beam users.
+
