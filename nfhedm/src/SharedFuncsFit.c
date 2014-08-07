@@ -629,6 +629,9 @@ CalcFracOverlap(
 {
   PROFILE_START(profile_calc_frac_overlap);
   static bool printed = false;
+  #if ! ENABLE_LOG
+  printed = true;
+  #endif
   if (! printed)
   {
     printf("CalcFracOverlap: NrOfFiles=%i nLayers=%i nTspots=%i "

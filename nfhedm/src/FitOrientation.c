@@ -53,9 +53,11 @@ struct my_func_data{
     double *zbc;
 };
 
+#if ENABLE_PROFILE
 static profile_index profile_problem_function;
 profile_index profile_calc_diff_spots;
 profile_index profile_calc_frac_overlap;
+#endif
 
 static
 double problem_function(
@@ -138,7 +140,9 @@ double problem_function(
     return (1 - FracOverlap);
 }
 
+#if ENABLE_PROFILE
 static profile_index profile_nlopt = -1;
+#endif
 
 void
 FitOrientation(
@@ -674,7 +678,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     //FreeMemMatrix(XY,3);
     //FreeMemMatrix(OrientationMatrix,NrOrientations);
     //FreeMemMatrix(OrientMatrix,MAX_POINTS_GRID_GOOD);
-    printf("%d %d %f %f %f %f %f %f\n",rown, OrientationGoodID,
+    LOG("%d %d %f %f %f %f %f %f\n",rown, OrientationGoodID,
            xs, ys, BestEuler[0],BestEuler[1],BestEuler[2],BestFrac);
     double result[5];
     result[0] = (double) rown;

@@ -21,8 +21,10 @@ int GenerateRingInfo(int SpaceGroup,double a,double b, double c,
 	double TthetaMax, double ThetasSorted[5000],
 	int HKLs[5000][4], int *NPs);
 
+#if PROFILE_ENABLED
 extern profile_index profile_calc_diff_spots;
 extern profile_index profile_calc_frac_overlap;
+#endif
 
 int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, double tz,
                        int nLayers, double *Lsd, double **XY, int NrOrientations,
