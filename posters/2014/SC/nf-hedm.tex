@@ -200,6 +200,15 @@ C. Parallel processing of the analysis routines is implemented using
 the Swift parallel scripting language in collaboration with the DEBD
 project.
 
+\begin{figure}
+  \begin{center}
+    \includegraphics[scale=0.58,clip=true,trim=0.05in -0.3in 0 0]
+                    {img/NFHEDM.pdf}
+    \caption{Cross-lab APS to ALCF workflow.
+      \label{figure:nfhedm-workflow}}
+  \end{center}
+\end{figure}
+
 A detailed diagram of the workflow for NF-HEDM is shown in
 Figure~\ref{figure:nfhedm-workflow}.  In this figure, the detector
 produces data on an NFS installation at the APS~\circled{1}. A large
@@ -213,6 +222,8 @@ of thousands of CPU cores of a Blue Gene/Q.
 
 \section{Many-task parallelization for HEDM}
 
+
+
 The HPC component of the workflow was implemented using
 Swift/T~\cite{SwiftT_2013}, a dataflow programming system implemented
 atop the Turbine runtime~\cite{Turbine_2013} and the Asynchronous
@@ -225,14 +236,41 @@ billion tasks/second on hundreds of thousands of cores~\cite{STC_2014}
 or GPUs~\cite{Krieder_2014}.
 
 
+
+
+\section{Performance} 
+
 \begin{figure}
   \begin{center}
     \includegraphics[scale=0.58,clip=true,trim=0.05in -0.3in 0 0]
-                    {img/NFHEDM.pdf}
+                    {plots/nf-hedm.pdf}
     \caption{Cross-lab APS to ALCF workflow.
       \label{figure:nfhedm-workflow}}
   \end{center}
 \end{figure}
+
+To measure performance of the HPC portion of the workflow, we ran it
+on several allocation sizes of the Blue Gene/Q systems at ANL.  In
+each run, only one task is processed by each processor.  This emulates
+the case in which the scientist has access all available cores, and
+desires the fastest result.  The time to solution is limited by the
+slowest task- task runtimes may vary as the optimization routine is
+not easily predictable.  
+
+Our implementation performs well up to 32K cores, after which some
+slowdown is observed.  Performance is dependent on input rates, as the
+whole dataset must be read by each process.  Thus, run times vary
+widely due  to other users of the filesystem.  At 64K cores,
+performance drops a bit, probably due to I/O, which will be the focus
+of our future work.  
+
+\section{Summary}
+
+This work presented the initial application of HPC to an X-ray HEDM
+problem, and showed that HPC can solve the whole analysis phase of the
+workflow extremely quickly ($\sim$ 5 minutes).  Future work will
+refine the workflow and improve the use of I/O to achieve better
+performance on the maximal required number of cores. 
 
 \section*{Acknowledgments}
 
