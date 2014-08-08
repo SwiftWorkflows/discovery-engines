@@ -1,9 +1,9 @@
 
-%% DFM 2014 
-%% Position paper
-%% http://www.cs.ucy.ac.cy/dfmworkshop
-%% Due: June 30
-%% Page limit: 4
+%% SC 2014
+%% Poster text
+%% http://sc14.supercomputing.org/program/posters
+%% Due: August 7, 2014
+%% Page limit: 2
 
 \documentclass[conference,10pt]{IEEEtran}
 %\usepackage{epsfig}
@@ -20,6 +20,7 @@
 \usepackage{caption}
 \DeclareCaptionType{copyrightbox} % workaround for bug in caption
 \usepackage{subcaption}
+\usepackage{tikz}
 %\usepackage{paralist}
 \usepackage{xspace}
 %\usepackage{numprint} % print numbers with thousands separator
@@ -30,6 +31,10 @@
 
 \newcommand{\SwiftT}{Swift/T\xspace}
 \newcommand{\STC}{STC\xspace}
+
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+  \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
 
 % Symbols used to represent congruence
 \newcommand{\valcong}{\cong^V}
@@ -93,10 +98,11 @@
 \newcommand{\topic}[1] { { \noindent $\bullet$ \textbf{ #1:}}}
 
 
-\title{Language Features for Scalable Distributed-Memory Dataflow Computing}
+\title{Discovery Engines: Connecting X-ray Experiments to HPC Analysis}
 
 \author{\IEEEauthorblockN{
 Justin M. Wozniak,\IEEEauthorrefmark{1}\IEEEauthorrefmark{2}
+Hemant Sharma,\IEEEauthorrefmark{1}
 Michael Wilde,\IEEEauthorrefmark{1}\IEEEauthorrefmark{2}
 Ian T. Foster\IEEEauthorrefmark{1}\IEEEauthorrefmark{2}\IEEEauthorrefmark{3}}
   \IEEEauthorblockA{
@@ -113,472 +119,120 @@ Ian T. Foster\IEEEauthorrefmark{1}\IEEEauthorrefmark{2}\IEEEauthorrefmark{3}}
 
 \maketitle
 
-\begin{abstract}
+\section{Overview}
 
-Dataflow languages offer a natural means to express concurrency but
-are not a natural representation of the architectural features of
-high-performance, distributed-memory computers.  When used as the
-outermost language in a hierarchical programming model, dataflow is
-very effective at expressing the overall flow of a computation.
-In this work, we present strategies and techniques used by the Swift
-dataflow language to obtain good performance on extremely large
-computing systems.  We also present multiple unique language features
-that offer practical utility and performance enhancements.
+High-energy diffraction microscopy (HEDM) is an important method for
+determining the grain structure of metals.  It is performed at
+specialized light sources such as the Advanced Photon Source (APS) at
+Argonne National Laboratory (ANL).  In the typical scientific
+workflow, the scientist applies for a week of beam time and spends
+that time gathering data.  Over the next several months, the data is
+processed using custom-built tools.  High-performance computing (HPC)
+is rarely if ever applied during the week of beam time.  Applying HPC
+to quickly analyze the data produced by the experiment detectors has
+the potential to greatly reduce errors.  It may provide feedback to
+the scientist during the run, to improve the quality of results and
+the utility of precious beam time.  Most importantly, it will speed
+the process of scientific discovery, even if the HPC is applied after
+beam time. In this work, we present an HEDM application that spans a
+small cluster and the Blue Gene/Q at ANL.  It uses up to 64K cores of
+the BG/Q to provide near real-time feedback to APS beam users.
 
-\end{abstract}
+\section{High-energy diffraction microscopy at the APS}
 
-\section{Introduction}
+APS beamline scientists H. Sharma and J. Almer, performing experiments
+at APS Sector 1-ID, are developing new experimental techniques and
+algorithms for determining the grain structure of polycrystalline
+material samples, via high-energy diffraction microscopy (HEDM).  In
+close collaboration with DEBD, they are applying new tools and methods
+to parallelize (and dramatically speed up) their new algorithms;
+enhance them with data and metadata management techniques; and make
+them available to the broader APS and scattering communities.
 
-Many applications are hierarchical-- they consist of core
-performance-sensitive libraries, application-specific components, and
-high-level patterns such as statistics collection, parameter sweeps,
-or MapReduce-like structures.  Many programmers attempt to solve
-problems at each different level with the same tool.  In parallel and
-distributed computing, the outermost patterns are often expressed with
-a custom master-worker task distributor and blackboard system.  The
-algorithms used may be elegantly expressed in dataflow format.
+\subsection{Scientific overview}
 
-\SwiftT~\cite{SwiftT_2013} allows programmers to seamlessly and safely
-mix application logic with asynchronous task parallelism, using
-high-level data structures such as associative arrays and avoiding
-low-level concerns such as memory management.  It offers familiar
-control flow statements, mathematical functions, and rich libraries
-for writing high-level ``glue code'' applications composing serial or
-parallel foreign functions written in languages such as C and Fortran,
-including calls to MPI libraries~\cite{Wozniak_2013}.  Swift
-applications executing tasks on CPUs, GPUs, or other devices can scale
-from multi-core workstations to high-performance computing (HPC)
-systems with hundreds of thousands of cores~\cite{Krieder_2014}.
+HEDM is used to non-destructively determine the grain structure of
+polycrystalline materials. It's a valuable technique for the analysis of
+grain defects in advanced alloy materials, such as those used in
+turbine blades for both energy (e.g. wind turbines) and engine
+applications (e.g. jet engine turbines). The technique allows a
+material sample, or even a manufactured part, to be studied within an
+APS beamline across a dynamically varying range of concurrent thermal
+and tensile stresses.  A polycrystalline material sample (typically a
+metal alloy) is positioned in the X-ray beam, and the diffraction
+pattern of the beam as it passes through the sample is collected by a
+detector.  The diffraction patterns are then analyzed by software
+tools to reconstruct the granular structure of the material, with a
+focus on determining the granular structure of material defects that
+can cause component failure in fabricated parts.
 
-Even such seemingly trivial applications
-can require significant language expressiveness.
-A high-level language is perhaps the most intuitive
-and powerful way to express this kind of application logic.
-Ultimately, what many users want is a scripting
-language that lets them %write ``glue code'' that lets them
-quickly develop scripts that compose high performance functions
-implemented in a native language.
-For sequential execution, dynamic languages such as
-shell scripts, Perl, or Python address this need.
-However, this paradigm breaks down when
-parallel computation is desired. With current sequential
-scripting languages, the logic must be rewritten and restructured
-to fit in a paradigm such as message passing, threading, or MapReduce.
-In contrast, \SwiftT natively supports parallel and distributed execution
-while retaining the intuitive nature of sequential scripting, in which
-program logic is expressed directly with loops and conditionals.
+A line-focus X-ray beam is used to collect diffraction data from
+a 2D cross-section (``layer'') of a rotating polycrystalline sample
+using a high-resolution detector (1.5 micron pixel size) placed in close
+proximity to the sample (less than 10 mm away). 2D TIFF format images, 8MB in
+size, are collected from the detector. At each angle of rotation,
+typically 360 to 1440 angles per layer, 8MB per file, are stored on
+the s1idserv file server. A new layer (3 to 12 GB of raw data) is
+collected every 3-5 minutes. As in the case of FF-HEDM, the
+acquisition is performed using a set of ``SPEC'' scripts. The metadata
+of each layer is stored in a separate file.
 
-Ahead-of-time compiler optimization and intelligent engineering of
-runtime systems are essential for this high-level programming model to
-be viable for applications that demand high performance.  The goal of
-the Swift/T project is to develop an advanced compiler~\cite{STC_2014}
-and efficient runtime system~\cite{Turbine_2013} to implement the
-Swift language on extreme-scale, distributed-memory machines such as
-the Cray XE, IBM Blue Gene/Q, large clusters, and emerging systems in
-the exascale design space.  In practice, this means translating the
-user-provided Swift program into an portable MPI program compatible
-with Linux-based and exotic HPC environments.
-\arm{exotic may need more clarification}
-\woz{Now says exotic HPC.}
+\subsection{Workflow details}
 
-This work describes the Swift/T implementation and emphasizes its
-generalizable contributions to the dataflow computing community.  In
-Section~\ref{section:history}, we provide background on the
-development of Swift. In Section~\ref{section:language}, we describe
-the Swift language as a dataflow language.  In
-Section~\ref{section:turbine}, we describe the MPI-based runtime
-libraries that implement Swift semantics.  In
-Section~\ref{section:features}, we describe features unique to Swift/T
-of general interest to dataflow computing.  In
-Section~\ref{section:proposed}, we propose interesting dataflow
-programming features that may emerge in the Swift language.  In
-Section~\ref{section:summary}, we summarize the paper and offer
-concluding remarks.
+The raw TIFF files are reduced to binary files containing only
+information about the diffraction signal of the detector. Due to the
+sparse nature of the data, each 8 MB raw file can be reduced to a
+binary file of about 1 MB. This reduction is performed using 320 CPUs
+on Orthros, each using about 2 min of CPU time. These binary files are
+fed into an orientation detection program to map the orientation of
+each point in a grid in the 2D cross-section of the sample. Two
+approaches are possible for this step.  Using 320 CPUs on Orthros, at
+about 30s for each grid point (a total of 100k grid points), we can
+obtain results in 3 hours.  Using 10,000 CPUs on the Mira BG/Q or a
+similarly parallel resource, we can scale this workflow to obtain
+results in less than 5 min.
 
-\section{Background}
-\label{section:history}
+The output is a text or binary file (selectable by the user), about 10
+MB in size, containing information about the orientation of each point
+in a grid in the 2D cross-section of the sample.  All analysis
+software has been developed in-house in Sector 1, implemented in
+C. Parallel processing of the analysis routines is implemented using
+the Swift parallel scripting language in collaboration with the DEBD
+project.
 
-The Swift language emerged from concerted efforts at the University of
-Chicago and elsewhere to produce a workflow language for grid
-computing, most recently resulting in an exascale-ready programming
-language.  Early efforts (c. 2000) produced the Java Commodity Grid
-Kit (CoG)~\cite{CoG_2001}, which provided abstractions for remote
-execution.  CoG included an optional Java-based directed-acyclic-graph
-(DAG) API.  CoG then produced an XML-based programming language called
-GridAnt (c. 2002)~\cite{GridAnt_2002}, which had similarities to
-Apache Ant.  A major revision of the GridAnt work resulted in Karajan
-(c. 2006)~\cite{Karajan_Manual}, which had both XML-based and
-functional syntaxes.  Concurrently, the Virtual Data Language (VDL)
-projects (c. 2003)~\cite{VDG_2003} produced pure "virtual data" tools
-for data-dependent processing on remote resources.  The combined
-effort, VDL2 (c. 2006), produced a high-level dataflow language with
-C/Java syntax likenesses that translated into a Karajan program.  VDL2
-was renamed to Swift (Scientific WorkFlow Tool)~\cite{Swift_2007}.  An
-exascale-funded project ExM (c. 2010) was launched to produce a
-version of Swift capable of running on exascale resources.  Thus Swift
-was renamed to Swift/K (for Karajan), and the new system was named
-Swift/T (for the new Turbine runtime).
+A detailed diagram of the workflow for NF-HEDM is shown in
+Figure~\ref{figure:nfhedm-workflow}.  In this figure, the detector
+produces data on an NFS installation at the APS~\circled{1}. A large
+batch of data reduction jobs are run on the local cluster, named
+Orthros~\circled{2}.  The data is moved via Globus to Argonne
+Leadership Computing Facility (ALCF) storage~\circled{3}, and stored
+in a metadata catalog~\circled{4}~\cite{Catalog_2014}.  Finally, the
+HPC component begins~\circled{5}- a large batch of hundreds of
+thousands of optimization operations are performed rapidly across tens
+of thousands of CPU cores of a Blue Gene/Q.
 
-\section{Overview of the Swift language}
-\label{section:language}
+\section{Many-task parallelization for HEDM}
 
-\arm{This section seems like more of a tutorial on basic dataflow
-ideas than an overview of Swift for dataflow experts.  I think
-for the audience as well we need to be clear about what is a
-surface language feature, the ``core'' abstract execution model,
-or an implementation technique.  I'm not sure if it makes sense to
-try to cover them all at once.}
-
-Superficially, Swift appears to be a simple, sequential language.  It
-includes typical variable types, familiar control
-constructs, and typical arithmetic operators and builtin functions.  It
-also includes \emph{leaf functions}, which call into user code in the
-subordinate level of the programming hierarchy (commonly C or Fortran
-functions, or executables).  As a dataflow language, however, all
-variables are \emph{futures}; execution is based on data
-availability, not an instruction pointer.  
-\arm{Terminology: I prefer single-assignment variables to futures,
-  since futures are often tied to a particular computation}
-\woz{I'm looking at the Wiki entry for this: ``a future may be defined
-  without specifying which specific promise will set its
-  value''. Unless you mean something else.}
-
-\begin{figure}[h]
-  \begin{minipage}[b]{0.45\linewidth}
-    \input code/diamond.swift
-    \vspace{0.4cm}
-  \end{minipage} 
-  \hspace{0.1cm}
-  \begin{minipage}[b]{0.45\linewidth}
-    \includegraphics[scale=0.4]{img/diamond}
-    \vspace{-0.0cm}
-  \end{minipage}
-  \caption{Simple diamond dataflow pattern.
-    \label{figure:diamond}}
-\end{figure}
-
-This is clearly a simple dataflow ``diamond'' pattern, in which {\tt
-  B()} and {\tt C()} are eligible to run concurrently, as shown in
-Figure~\ref{figure:diamond}.  If {\tt B()} and {\tt C()} are leaf
-functions, in the Swift model, each is submitted to a
-\emph{work queue} that load balances and distributes the function as a
-task for remote execution.
-\arm{Is a work queue an implementation detail or a necessary
-    part of the ``Swift model''?  What is meant by a work queue?
-    Could this be taken to mean global FIFO or priority queuing?}
-\woz{I refer to it in S. V and VI.}
-
-Additional concurrency may be produced through the use of the {\tt
-  foreach} statement: 
-\input code/n-diamonds.swift
-In this fragment, the {\tt [m:n]} syntax specifies a literal array of
-integers.  For each entry {\tt i}, a \emph{block} is created, in
-which variables are dynamically created and dataflow 
-begins.  \arm{The block is really just a lexical construct, not part
-of the runtime implementation or semantics.}
-
-Blocks themselves may be the subject of dataflow.  In the {\tt
-  wait} statement, the block is specified as the object of dataflow
-evaluation, as shown in Figure~\ref{figure:diamond-wait}.
-\arm{``posted''?}
-\woz{``specified''?}
-\begin{figure}[h]
-  \begin{minipage}[b]{0.45\linewidth}
-    \input code/diamond-wait.swift
-    \vspace{0.2cm}
-  \end{minipage} 
-  \hspace{0.1cm}
-  \begin{minipage}[b]{0.45\linewidth}
-    \includegraphics[scale=0.5]{img/diamond-wait}
-    \vspace{0.1cm}
-  \end{minipage}
-  \caption{Dataflow pattern with {\tt wait} on externality.
-    \label{figure:diamond-wait}}
-\end{figure}
-
-We stress that {\tt wait} is not required for dataflow computing- it
-is useful for certain ``dirty hacks'' that enable dependency on
-miscellaneous native computer features, such as the clock, changing
-external data sources, etc.  It is also illustrative for more complex
-Swift constructs.  \arm{I disagree, I think it's generally a useful
-construct beyond beyond hacks.} \woz{Throttling might be good to
-  mention.  Anything else?}
-
-The {\tt if} statement is essentially a {\tt wait} plus a condition
-evaluation:
-\arm{Is this talking about abstract semantics or implementation?}
-\input code/diamond-if.swift
-The two blocks that assign to {\tt b} are equivalent to {\tt
-  wait(k)} blocks but are selected based on the value of the Boolean
-condition, {\tt k}. \arm{Equivalent to what?  There isn't
-any lower-level form of conditional in the language.}
-
-The combination of Swift conditional blocks and iteration enables the
-novel Swift/T {\tt for} construct: 
- \arm{Combined how? At the implementation level? At the language level?
-    Neither seems entirely accurate.}
-\input code/diamond-for.swift
-In this C-like construct, there is one key difference: the third
-statement in the {\tt for} header ({\tt i=i+1}) is \emph{split} into
-left-hand and right-hand sides, which refer to variables ({\tt i}) in
-different blocks (more than one such statement may be written,
-separated by commas).  Thus, a data dependency from one iteration
-to the next is created.  Across iterations, concurrent evaluation is
-possible depending on how dependencies are structured.  The condition
-statement ({\tt G(i,d)} is a conditional dependency \arm{Is this meant
-as a precise term?} for the next 
-block.  Thus, in the case shown, the next block depends on the
-value of {\tt d} in the previous block, creating a strictly linear
-sequence of blocks, and limiting concurrency to within the
-block. 
-\arm{this sounds like it's meant as a technical term but isn't
-defined}
+The HPC component of the workflow was implemented using
+Swift/T~\cite{SwiftT_2013}, a dataflow programming system implemented
+atop the Turbine runtime~\cite{Turbine_2013} and the Asynchronous
+Dynamic Load Balancer~\cite{ADLB_2010}.  In this model, C analysis
+code developed for this work is linked to the NLopt optimizer library
+and the GNU scientific library.  These C code tasks are grouped into a
+large Swift script, which compiles into an MPI program for execution
+on a large HPC resource.  Swift/T has been shown to scale to over a
+billion tasks/second on hundreds of thousands of cores~\cite{STC_2014}
+or GPUs~\cite{Krieder_2014}.
 
 
-\section{Overview of the Swift runtime: Turbine}
-\label{section:turbine}
-
-\begin{figure}[h]
+\begin{figure}
   \begin{center}
-    \includegraphics[scale=0.4]{img/UserFlow2}
-    \caption{Schematic of STC usage. 
-      \label{figure:userflow}}
+    \includegraphics[scale=0.58,clip=true,trim=0.05in -0.3in 0 0]
+                    {img/NFHEDM.pdf}
+    \caption{Cross-lab APS to ALCF workflow.
+      \label{figure:nfhedm-workflow}}
   \end{center}
 \end{figure}
-
-The Swift-Turbine Compiler (STC) is an optimizing compiler.  The
-compiler interprets Swift syntax as an abstract syntax tree (AST).
-Based on user controls, it performs multiple optimization passes.  It
-emits code in a representation compatible with our runtime, Turbine.
-This representation is a Tcl script; thus, STC internally generates a
-Tcl AST and writes that to the generated file.  \arm{Much of this
-  describes any compiler and/or isn't very remarkable.}
-%%  A variety of metadata is
-%% included in the script in human-readable format, including the
-%% compiler options used, etc. 
-
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics[width=0.4\textwidth]{img/turbine-arch}
-    \caption{Schematic of Turbine architecture. 
-      \label{figure:turbine-arch}}
-  \end{center}
-\end{figure}
-
-The Turbine runtime is shown in Figure~\ref{figure:turbine-arch}.
-Designed for massively multi-node systems, each node runs multiple
-Turbine processes that are launched using the system-specific MPI job
-scheduler (PBS, SLURM, etc.).  Each process
-runs the STC-generated script.  All communication is performed over
-the MPI-based Asynchronous Dynamic Load Balancer (ADLB)
-library~\cite{ADLB_2010}. Each process
-is dispatched into one of two execution modes based on rank number--
-worker or server.
-%% Servers (shown in bold) occupy the high ranks in accordance with ADLB
-%% conventions. \arm{Is the rank order significant?} 
-
-\subsection{Implementation}
-
-The original ADLB served as a scalable, lightweight library that
-offered two key RPCs- {\tt Put()} and {\tt Get()} on tasks.  Tasks,
-each represented as a byte buffer (or message), are distributed for
-execution on workers and shared among servers based on memory limits.
-ADLB tasks have rich features, including priorities and location
-targeting.  The ADLB library implements the work queue described
-previously.
-%% \arm{This raises the question of who interprets the byte buffer.}
-%% Ok. -Justin
-
-For the Turbine effort, ADLB was significantly enhanced.  Server
-work-sharing is now based on a Scioto-like~\cite{scioto} work
-stealing mechanism. Many additional RPCs were added to allow servers
-to manage data in addition to tasks, including data operations {\tt
-  Create()}, {\tt Subscribe()}, {\tt Store()}, and {\tt Retrieve()}.  
-\arm{Unclear what the order comment means or if it's correct.}
-Data creation allocates the memory
-location on a server in accordance with a simple hashing scheme.  
-\arm{This makes it sounds like it's allocating all memory upfront.}
-Data
-subscription results in a notification when data is stored, and data
-may be retrieved by any process.  Thus, this creates a full-featured,
-write-once global data store with notifications.
-\arm{What does ``full-featured'' mean?}
-\arm{I think the idea predates Scioto (there are
-  certainly better-known systems with similar approaches)}
-\woz{Ok- feel free to suggest one.}
-
-\subsection{Swift semantics}
-\arm{What are we trying to convey with this section?}
-
-Our goal for Turbine was to create a convenient compiler target for
-STC.  \arm{Did it achieve this? What problems does it solve for a
-  compiler author?  I have some thoughts on this in retrospect - the
-  data dependency engine and library functions were important, and
-  Tcl's automatic serialization helped a lot but the Turbine functions
-  that wrapped lower-level functions didn't make the lower-level
-  functionality much easier for the compiler to use.}  Thus, all ADLB
-operations (implemented in C) are exposed as Tcl statements, making up
-the (sequential) instruction set for \emph{Turbine code}.  The key
-statement for data-dependent, distributed execution is the Turbine
-\emph{rule statement}:
-
-{\tt rule} $(v_0,v_1,...)$ \textit{continuation} \textit{options...}
-
-\noindent The rule establishes data dependendencies on $v_0,v_1,...$
-and does not block. When these are resolved, the continuation is
-released to the work queue for processing.  Options may be used to
-control details of how the continuation is executed.
-
-\begin{figure}[h]
-  \begin{minipage}[b]{0.45\linewidth}
-    \input code/rule-1.swift
-  \end{minipage} 
-  \hspace{0.0cm}
-  \begin{minipage}[b]{0.45\linewidth}
-    \input code/rule-1.tcl
-  \end{minipage}
-  \caption{Elementary dataflow expression in Turbine
-    \label{figure:rule-1}}
-\end{figure}
-
-A typical Swift expression is translated into Turbine code (shown as
-Tcl-like pseudocode) in Figure~\ref{figure:rule-1}.  As shown, the
-data-dependent block representing the implementation of {\tt
-  increment} is expressed as a Tcl {\tt proc}.  This implements the
-rule continuation on any worker process, by retrieving its state from
-the data store and storing its results, possibly releasing
-continuations elsewhere.  Other blocks, such as those produced by {\tt
-  wait}, etc., may be translated in a similar manner, with appropriate
-data management.
-
-\subsection{A data-dependent master-worker system}
-
-At the lowest level (above MPI), the data-dependent task is presented
-to ADLB with the new {\tt ADLB\_Dput()} RPC, which allows a task
-submission to ADLB that is dependent on data availability.  Thus, our
-system could support other frameworks that 1) use ADLB, 2) generate ADLB
-programs in the C language, or 3) translate
-to Swift.  Our ADLB-level extensions offer a scalable, generic
-master-worker system with rich data features in addition to
-traditional task distribution.
-\arm{I'm honestly not sure how successful other people would be
-in using it as a compiler target for another language, unless
-the language was almost identical to Swift, particularly taking
-into account performance: there's a lot of stuff in there where
-we've only implemented the things that were needed to get Swift
-working.  I think it's difficult to claim that
-it's a general-purpose compiler target when we've only tried
-to implement one language on top of it.}
-
-\section{Language features}
-\label{section:features}
-
-In this section, we describe multiple novel features available in
-Swift/T for dataflow processing.  
-
-\topic{Prioritized evaluation ordering}
-The priority annotation may be affixed to a Swift leaf function to
-modify the task priority in the ADLB work queue.  Thus, the code: 
-\input code/priority.swift
-allows the user Swift function {\tt compute\_priority()} to set the priority
-of the task resulting from {\tt f(x)}.  This is an effective way for
-the user to control concurrency, by specifying high-priority tasks
-that satisfy many data dependencies early in execution.  Another use
-is to run longer-running tasks as higher priority, allowing shorter
-tasks to fill in gaps at the end of a run, limiting the long-tail
-effect of an irregular run. 
-\arm{The semantics of @prio are a bit odd since the priorities are
-only respected locally.  Not sure how to deal with this issue here:
-I think it needs to be clear that it's best-effort rather than guaranteed.}
-
-\topic{Task locations for data locality}
-The location annotation may be affixed to a Swift leaf function to
-modify the task location setting in the ADLB.  This targets
-a task to a certain rank.  Swift/T provides builtin functions to
-translate hostnames to ranks, allowing the user to use data locations
-in an external storage system to drive execution.  Thus the code: 
-\input code/location.swift
-could be used to perform data location-aware scheduling, enabling
-data-intensive computing with Swift (provided a storage system that makes
-data locations available).
-
-\topic{Updateable variables}
-As described above, Swift execution occurs after the task has
-proceeded through the work queue.  Thus, program state could have
-changed, invalidating work or changing requirements for work in the queue.
-Swift \emph{updateables} allow Swift blocks to change the value of a
-variable.  Thus, the receiving task
-must be capable of using the previous or updated value of the
-variable. In this example: 
-\input code/updateable.swift
-task {\tt g()} may or may not run concurrently with {\tt f()}.  If it
-does run later, it may have access to the latest value of {\tt error},
-allowing it to exit early or make other behavioral changes based on
-the latest value of \texttt{error}. 
-\arm{``updateable int'' isn't a valid type identifier and ``error := 1''
-    isn't syntactically valid Swift/T.  This isn't consistent with the
-    Swift/T idea of updateable variables either since the update operation
-    isn't commutative.}
-
-\section{Proposed language features}
-\label{section:proposed}
-
-In this section, we propose new dataflow language features related to
-those described previously that may be implemented in Swift in the
-near future. 
-
-\topic{Compiler-managed data locality}
- The Swift \texttt{@location} syntax provides low-level control to the
-programmer regarding task/data locality.  We intend to partially
-automate this by annotating Swift data definitions with the
-\texttt{@heavy} annotation, enabling the compiler to generate
-appropriate \texttt{@location} directives.  \arm{Does it have
-to be implemented in this way?} This would allow the user
-to influence the locality of data-intensive execution without the
-book-keeping required for manual data management. 
-
-\topic{Flexible task location targeting} 
-The ADLB API currently allows only two possibilities for task
-location: a specific MPI rank, or \emph{anywhere}.  This is not a good
-match for modern computer systems with complex data access costs.  We
-propose to extend ADLB with soft targets, which will allow soft
-requirements for execution location, and expose these to the Swift
-programmer as we do with other annotations. 
-
-\topic{Optional data dependencies}  
-Updateables are a useful way to manage computation patterns that do
-not quite fit the dataflow model, yet push the limits of acceptable
-variations to dataflow processing.  We propose a \emph{soft
-  dependency} feature that would allow work to be released to the work
-queue before soft dependencies are resolved.  If the dependencies are
-resolved before task execution begins, the task would receive the
-user-stored value; otherwise a default value would be received:
-\input code/soft.swift
-As shown in Example 7, the execution of \texttt{g()} may or may not
-receive the value of \texttt{d} set by \texttt{f()}, allowing maximal
-concurrency at the cost of determinism. 
-
-%% Other ideas- no space! 
-%% cancellation
-%% post-queue evaluation
-%% streaming
-
-\section{Summary}
-\label{section:summary}
-
-In this work, we have described Swift from dataflow principles.  We
-presented a brief history of the development of Swift from a
-convergence of distributed computing and dataflow computing concepts.
-We described how Swift uses dataflow to represent concurrent
-computation, including some of its syntactic structures for more
-complex dataflow and concurrency semantics.  We also described how
-Swift may be translated into a representation compatible with our
-scalable dataflow-oriented runtime, Turbine.  We then described some
-Swift-specific features to enhance dataflow computing in practice,
-including priority, locality, and non-deterministic extensions to
-dataflow computing.  We intend that this will motivate future work in
-the dataflow community for solving extreme scale, high performance
-computing challenges with the elegance of scripted dataflow programs. 
 
 \section*{Acknowledgments}
 
@@ -606,7 +260,7 @@ the U.S. Department of Energy under contract DE-AC02-06CH11357.
 \vspace{0.5cm}
 
 \noindent
-This manuscript was created by UChicago Argonne, LLC, Operator of 
+This manuscript was created by UChicago Argonne, LLC, Operator of
 Argonne National Laboratory (``Argonne''). Argonne, a U.S. Department
 of Energy Office of Science laboratory, is operated under Contract
 DE-AC02-06CH11357.  The U.S. Government retains for itself, and others
@@ -618,4 +272,3 @@ publicly, by or on behalf of the Government.
 \end{comment}
 
 \end{document}
-

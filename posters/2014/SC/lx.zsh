@@ -9,7 +9,7 @@
 
 # set -x
 
-DEFAULTDOC="swift"
+DEFAULTDOC="nf-hedm"
 COMPILER="pdflatex"
 
 NEEDBIB="yes"
@@ -64,7 +64,7 @@ uptodate()
   done
   shift $(( OPTIND-1 ))
 
-  if (( VERBOSE > 1 )) 
+  if (( VERBOSE > 1 ))
   then
     set -x
   fi
