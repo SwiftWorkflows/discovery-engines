@@ -63,8 +63,9 @@ void debug_printf(const char *token, const char *format, ...);
 #define PROFILE_TOKEN_LENGTH 32
 typedef uint16_t profile_index;
 #if ENABLE_PROFILE
-#define PROFILE_CREATE(token,i)  profile_index i = profile_create(#token)
+#define PROFILE_DEFINE(i)        profile_index i
 #define PROFILE_ASSIGN(token,i)  i = profile_create(#token)
+#define PROFILE_CREATE(token,i)  profile_index i = profile_create(#token)
 #define PROFILE_START(i)         profile_start(i)
 #define PROFILE_END(i)           profile_end(i)
 #define PROFILE_REPORT           profile_report()
@@ -75,8 +76,9 @@ void profile_end(profile_index i);
 void profile_report(void);
 void profile_reset(void);
 #else
+#define PROFILE_DEFINE(i)       // noop
+#define PROFILE_ASSIGN(token,i) // noop
 #define PROFILE_CREATE(token,i) // noop
-#define PROFILE_ASSIGN(token,i) //noop
 #define PROFILE_START(i)        // noop
 #define PROFILE_END(i)          // noop
 #define PROFILE_REPORT          // noop
