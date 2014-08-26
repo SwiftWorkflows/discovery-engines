@@ -71,7 +71,7 @@ profile_create(const char* token)
                PROFILE_TOKEN_LENGTH, token);
         exit(1);
     }
-    if (profile_index_next == PROFILE_ENTRIES)
+    if (profile_index_next >= PROFILE_ENTRIES)
     {
         printf("Too many profile entries!\n");
         exit(1);
