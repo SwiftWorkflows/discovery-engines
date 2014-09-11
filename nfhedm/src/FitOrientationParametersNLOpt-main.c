@@ -43,8 +43,8 @@ main(int argc, char *argv[])
     SizeObsSpots*=nrPixels;
     SizeObsSpots*=nrFiles;
     SizeObsSpots/=32;
-    ObsSpotsInfo = malloc(SizeObsSpots*sizeof(ObsSpotsInfo));
-    memset(ObsSpotsInfo,0,SizeObsSpots*sizeof(ObsSpotsInfo));
+    ObsSpotsInfo = malloc(SizeObsSpots*sizeof(*ObsSpotsInfo));
+    memset(ObsSpotsInfo,0,SizeObsSpots*sizeof(*ObsSpotsInfo));
     if (ObsSpotsInfo==NULL){
         printf("Could not allocate ObsSpotsInfo.\n");
         return 0;
