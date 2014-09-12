@@ -300,6 +300,8 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     PROFILE_ASSIGN(problem_calc_diff_spots, profile_calc_diff_spots);
     PROFILE_ASSIGN(problem_calc_frac_overlap, profile_calc_frac_overlap);
 
+    double io_start = time_double();
+
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
     //Read bin files
     char fn[1000];
@@ -351,6 +353,12 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     // Read Spots
     b = ReadSpots(params.direct, TotalDiffrSpots, &SpotsMat);
     assert(b);
+
+    if (rown == 0)
+    {
+        double io_stop = time_double();
+        printf("IO TIME: %0.3f\n", io_stop - io_start);
+    }
 
     int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
                                  /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
