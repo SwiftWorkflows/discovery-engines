@@ -37,7 +37,7 @@ L2N(const char *input, const char *output)
     // 5 dummies
     b = ReadHeader(fp_in, &head);
     CHECK(b, "ReadHeader failed (dummies)!");
-    NWriteHeader(fp_out, &head);
+    WriteHeader_hton(fp_out, &head);
     uint32_t *t_ui32=NULL;
     t_ui32 = malloc(sizeof(uint32_t) * 5);
     READ(t_ui32, sizeof(uint32_t), 5, fp_in);
@@ -48,7 +48,7 @@ L2N(const char *input, const char *output)
     printf("Y positions\n");
     b = ReadHeader(fp_in, &head);
     CHECK(b, "ReadHeader failed (Y)!");
-    NWriteHeader(fp_out, &head);
+    WriteHeader_hton(fp_out, &head);
     nElements = (head.DataSize - head.NameSize) / sizeof(uint16_t);
     uint16_t *t_ui16 = malloc(nElements*sizeof(uint16_t));
     READ(t_ui16,sizeof(uint16_t),nElements,fp_in);
@@ -59,7 +59,7 @@ L2N(const char *input, const char *output)
     printf("Z positions\n");
     b = ReadHeader(fp_in,&head);
     CHECK(b, "ReadHeader failed (Z)!");
-    NWriteHeader(fp_out, &head);
+    WriteHeader_hton(fp_out, &head);
     int nCheck = (head.DataSize - head.NameSize) / sizeof(uint16_t);
     CHECK(nCheck == nElements, "size mismatch (Z)!");
     READ(t_ui16,sizeof(uint16_t),nElements,fp_in);
@@ -71,7 +71,7 @@ L2N(const char *input, const char *output)
     float32_t *t_f32 = malloc(sizeof(float32_t)*nElements);
     b = ReadHeader(fp_in,&head);
     CHECK(b, "ReadHeader failed (intensities)!");
-    NWriteHeader(fp_out, &head);
+    WriteHeader_hton(fp_out, &head);
     nCheck = (head.DataSize - head.NameSize) / sizeof(float32_t);
     CHECK(nCheck == nElements, "size mismatch (intensities)!");
     READ(t_f32,sizeof(float32_t),nElements,fp_in);
@@ -82,7 +82,7 @@ L2N(const char *input, const char *output)
     printf("Peak IDs\n");
     b = ReadHeader(fp_in,&head);
     CHECK(b, "ReadHeader failed (peak IDs)!");
-    NWriteHeader(fp_out,&head);
+    WriteHeader_hton(fp_out,&head);
     nCheck = (head.DataSize - head.NameSize) / sizeof(uint16_t);
     CHECK(nCheck == nElements, "size mismatch (peak IDs)!");
     READ(t_ui16,sizeof(uint16_t),nElements,fp_in);
