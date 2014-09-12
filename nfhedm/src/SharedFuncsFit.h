@@ -227,11 +227,15 @@ void gsl_vector_print(const char *name, gsl_vector *v);
 
 void gsl_matrix_print(const char *name, gsl_matrix *A);
 
+/** Text output */
 void PrintUint16s(  FILE *fp, uint16_t  *data, int count);
+/** Text output */
 void PrintUint32s(  FILE *fp, uint32_t  *data, int count);
+/** Text output */
 void PrintFloat32s( FILE *fp, float32_t *data, int count);
 void PrintHeader(   FILE *fp, struct Theader *head);
 bool ReadHeader(    FILE *fp, struct Theader *head);
+/** Write header: network format */
 void NWriteHeader(  FILE *fp, struct Theader * head);
 
 void hton_Uint16s( uint16_t  *data, int count);
