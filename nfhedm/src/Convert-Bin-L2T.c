@@ -1,8 +1,11 @@
+
 /*
  * Convert-Bin-L2T.c
  *
  *  Created on: Apr 29, 2014
  *      Author: justin
+ *
+ * Creates text version of binary file on stdout
  */
 
 #include <stdbool.h>
@@ -13,7 +16,7 @@
 #include "SharedFuncsFit.h"
 
 bool
-L2P(const char *filename)
+L2T(const char *filename)
 {
     FILE* fp = fopen(filename, "r");
     if (fp == NULL) file_not_found(filename);
@@ -96,7 +99,7 @@ main(int argc, char* argv[])
     }
     char* filename = argv[1];
 
-    bool result = L2P(filename);
+    bool result = L2T(filename);
     if (!result) {
         printf("%s failed!\n", argv[0]);
         return 1;
