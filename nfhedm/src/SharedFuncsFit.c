@@ -128,7 +128,7 @@ void WriteHeader(
     fwrite(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
 }
 
-void NWriteHeader(
+void WriteHeader_hton(
     FILE *fp,
     struct Theader * head)
 {
@@ -149,6 +149,31 @@ void NWriteHeader(
     t16 = htons(head->ChunkNumber);
     fwrite(&t16,sizeof(uint16_t),1,fp);
     t16 = htons(head->TotalChunks);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    fwrite(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
+}
+
+void WriteHeader_ntoh(
+    FILE *fp,
+    struct Theader * head)
+{
+    uint16_t t16;
+    uint32_t t32;
+    t32 = ntohl(head->uBlockHeader);
+    fwrite(&t32,sizeof(uint32_t),1,fp);
+    t16 = ntohs(head->BlockType);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t16 = ntohs(head->DataFormat);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t16 = ntohs(head->NumChildren);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t16 = ntohs(head->NameSize);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t32 = ntohl(head->DataSize);
+    fwrite(&t32,sizeof(uint32_t),1,fp);
+    t16 = ntohs(head->ChunkNumber);
+    fwrite(&t16,sizeof(uint16_t),1,fp);
+    t16 = ntohs(head->TotalChunks);
     fwrite(&t16,sizeof(uint16_t),1,fp);
     fwrite(&head->BlockName,(sizeof(char)*(head->NameSize)),1,fp);
 }
@@ -881,3 +906,26 @@ hton_Float32s(float32_t *data, int count) {
         memcpy(&data[i], &v, 4);
     }
 }
+
+void
+ntoh_Uint16s(uint16_t  *data, int count) {
+    for (int i = 0; i < count; i++)
+        data[i] = ntohs(data[i]);
+}
+void
+ntoh_Uint32s(uint32_t  *data, int count) {
+    for (int i = 0; i < count; i++)
+        data[i] = ntohl(data[i]);
+}
+
+void
+ntoh_Float32s(float32_t *data, int count) {
+    int32_t t;
+    for (int i = 0; i < count; i++) {
+        // These memcpy's are required for correctness
+        memcpy(&t, &data[i], 4);
+        int32_t v = ntohl(t);
+        memcpy(&data[i], &v, 4);
+    }
+}
+

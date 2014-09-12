@@ -236,10 +236,21 @@ void PrintFloat32s( FILE *fp, float32_t *data, int count);
 void PrintHeader(   FILE *fp, struct Theader *head);
 bool ReadHeader(    FILE *fp, struct Theader *head);
 /** Write header: network format */
-void NWriteHeader(  FILE *fp, struct Theader * head);
+void WriteHeader_hton(  FILE *fp, struct Theader * head);
 
+/** Convert array via hton */
 void hton_Uint16s( uint16_t  *data, int count);
+/** Convert array via hton */
 void hton_Uint32s( uint32_t  *data, int count);
+/** Convert array via hton */
 void hton_Float32s(float32_t *data, int count);
+
+/** Convert array via ntoh */
+void ntoh_Uint16s( uint16_t  *data, int count);
+/** Convert array via ntoh */
+void ntoh_Uint32s( uint32_t  *data, int count);
+/** Convert array via ntoh */
+void ntoh_Float32s(float32_t *data, int count);
+
 
 #endif
