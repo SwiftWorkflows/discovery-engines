@@ -6,8 +6,8 @@
  *      Author: wozniak
  */
 
-#ifndef DEBUG_H_
-#define DEBUG_H_
+#ifndef DEBUG_H
+#define DEBUG_H
 
 #include <inttypes.h>
 #include <stdarg.h>
