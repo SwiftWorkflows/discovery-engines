@@ -41,7 +41,7 @@ void debug_printf(const char *token, const char *format, ...);
 
 #if ENABLE_LOG
 #define LOG(format, args...)                                          \
-  { if (debug_enabled)                                                \
+  { if (log_enabled)                                                \
          debug_printf("LOG:   ", format "\n", ## args);          \
        }
 #else
