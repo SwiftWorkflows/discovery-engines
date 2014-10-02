@@ -252,5 +252,12 @@ void ntoh_Uint32s( uint32_t  *data, int count);
 /** Convert array via ntoh */
 void ntoh_Float32s(float32_t *data, int count);
 
+static inline int min_integer(int a, int b)
+{
+    if (a < b)
+        return a;
+    else
+        return b;
+}
 
 #endif
