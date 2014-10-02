@@ -117,5 +117,9 @@ fi
 AC_SUBST(ENABLE_OPENMP)
 AC_DEFINE_UNQUOTED(HAVE_OPENMP,${ENABLE_OPENMP},[If we have OpenMP, 1, else 0.])
 
+m4_include([m4/ax_lib_hdf5.m4])
+AX_LIB_HDF5()
+echo "HDF5 support: ${with_hdf5}"
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

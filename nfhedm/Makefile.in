@@ -29,6 +29,7 @@ CFLAGS += $(INCLUDES) -g $(WARNS) $(PIC) $(STD)
 ifeq ($(ENABLE_OPENMP),1)
 	CFLAGS += -fopenmp
 endif
+CFLAGS += @HDF5_CPPFLAGS@
 
 LDFLAGS += @LDFLAGS@
 
@@ -36,12 +37,17 @@ LIBDIRS += -L $(NLOPT)/lib
 
 LIBS += $(LIBDIRS) -lnlopt -lgsl -lgslcblas -lm
 
+HDF5_LDFLAGS = @HDF5_LDFLAGS@
+HDF5_LIBS    = @HDF5_LIBS@
+HDF5_LINK    = $(HDF5_LDFLAGS) $(HDF5_LIBS)
+
 TCLSH = @USE_TCLSH@
 
 EXECUTABLES = bin/fo-nlopt \
               bin/fop-nlopt \
               bin/MedianImage bin/ImageProcessing \
-              bin/convert-bin-l2t bin/convert-bin-l2n
+              bin/convert-bin-l2t bin/convert-bin-l2n \
+              bin/convert-dbls2hdf
 
 all: $(EXECUTABLES)
 
@@ -128,6 +134,15 @@ bin/convert-bin-l2n:  $(LIBNFHEDM)                                           \
 		-o $(@) src/Convert-Bin-L2N.o \
 		-L lib -l nfhedm                                    \
 		$(LIBS)                                          \
+		$(RPATHS)
+
+bin/convert-dbls2hdf:  $(LIBNFHEDM)                                           \
+                src/Convert-Dbls2HDF.o
+	@mkdir -pv bin
+	$(CC) $(LDFLAGS)                                           \
+		-o $(@) src/Convert-Dbls2HDF.o \
+		-L lib -l nfhedm                                    \
+		$(LIBS) $(HDF5_LINK)                                \
 		$(RPATHS)
 
 bin/ImageProcessing: src/ImageProcessing.c
