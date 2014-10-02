@@ -43,4 +43,29 @@ file_not_writable(const char* filename)
     exit(EXIT_FAILURE);
 }
 
+UNUSED
+static void
+check_msg_impl(const char* format, ...)
+{
+  int buffer_size = 10240;
+  char buffer[buffer_size];
+  int count = 0;
+  char* p = &buffer[0];
+  va_list ap;
+  va_start(ap, format);
+  count += sprintf(p, "mt2: error: ");
+  count += vsnprintf(buffer+count, (size_t)(buffer_size-count),
+                     format, ap);
+  va_end(ap);
+  printf("%s\n", buffer);
+  fflush(NULL);
+  exit(1);
+}
+
+/** Nice vargs error check and message */
+#define check_msg(condition, format, args...)  \
+    { if (!(condition))                          \
+       check_msg_impl(format, ## args);        \
+    }
+
 #endif
