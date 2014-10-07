@@ -33,10 +33,10 @@ export TURBINE_USER_LIB=${NFHEDM_INSTALL}/lib
 
 SCRIPT=FitOrientation-T
 
-stc -u -t checkpointing ${DIR}/${SCRIPT}.swift
+stc -u -F checkpointing ${DIR}/${SCRIPT}.swift
 
 export MODE=BGQ
-export PROCS=3
+export PROCS=2
 export PROJECT=ExM
 export QUEUE=default
 export TURBINE_LOG=1
@@ -54,5 +54,5 @@ else
   PARAMETERS_PATH=${DATA}/${PARAMETERS}
 fi
 set -x
-turbine -n ${PROCS} ${DIR}/${SCRIPT}.tcl \
+turbine -l -n ${PROCS} ${DIR}/${SCRIPT}.tcl \
   -p=${PARAMETERS_PATH} -m=${MICROSTRUCTURE} ${START} ${END}
