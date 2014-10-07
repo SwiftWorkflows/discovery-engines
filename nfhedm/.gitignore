@@ -18,3 +18,4 @@ configure.out
 install.txt
 pkgIndex.tcl
 .settings
+*.mic
