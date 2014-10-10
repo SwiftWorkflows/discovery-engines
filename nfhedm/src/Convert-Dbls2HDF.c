@@ -71,7 +71,7 @@ write_hdf(off_t p, int n, struct h5target *target, double* data)
   hsize_t* stride = NULL;
   hsize_t* block = NULL;
 
-  hsize_t dimsm[3];
+  hsize_t dimsm[1];
   dimsm[0] = n;
   hid_t memspace_id = H5Screate_simple(1, dimsm, NULL);
 
