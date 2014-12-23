@@ -7,7 +7,7 @@ set -x
 pwd
 
 DE=$( cd $( dirname $0 )/../.. ; /bin/pwd )
-source ${DE}/bin/python-settings.sh
+source ${DE}/bin/python-settings-nxrs.sh
 
 MERGE_TIFFS_PY=${DE}/nexus/bin/merge-tiffs.py
 

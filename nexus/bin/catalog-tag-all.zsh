@@ -26,12 +26,19 @@ fi
 
 source ${DE_HOME}/nexus/lib/catalog.zsh
 
-KEYS=( "host" "path" "size" "year" "month" "temperature" "sample" \
+KEYS=( "host" "path" "size_human" "sample" \
        "PI" "date" "beamline" )
 for KEY in ${KEYS}
 do
   # This fails if the annotation exists
   catalog.py create_annotation_def ${KEY} "text" || true
+done
+
+KEYS=( "year" "month" "temperature" "size_bytes" )
+for KEY in ${KEYS}
+do
+  # This fails if the annotation exists
+  catalog.py create_annotation_def ${KEY} "int8" || true
 done
 
 CATALOG_TAG=${DE_HOME}/nexus/bin/catalog-tag-dataset.zsh

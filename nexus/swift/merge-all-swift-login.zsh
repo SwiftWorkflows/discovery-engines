@@ -27,11 +27,9 @@ DE_BIN=${DE}/bin
 # Use location of merge-tiffs.py
 PATH=${DE_BIN}:${PATH}
 
-stc -u ${DE_SWIFT}/merge-all.swift
-
 # This is just a test for success
 cd ${DATA}
 cd -
 
-turbine -l -n ${PROCS} -C ${DATA} \
-  ${DE_SWIFT}/merge-all.tcl --data=${DATA} --list=${LIST}
+swift-t -l -n ${PROCS} \
+  ${DE_SWIFT}/merge-all.swift --data=${DATA} --list=${LIST}

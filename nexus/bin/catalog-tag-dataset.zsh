@@ -47,20 +47,29 @@ DATASET_ID=$( catalog.py create_dataset name:${NAME} )
 declare DATASET_ID
 
 NEWEST_FILE=$( print *(om[1]) )
-DATE=$( stat ${NEWEST_FILE} | awk '$1 == "Modify:" { print $2 $3 }' )
+DATE=$( stat ${NEWEST_FILE} | awk '$1 == "Modify:" { print $2 " " $3 }' )
+DATE=${DATE/.[0-9]*/} # Chop off subsecond resolution
 TEMPERATURE=${NAME#*_}
-declare DATE TEMPERATURE
-print "Getting size..."
-SIZE=$( du -s . | zclm 1 )
+TEMPERATURE=${TEMPERATURE%k}
+# declare DATE TEMPERATURE
+print "Getting size (${PWD})..."
+SIZE_BYTES=$( command du -s  . | zclm 1 )
+# declare SIZE_BYTES
+SIZE_HUMAN=$( bformat ${SIZE_BYTES} ; true )
+
+# declare SIZE_HUMAN
 
 catalog.py -t add_dataset_annotation ${DATASET_ID} name:${NAME}
-catalog.py -t add_dataset_annotation ${DATASET_ID} host:mira
+catalog.py -t add_dataset_annotation ${DATASET_ID} host:nxrs.msd.anl.gov
 catalog.py -t add_dataset_annotation ${DATASET_ID} path:${DIR}
 catalog.py -t add_dataset_annotation ${DATASET_ID} date:${DATE}
 catalog.py -t add_dataset_annotation ${DATASET_ID} temperature:${TEMPERATURE}
 catalog.py -t add_dataset_annotation ${DATASET_ID} sample:LSMO
 catalog.py -t add_dataset_annotation ${DATASET_ID} PI:"Ray Osborn"
 catalog.py -t add_dataset_annotation ${DATASET_ID} beamline:"ANL APS Sector 6"
-catalog.py -t add_dataset_annotation ${DATASET_ID} size:${SIZE}
+catalog.py -t add_dataset_annotation ${DATASET_ID} size_bytes:${SIZE_BYTES}
+catalog.py -t add_dataset_annotation ${DATASET_ID} size_human:${SIZE_HUMAN}
 
-# catalog-acl-add ${DATASET_ID} "*" "r"
+catalog.py -t add_dataset_acl ${DATASET_ID} u:rosborn user "r"
+
+ls *.nxs 
