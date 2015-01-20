@@ -39,37 +39,78 @@ cd ${DIR}
 DIR=$( /bin/pwd )
 
 NAME=$( basename ${DIR} )
-
-declare NAME
-
+# declare NAME
 DATASET_ID=$( catalog.py create_dataset name:${NAME} )
-
-declare DATASET_ID
-
-NEWEST_FILE=$( print *(om[1]) )
-DATE=$( stat ${NEWEST_FILE} | awk '$1 == "Modify:" { print $2 " " $3 }' )
-DATE=${DATE/.[0-9]*/} # Chop off subsecond resolution
+# declare DATASET_ID
+SAMPLE=${NAME%_*}
+FRACTION=${SAMPLE#lsmo}
 TEMPERATURE=${NAME#*_}
 TEMPERATURE=${TEMPERATURE%k}
-# declare DATE TEMPERATURE
-print "Getting size (${PWD})..."
-SIZE_BYTES=$( command du -s  . | zclm 1 )
-# declare SIZE_BYTES
-SIZE_HUMAN=$( bformat ${SIZE_BYTES} ; true )
 
-# declare SIZE_HUMAN
+print "Annotating: ${NAME}"
+ANNOTATIONS=(
 
-catalog.py -t add_dataset_annotation ${DATASET_ID} name:${NAME}
-catalog.py -t add_dataset_annotation ${DATASET_ID} host:nxrs.msd.anl.gov
-catalog.py -t add_dataset_annotation ${DATASET_ID} path:${DIR}
-catalog.py -t add_dataset_annotation ${DATASET_ID} date:${DATE}
-catalog.py -t add_dataset_annotation ${DATASET_ID} temperature:${TEMPERATURE}
-catalog.py -t add_dataset_annotation ${DATASET_ID} sample:LSMO
-catalog.py -t add_dataset_annotation ${DATASET_ID} PI:"Ray Osborn"
-catalog.py -t add_dataset_annotation ${DATASET_ID} beamline:"ANL APS Sector 6"
-catalog.py -t add_dataset_annotation ${DATASET_ID} size_bytes:${SIZE_BYTES}
-catalog.py -t add_dataset_annotation ${DATASET_ID} size_human:${SIZE_HUMAN}
+  # Text  
+  name:${NAME}
+  PI:"Ray Osborn"
+  beamline:"ANL APS Sector 6"
+  material:lsmo
+  sample:${SAMPLE}
+  host:nxrs.msd.anl.gov
+  path:${DIR}
 
+  # Int8s 
+  year:2013
+  month:10
+
+  # Floats
+  fraction:${FRACTION}
+  temperature_K:${TEMPERATURE}
+)
+
+catalog.py -t add_dataset_annotation ${DATASET_ID} ${ANNOTATIONS}
 catalog.py -t add_dataset_acl ${DATASET_ID} u:rosborn user "r"
 
-ls *.nxs 
+get_md5sum()
+{
+  (( ${#*} == 1 )) || return 1
+  FILE=$1
+  MD5=${FILE}.md5
+  if [[ -f ${MD5} ]] 
+    then 
+    cat ${MD5}
+  else
+    md5sum ${FILE} | cut -d ' ' -f 1 | tee ${MD5}
+  fi
+  return 0
+}
+
+cd ${DIR}
+pwd
+NXS_LIST=( $( find . -name "*.nxs" ) )
+foreach NXS in ${NXS_LIST}
+do
+  print "Annotating member: ${NXS}"
+  DATE=$( stat ${NXS} | awk '$1 == "Modify:" { print $2 " " $3 }' )
+  DATE=${DATE/.[0-9]*/} # Chop off subsecond resolution
+  SIZE_BYTES=$( command du -s ${NXS} | zclm 1 )
+  declare SIZE_BYTES
+  SIZE_HUMAN=$( bformat ${SIZE_BYTES} ; true )
+  SCAN=${NXS:h} # ZSH dirname
+  SCAN=${SCAN:t} # ZSH basename
+  FILE=${DIR}/${NXS}
+  FILE=${FILE:a} # Clean up path
+  MD5=$( get_md5sum ${NXS} )
+
+  ANNOTATIONS=( 
+    size_bytes:${SIZE_BYTES}
+    size_human:${SIZE_HUMAN}
+    date:${DATE}
+    scan:${SCAN}
+    path:${FILE}
+    md5:${MD5}
+  )
+
+  MEMBER_ID=$( catalog.py -t create_members ${DATASET_ID} file ${NXS} )
+  catalog.py -t add_dataset_annotation ${MEMBER_ID} ${ANNOTATIONS}
+done

@@ -1,5 +1,9 @@
 #!/bin/zsh -eu
 
+CREATE_DEFS=1
+zparseopts -D -E d=d
+(( ${#d} > 0 )) && CREATE_DEFS=0
+
 DIRS=( ${*} )
 
 if [[ -z ${GCAT_DEFAULT_CATALOG_ID} ]]
@@ -24,22 +28,30 @@ then
   exit 1
 fi
 
-source ${DE_HOME}/nexus/lib/catalog.zsh
+if (( CREATE_DEFS ))
+then
+  KEYS=( "name" "PI" "host" "path" "size_human" "sample" \
+    "beamline" )
+  for KEY in ${KEYS}
+  do
+    # This fails if the annotation exists
+    catalog.py create_annotation_def ${KEY} "text" || true
+  done
 
-KEYS=( "host" "path" "size_human" "sample" \
-       "PI" "date" "beamline" )
-for KEY in ${KEYS}
-do
-  # This fails if the annotation exists
-  catalog.py create_annotation_def ${KEY} "text" || true
-done
+  KEYS=( "year" "month" "temperature" "size_bytes" )
+  for KEY in ${KEYS}
+  do
+    # This fails if the annotation exists
+    catalog.py create_annotation_def ${KEY} "int8" || true
+  done
 
-KEYS=( "year" "month" "temperature" "size_bytes" )
-for KEY in ${KEYS}
-do
-  # This fails if the annotation exists
-  catalog.py create_annotation_def ${KEY} "int8" || true
-done
+  KEYS=( "fraction" "temperature" )
+  for KEY in ${KEYS}
+  do
+    # This fails if the annotation exists
+    catalog.py create_annotation_def ${KEY} "float8" || true
+  done
+fi 
 
 CATALOG_TAG=${DE_HOME}/nexus/bin/catalog-tag-dataset.zsh
 
