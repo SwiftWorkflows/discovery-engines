@@ -13,12 +13,14 @@ print NXMERGE.SH in ${DIR}
 if (( ${#o} > 0 )) 
 then
   OUTPUT=${DIR}/${o[2]}.nxs
-  if [[ -f ${OUTPUT} ]] 
-  then
-    echo "Output already exists: ${OUTPUT}"
-    exit 0
-  fi
 fi
 
-LOG=${o[2]%.nxs}.log
-nice nxmerge ${ARGS} >& ${LOG} 
+if [[ -f ${OUTPUT} ]] 
+then
+  echo "Output already exists: ${OUTPUT}"
+  exit 0
+else
+  LOG=${o[2]%.nxs}.log
+  nice nxmerge ${ARGS} >& ${LOG} 
+fi
+
