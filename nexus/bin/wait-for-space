@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-unalias df # Ensure we are using the default df command
+unalias df 2> /dev/null # Ensure we are using the default df command
 set -eu
 
 usage()
