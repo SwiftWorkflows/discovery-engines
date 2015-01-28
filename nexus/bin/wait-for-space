@@ -1,0 +1,38 @@
+#!/bin/zsh
+
+unalias df # Ensure we are using the default df command
+set -eu
+
+usage()
+{
+  print "usage: wait-for-space <OPTS>* <DIRECTORY> <KBYTES>"
+  print "\t OPTS:      -h for help"
+  print "\t DIRECTORY: the directory in which to check"
+  print "\t KBYTES:    the kilobytes required"
+}
+
+zparseopts -D -E h=H
+if [[ ${#H} != 0 ]]
+then
+  usage 
+  exit 0
+fi
+
+if [[ ${#*} != 2 ]]
+then
+  usage
+  exit 1
+fi
+
+# set -x
+
+DIRECTORY=$1
+KBYTES=$2
+
+while true
+do
+  TOKENS=( $( command df ${DIRECTORY} ) )
+  AVAILABLE=${TOKENS[11]}
+  (( AVAILABLE > KBYTES )) && break
+  sleep 10
+done
