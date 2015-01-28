@@ -17,7 +17,7 @@ then
   exit 0
 fi
 
-if [[ ${#*} != 1 ]]
+if [[ ${#*} != 2 ]]
 then
   usage
   exit 1
