@@ -26,7 +26,7 @@ fi
 DIRECTORY=$1
 TARGET=$2
 
-alias RSYNC='nice rsync -rt --exclude "*tmp"'
+alias RSYNC='nice rsync -rtz --exclude "*tmp"'
 
 DONE=0
 while true
