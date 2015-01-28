@@ -26,16 +26,13 @@ fi
 DIRECTORY=$1
 TARGET=$2
 
-REMOTE_HOST=nxrs.msd.anl.gov
-REMOTE_DIR=/home/bessrc/sharedbigdata/data1/osborn-2015-1
-
-alias RSYNC='rsync -rtv --exclude "*tmp"'
+alias RSYNC='nice rsync -rtv --exclude "*tmp"'
 
 DONE=0
 while true
 do
   [[ -f ${DIRECTORY}/done.txt ]] && DONE=1
-  RSYNC ${DIRECTORY} ${REMOTE_HOST}:${REMOTE_DIR}
+  RSYNC ${DIRECTORY} ${TARGET}
   (( DONE )) && break
   sleep 10
 done
