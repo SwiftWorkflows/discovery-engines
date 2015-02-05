@@ -303,7 +303,7 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     bool reporter = false;
     // printf("IO START: %i\n", rown);
     double io_start = time_double();
-    if ((rown % 100) == 1) 
+    if ((rown % 1000) == 4)
       reporter = true;
 
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
@@ -710,6 +710,12 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     DEBUG("FitOrientation_Calc() pwrite: rown=%i",rown-1);
     int rc;
     // rc = pwrite(result_fd, result, 5*sizeof(double), (rown-1)*5*sizeof(double));
+    #if 0
+    double start = time_double();
+    int rc = pwrite(result_fd, result, 5*sizeof(double), (rown-1)*5*sizeof(double));
+    double stop = time_double();
+    if (rown % 200 == 0) printf("pwrite time: %0.4f\n", stop-start);
+    #endif 
     if (rc < 0)
     {
         perror("result data file");

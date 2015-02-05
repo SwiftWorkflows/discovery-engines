@@ -29,8 +29,6 @@ export SWIFT_PATH=${NFHEDM_INSTALL}/lib
 
 SCRIPT=FitOrientation-T
 
-stc -f checkpointing ${DIR}/${SCRIPT}.swift
-
 export MODE=BGQ
 export PROCS=${PROCS:-2}
 export PROJECT=DiscoveryEngines
@@ -54,13 +52,12 @@ else
   PARAMETERS_PATH=${DATA}/${PARAMETERS}
 fi
 
-PATH=$HOME/sfw/ppc64/turbine/scripts/submit/cobalt:$PATH
-
 # set -x
-which turbine-cobalt-run.zsh
-turbine-cobalt-run.zsh -n ${PROCS}                      \
-  ${DIR}/${SCRIPT}.tcl                                  \
-  -p=${PARAMETERS_PATH} -m=${MICROSTRUCTURE}            \
+which swift-t
+swift-t -m cobalt -n ${PROCS}                      \
+  -s ${PWD}/swift/settings-bgq.sh                  \
+  ${DIR}/${SCRIPT}.swift                           \
+  -p=${PARAMETERS_PATH} -m=${MICROSTRUCTURE}       \
    ${START} ${END}
 
-#   -e TURBINE_LEADER_HOOK="$( < ${DIR}/hook.tcl )"
+#   -e TURBINE_LEADER_HOOK="$( < ${DIR}/hook.tcl )"  \
