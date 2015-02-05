@@ -25,11 +25,11 @@ then
   exit 1
 fi
 
-export TURBINE_USER_LIB=${NFHEDM_INSTALL}/lib
+export SWIFT_PATH=${NFHEDM_INSTALL}/lib
 
 SCRIPT=FitOrientation-T
 
-stc -t checkpointing ${DIR}/${SCRIPT}.swift
+stc -f checkpointing ${DIR}/${SCRIPT}.swift
 
 export MODE=BGQ
 export PROCS=${PROCS:-2}
@@ -38,7 +38,7 @@ export QUEUE=default
 export TURBINE_LOG=${TURBINE_LOG:-0}
 export TURBINE_DEBUG=${TURBINE_DEBUG:-0}
 export ADLB_DEBUG=${ADLB_DEBUG:-0}
-export WALLTIME=${WT:-8}
+export WALLTIME=${WALLTIME:-8}
 export PPN=${PPN:-4}
 export ADLB_PRINT_TIME=1
 
@@ -59,7 +59,8 @@ PATH=$HOME/sfw/ppc64/turbine/scripts/submit/cobalt:$PATH
 # set -x
 which turbine-cobalt-run.zsh
 turbine-cobalt-run.zsh -n ${PROCS}                      \
-  -e TURBINE_LEADER_HOOK="$( < ${DIR}/hook.tcl )"       \
   ${DIR}/${SCRIPT}.tcl                                  \
   -p=${PARAMETERS_PATH} -m=${MICROSTRUCTURE}            \
    ${START} ${END}
+
+#   -e TURBINE_LEADER_HOOK="$( < ${DIR}/hook.tcl )"
