@@ -266,7 +266,7 @@ Init_FitOrientation(const char *ParamFN, const char *MicrostructureFN)
 
     int result = ReadParameters(ParamFN, &params);
     assert(result);
-    
+
     result_fd = open(MicrostructureFN, O_CREAT|O_WRONLY,
                                       S_IRUSR|S_IWUSR);
     if (result_fd <= 0)
@@ -292,7 +292,7 @@ static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***
 int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureFN)
 {
     LOG("FitOrientationAll(rown=%i)", rown);
-   
+
     Init_FitOrientation(ParamFN, MicrostructureFN);
 
     PROFILE_ASSIGN(nlopt,            profile_nlopt);
@@ -300,7 +300,11 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     PROFILE_ASSIGN(problem_calc_diff_spots, profile_calc_diff_spots);
     PROFILE_ASSIGN(problem_calc_frac_overlap, profile_calc_frac_overlap);
 
+    bool reporter = false;
+    // printf("IO START: %i\n", rown);
     double io_start = time_double();
+    if ((rown % 100) == 1) 
+      reporter = true;
 
     double MaxTtheta = rad2deg*atan(params.MaxRingRad/params.Lsd[0]);
     //Read bin files
@@ -350,14 +354,20 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
     b = ReadOrientations(params.direct, NrOrientations, &OrientationMatrix);
     assert(b);
 
+    // if (reporter) printf("ORIENTATIONS OK\n");
+
     // Read Spots
     b = ReadSpots(params.direct, TotalDiffrSpots, &SpotsMat);
     assert(b);
 
-    if (rown == 0)
+    if (reporter)
     {
         double io_stop = time_double();
         printf("IO TIME: %0.3f\n", io_stop - io_start);
+        // printf("EXITING AFTER IO.\n");
+        // fflush(stdout);
+        // sleep(5);
+        // exit(0);
     }
 
     int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
@@ -659,11 +669,13 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                 }
                 Convert9To3x3(OMTemp,OrientIn);
                 OrientMat2Euler(OrientIn,EulerIn);
+                DEBUG("FitOrientation(%i)...", i);
                 FitOrientation(nrFiles,nLayers,ExcludePoleAngle,Lsd,SizeObsSpots,
                                XG,YG,RotMatTilts,OmegaStart,OmegaStep,px,ybc,zbc,gs,
                                OmegaRanges,NoOfOmegaRanges,BoxSizes,P0,NrPixelsGrid,
                                ObsSpotsInfo,EulerIn,tol,&EulerOutA,&EulerOutB,
                                &EulerOutC,&FracOut,hkls,Thetas,n_hkls);
+                DEBUG("FitOrientation(%i) done.", i);
                 Fractions = 1-FracOut;
 
                 if (Fractions > BestFrac){
@@ -696,7 +708,8 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     result[4] = BestFrac;
     // fwrite(result, sizeof(double), 5, result_fd);
     DEBUG("FitOrientation_Calc() pwrite: rown=%i",rown-1);
-    int rc = pwrite(result_fd, result, 5*sizeof(double), (rown-1)*5*sizeof(double));
+    int rc;
+    // rc = pwrite(result_fd, result, 5*sizeof(double), (rown-1)*5*sizeof(double));
     if (rc < 0)
     {
         perror("result data file");
