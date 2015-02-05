@@ -29,17 +29,6 @@ export SWIFT_PATH=${NFHEDM_INSTALL}/lib
 
 SCRIPT=FitOrientation-T
 
-export MODE=BGQ
-export PROCS=${PROCS:-2}
-export PROJECT=DiscoveryEngines
-export QUEUE=default
-export TURBINE_LOG=${TURBINE_LOG:-0}
-export TURBINE_DEBUG=${TURBINE_DEBUG:-0}
-export ADLB_DEBUG=${ADLB_DEBUG:-0}
-export WALLTIME=${WALLTIME:-8}
-export PPN=${PPN:-4}
-export ADLB_PRINT_TIME=1
-
 declare PROCS PPN TURBINE_LOG WALLTIME
 
 # cd ${DATA}
