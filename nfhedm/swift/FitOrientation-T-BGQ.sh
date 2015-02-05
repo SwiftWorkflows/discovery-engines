@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/zsh -eu
 
 # FitOrientation-T
 # Runs FitOrientation-T.swift on the BG/Q
@@ -32,17 +32,20 @@ SCRIPT=FitOrientation-T
 stc -t checkpointing ${DIR}/${SCRIPT}.swift
 
 export MODE=BGQ
-export PROCS=${PROCS:-3}
-export PROJECT=ExM
+export PROCS=${PROCS:-2}
+export PROJECT=DiscoveryEngines
 export QUEUE=default
 export TURBINE_LOG=${TURBINE_LOG:-0}
 export TURBINE_DEBUG=${TURBINE_DEBUG:-0}
-export WALLTIME=${WT:-15}
+export ADLB_DEBUG=${ADLB_DEBUG:-0}
+export WALLTIME=${WT:-8}
 export PPN=${PPN:-4}
 export ADLB_PRINT_TIME=1
 
-cd ${DATA}
-echo "PWD: $(pwd)"
+declare PROCS PPN TURBINE_LOG WALLTIME
+
+# cd ${DATA}
+# echo "PWD: $(pwd)"
 
 if [[ ${PARAMETERS} == /* ]]
 then
@@ -50,7 +53,13 @@ then
 else
   PARAMETERS_PATH=${DATA}/${PARAMETERS}
 fi
-set -x
+
+PATH=$HOME/sfw/ppc64/turbine/scripts/submit/cobalt:$PATH
+
+# set -x
 which turbine-cobalt-run.zsh
-turbine-cobalt-run.zsh -n ${PROCS} ${DIR}/${SCRIPT}.tcl \
-  -p=${PARAMETERS_PATH} -m=${MICROSTRUCTURE} ${START} ${END}
+turbine-cobalt-run.zsh -n ${PROCS}                      \
+  -e TURBINE_LEADER_HOOK="$( < ${DIR}/hook.tcl )"       \
+  ${DIR}/${SCRIPT}.tcl                                  \
+  -p=${PARAMETERS_PATH} -m=${MICROSTRUCTURE}            \
+   ${START} ${END}
