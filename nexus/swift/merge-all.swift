@@ -10,20 +10,14 @@ import io;
 import string;
 import sys;
 
-app (file background) merge_tiffs_background(string directory,
-                                             string arguments[])
+app merge_tiffs(string temperature_directory, string scan)
 {
-  "/home/wozniak/proj/d-e/nexus/bin/merge-tiffs.sh" background
-    "-d" directory arguments;
+  "/home/wozniak/proj/d-e/nexus/bin/lsmo/nxmerge.sh"
+    "-D" temperature_directory
+    "-d" scan  "-e" ".tif" "-b" "darkbeg";
 }
 
-app (file nxs) merge_tiffs(string directory, file background,
-                           string arguments[])
-{
-  "/home/wozniak/proj/d-e/nexus/bin/merge-tiffs.sh" background
-    "-d" directory arguments;
-}
-
+/*
 app (file nxmax_out) nxmax(string directory, file nxs)
 {
   "/home/wozniak/proj/d-e/nexus/bin/nxmax.sh" directory nxs nxmax_out;
@@ -33,37 +27,29 @@ app (file nxfind_out) nxfind(string directory, file nxs, file nxmax_out)
 {
   "/home/wozniak/proj/d-e/nexus/bin/nxfind.sh" directory nxs nxmax_out nxfind_out;
 }
+*/
 
 main
 {
-  list = argv("list");
   data = argv("data");
-  printf("merge-all.swift in %s", data);
+  list = input(argv("list"));
 
-  string work[] = split(read(input(list)), "\n");
+  string work[] = file_lines(list);
+
+  string scans[] = [ "ff1scan", "fb1scan",
+                     "ff2scan", "fb2scan",
+                     "sfscan",  "sbscan",
+                     "ubfscan", "ubbscan" ];
 
   foreach directory in work
   {
-    if (directory != "")
+    temperature_directory = data/directory;
+    foreach scan in scans
     {
-      // Create background NXS:
-      file background<data/directory/"darkbeg.nxs"> =
-        merge_tiffs_background(directory, split("-p darkbeg -c", " "));
-
       // Merge each scan:
-      merge_tiffs(directory, background,
-                  split("-p fb1scan -b darkbeg -o 0 -s 0.1 -r -c", " "));
-      merge_tiffs(directory, background,
-                  split("-p ff1scan -b darkbeg -o 0 -s 0.1 -c", " "));
-      merge_tiffs(directory, background,
-                  split("-p ff2scan -b darkbeg -o 0 -s 0.1 -c", " "));
-      merge_tiffs(directory, background,
-                  split("-p fb2scan -b darkbeg -o 0 -s 0.1 -r -c", " "));
-      merge_tiffs(directory, background,
-                  split("-p sfscan -b darkbeg -o 0 -s 0.1 -c", " "));
-      merge_tiffs(directory, background,
-                  split("-p sbscan -b darkbeg -o 0 -s 0.1 -r -c", " "));
+      merge_tiffs(temperature_directory, scan);
 
+      /*
       // Merge the UB scans:
       file ubf_nxs<data/directory/"ubfscan.nxs"> =
         merge_tiffs(directory, background,
@@ -83,6 +69,7 @@ main
          nxfind(directory, ubf_nxs, ubf_nxmax_out);
       file ubb_nxfind_out<data/directory/"ubb.nxfind.out"> =
         nxfind(directory, ubb_nxs, ubb_nxmax_out);
+      */
     }
   }
 }
