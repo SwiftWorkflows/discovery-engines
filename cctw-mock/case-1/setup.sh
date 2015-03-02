@@ -1,20 +1,28 @@
 #!/bin/bash
 set -eu
 
-if [[ ${#*} != 2 ]]
+if [[ ${#*} != 3 ]]
 then
-  echo "usage: <N> <OUTPUT>"
+  echo "usage: <M> <N> <OUTPUT>"
   exit 1
 fi
 
-N=$1
-OUTPUT=$2
+M=$1
+N=$2
+OUTPUT=$3
 
-for (( i=0 ; i<N ; i++ ))
+k=0
+for (( i=0 ; i<M ; i++ ))
 do
-  V=0
-  R=${RANDOM}
-  (( ${R} % 10  == 0 )) V=1
-  (( ${R} % 100 == 0 )) V=2
-  printf "%i %i"
-done
+  for (( j=0 ; j<N ; j++ ))
+  do
+    V=0
+    R=${RANDOM}
+    (( ${R} % 10 == 0 )) && V=1
+    (( ${R} % 9  == 0 )) && V=2
+    echo ${k} ${V}
+    (( k++ )) || true
+  done
+done > ${OUTPUT}
+
+mkdir -pv chunks

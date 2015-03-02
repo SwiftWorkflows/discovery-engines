@@ -4,37 +4,44 @@ import math;
 import string;
 import sys;
 
-app (file o) transform_sh(file i)
+app (file o) transform_sh(file nxs, int i)
 {
-  "./transform.sh" i o;
+  "./transform.sh" o M N nxs i;
 }
 
 app (file o) merge_sh(file i, file j)
 {
-  "./merge.sh" i j o;
+  "./merge.sh" o i j;
 }
 
 (file o) merge(file d[], int start, int stop)
 {
-  if (stop-start == 1)
+  if (stop-start == 0)
   {
-    o = M(d[start], d[stop]);
+    o = d[start];
+  }
+  else if (stop-start == 1)
+  {
+    o = merge_sh(d[start], d[stop]);
   }
   else
   {
     n = stop-start;
     s = n %/ 2; // integer divide
-    o = M(merge(d, start,     start+s),
-          merge(d, start+s+1, stop));
+    o = merge_sh(merge(d, start,     start+s),
+                 merge(d, start+s+1, stop));
   }
 }
 
+global const int M = 10;
+global const int N = 10;
 
 nxs = input(argv("nxs"));
-tasks = round(2**n);
-file d[];
+tasks = 3;
+file chunks[];
 foreach i in [0:tasks-1]
 {
-  d[i] = transform_sh(a);
+  file chunk<"chunks/%i.nxs"%i> = transform_sh(nxs, i);
+  chunks[i] = chunk;
 }
-file final <"final.data"> = merge(d, 0, tasks-1);
+file final<"final.nxs"> = merge(chunks, 0, tasks-1);
