@@ -56,7 +56,23 @@ Run as:
 
 == Use on NXRS
 
+A run script for NXRS is provided in run-cctw-nxrs.sh .
 
+----
+$ git clone https://github.com/SwiftWorkflows/discovery-engines.git
+$ cd discovery-engines/cctw-mock/case-1
+$ ./setup.sh 10 10 init.nxs
+$ ./run-cctw-nxrs.sh --nxs=init.nxs
+----
+
+The data can be viewed with:
+----
+$ ./nxs2eps.sh 10 10 init.{nxs,eps}
+$ ./nxs2eps.sh 10 10 final.{nxs,eps}
+$ gv init.eps  &
+$ gv final.eps &
+----
+Use gv's "Fit to window".
 
 == Samples
 

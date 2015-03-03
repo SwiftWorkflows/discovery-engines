@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eu
 
+# NXS2PPM
+# Convert NXS file to PPM image format
+
 BLACK="0 0 0"
 RED="10 0 0"
 GREEN="0 10 0"
@@ -12,7 +15,7 @@ COLORS=( BLACK GREEN BLUE RED YELLOW PURPLE WHITE )
 
 if [[ ${#*} != 4 ]]
 then
-  echo "usage: M N INPUT OUTPUT"
+  echo "usage: <M> <N> <INPUT.EPS> <OUTPUT.PPM>"
   exit 1
 fi
 
