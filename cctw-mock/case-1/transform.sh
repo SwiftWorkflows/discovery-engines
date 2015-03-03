@@ -1,6 +1,12 @@
 #!/bin/bash
 set -eu
 
+if [[ ${#*} != 5 ]]
+then
+  echo "usage: <OUTPUT.NXS> <M> <N> <INPUT.NXS> <ROW>"
+  exit 1
+fi
+
 OUTPUT=$1
 M=$2
 N=$3
@@ -18,7 +24,7 @@ C=$( awk "NR == ${L} { print \$2 }" ${INPUT} )
 # echo L C $L $C
 # set +x
 
-for P in ${L} $(( L-1 )) $(( L+1 )) $(( L-10 )) $(( L+10 ))
+for P in ${LINE} $(( LINE-1 )) $(( LINE+1 )) $(( LINE-10 )) $(( LINE+10 ))
 do
   if (( P >= 0 )) && (( P < SIZE ))
   then

@@ -36,12 +36,15 @@ app (file o) merge_sh(file i, file j)
 global const int M = 10;
 global const int N = 10;
 
-nxs = input(argv("nxs"));
-tasks = 3;
-file chunks[];
-foreach i in [0:tasks-1]
+main
 {
-  file chunk<"chunks/%i.nxs"%i> = transform_sh(nxs, i);
-  chunks[i] = chunk;
+  file nxs = input(argv("nxs"));
+  int tasks =  M*N;
+  file chunks[];
+  foreach i in [0:tasks-1]
+  {
+    file chunk<"chunks/%i.nxs"%i> = transform_sh(nxs, i);
+    chunks[i] = chunk;
+  }
+  file final<"final.nxs"> = merge(chunks, 0, tasks-1);
 }
-file final<"final.nxs"> = merge(chunks, 0, tasks-1);

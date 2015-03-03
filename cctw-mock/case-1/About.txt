@@ -1,0 +1,63 @@
+
+////
+This file may be rendered with asciidoc
+////
+
+= CCTW Mock Case 1
+
+== Data
+
+NXS:: A fake NeXus file: a one-dimensional array in two columns of text.
+PPM:: Simple image file for viewing NXS data in 2D.
+M,N:: Parameters for width, height of data in 2D.
+
+== File index
+
+=== Key programs
+
+cctw.swift::
+The main Swift script.
++
+Run as:
++
+ swift-t cctw.swift --nxs=init.nxs
+
+setup.sh::  Creates init.nxs .  Run as:
++
+ ./setup.sh 10 10 init.nxs
+
+transform.sh::
+Called by cctw.swift to tranform one row.
+Run as:
++
+ ./transform.sh output-3.nxs 10 10 input.nxs 3
++
+to create sparse output-3.nxs from the stencil around 3.
+
+merge.sh::
+Merges two NXS files, adding the data columns.
+Run as:
++
+ ./merge.sh tmp-3-4.nxs output-3.nxs output-4.nxs
+
+=== Viz
+
+mkppm.sh:: Toy script for PPM experiments.
+
+nxs2ppm.sh:: Convert NXS file to PPM.
+Run as:
++
+ ./nxs2ppm.sh <M> <N> <INPUT.NXS> <OUTPUT.PPM>
+
+nxs2eps.sh:: Convert NXS file to EPS.
+Run as:
++
+ ./nxs2eps.sh <M> <N> <INPUT.NXS> <OUTPUT.EPS>
+
+== Use on NXRS
+
+
+
+== Samples
+
+image:sample-init.png[height=100] &rarr; image:sample-final.png[height=100]

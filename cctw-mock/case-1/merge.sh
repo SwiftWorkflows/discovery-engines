@@ -8,11 +8,19 @@ INPUT1=$2
 INPUT2=$3
 shift
 
+# echo "merge: ${INPUT1} ${INPUT2} to: ${OUTPUT}"
+
+crash()
+{
+  echo ${*}
+  exit 1
+}
+
 # Open files to be merged
+[[ -f ${INPUT1} ]] || crash "Not found: ${INPUT1}"
+[[ -f ${INPUT2} ]] || crash "Not found: ${INPUT2}"
 exec 11< ${INPUT1}
 exec 12< ${INPUT2}
-
-echo "merge: $INPUT1 $INPUT2"
 
 while true
 do
