@@ -737,6 +737,30 @@ asciidoc.install();
 </div>
 <div id="content">
 <div class="sect1">
+<h2 id="_overview">Overview</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This Swift script uses simple shell commands <code>transform</code> and <code>merge</code>
+to emulate potential multi-node concurrency in CCTW.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Setup: An initial mock NXS file is created.  It is a sparse MxN array.
+</p>
+</li>
+<li>
+<p>
+Transform: Each pixel copies its color to its five-point stencil.
+</p>
+</li>
+<li>
+<p>
+Merge: Each transform is added together.
+</p>
+</li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_data">Data</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -817,7 +841,7 @@ merge.sh
 </dt>
 <dd>
 <p>
-Merges two NXS files, adding the data columns.
+Called by cctw.swift . Merges two NXS files, adding the data columns.
 Run as:
 </p>
 <div class="literalblock">
@@ -904,7 +928,7 @@ $ gv final.eps &amp;</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-03 13:04:54 CST
+Last updated 2015-03-03 13:24:43 CST
 </div>
 </div>
 </body>

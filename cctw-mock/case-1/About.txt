@@ -5,6 +5,15 @@ This file may be rendered with asciidoc
 
 = CCTW Mock Case 1
 
+== Overview
+
+This Swift script uses simple shell commands +transform+ and +merge+
+to emulate potential multi-node concurrency in CCTW.
+
+. Setup: An initial mock NXS file is created.  It is a sparse MxN array.
+. Transform: Each pixel copies its color to its five-point stencil.
+. Merge: Each transform is added together.
+
 == Data
 
 NXS:: A fake NeXus file: a one-dimensional array in two columns of text.
@@ -35,7 +44,7 @@ Run as:
 to create sparse output-3.nxs from the stencil around 3.
 
 merge.sh::
-Merges two NXS files, adding the data columns.
+Called by cctw.swift . Merges two NXS files, adding the data columns.
 Run as:
 +
  ./merge.sh tmp-3-4.nxs output-3.nxs output-4.nxs
@@ -77,3 +86,9 @@ Use gv's "Fit to window".
 == Samples
 
 image:sample-init.png[height=100] &rarr; image:sample-final.png[height=100]
+
+////
+Local Variables:
+mode: doc
+End:
+////
