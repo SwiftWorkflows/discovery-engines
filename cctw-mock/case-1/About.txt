@@ -65,7 +65,8 @@ Run as:
 
 == Use on NXRS
 
-A run script for NXRS is provided in run-cctw-nxrs.sh .
+A run script for NXRS is provided in run-cctw-nxrs.sh .  
+It contains the installed location of Swift/T.
 
 ----
 $ git clone https://github.com/SwiftWorkflows/discovery-engines.git
