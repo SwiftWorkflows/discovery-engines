@@ -51,9 +51,9 @@ then
     # This fails if the annotation exists
     catalog.py create_annotation_def ${KEY} "float8" || true
   done
-fi 
+fi
 
-CATALOG_TAG=${DE_HOME}/nexus/bin/catalog-tag-dataset.zsh
+CATALOG_TAG=${DE_HOME}/nexus/bin/lsmo/catalog-tag-dataset.zsh
 
 for D in ${DIRS}
 do
