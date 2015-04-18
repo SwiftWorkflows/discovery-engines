@@ -6,5 +6,6 @@
 *sshx*
 *.kml
 *.swiftx
+*.tic
 logs
 turbine-directory.txt
