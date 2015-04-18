@@ -10,8 +10,7 @@ import io;
 import string;
 import sys;
 
-app merge_cbfs(string arguments[])
-// data: I.e., /home/bessrc/sharedbigdata/data1/osborn-2014-1/bfap00
+app (file o) merge_cbfs(string arguments[])
 {
   // nxmerge -d f1 -p scan -e cbf -o f1
   "/home/wozniak/proj/d-e/nexus/bin/nxmerge.sh" arguments;
@@ -19,28 +18,34 @@ app merge_cbfs(string arguments[])
 
 main
 {
+  // data: I.e., /home/bessrc/sharedbigdata/data1/osborn-2014-1/bfap00
   data = argv("data");
   printf("merge-cbfs.swift in %s", data);
 
-  file kts[] = glob(data/"kt*");
+  file labels[] = glob(data/"db*");
 
-  foreach kt in kts
+  foreach label in labels
   {
-    printf("kt: %s", filename(kt));
-    file temperatures[] = glob(filename(kt)/"*K");
+    printf("label: %s", filename(label));
+    file temperatures[] = glob(filename(label)/"*K");
     foreach temperature in temperatures
     {
       printf("temperature: %s", filename(temperature));
 
+      file f1;
+      file f2;
       // Merge each scan:
-      foreach f in [1:2]
-      {
-        directory = "%s/f%i"     % (filename(temperature), f);
-        output    = "%s/f%i.nxs" % (filename(temperature), f);
-        merge_cbfs(split("-d " + directory + " -o " + output +
-                         " -p scan -e cbf",
-                         " "));
-      }
+      directory1 = "%s/f1"     % (filename(temperature));
+      output1    = "%s/f1.nxs" % (filename(temperature));
+      directory2 = "%s/f2"     % (filename(temperature));
+      output2    = "%s/f2.nxs" % (filename(temperature));
+      merge_cbfs(split("-d " + directory1 +
+                       " -o " + output1 +
+                       " -p scan -e cbf", " "));
+      merge_cbfs(split("-d " + directory2 +
+                       " -o " + output2 +
+                       " -p scan -e cbf", " "));
     }
   }
 }
+
