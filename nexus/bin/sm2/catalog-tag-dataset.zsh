@@ -1,4 +1,5 @@
-#!/bin/zsh -eu
+#!/bin/zsh
+set -eu
 
 if [[ -z ${GCAT_DEFAULT_CATALOG_ID} ]]
 then
@@ -31,15 +32,11 @@ cd ${DIR}
 DIR=$( /bin/pwd )
 
 NAME=$( basename ${DIR} )
-# declare NAME
-# DATASET_ID=$( catalog.py create_dataset name:${NAME} )
-DATASET_ID=66
-declare DATASET_ID
+declare NAME
 
 SAMPLE=${NAME%_*}
 # FRACTION=${SAMPLE#}
 
-print "Annotating: ${NAME}"
 ANNOTATIONS=(
   # Text
   name:${NAME}
@@ -55,51 +52,90 @@ ANNOTATIONS=(
   # fraction:${FRACTION}
 )
 
-catalog.py -t add_dataset_annotation ${DATASET_ID} ${ANNOTATIONS}
-@ catalog.py -t add_dataset_acl ${DATASET_ID} rosborn user "r"
+TMPFILE=$( mktemp /tmp/catalog-tag-XXXX )
+if catalog -tn get_dataset_annotations ${NAME} > ${TMPFILE}
+then
+  print "Dataset exists: ${NAME}"
+  DATASET_ID=$( awk '/id:/ {print substr($0, 4)}' < ${TMPFILE} )
+  declare DATASET_ID
+else
+  print "Creating dataset: ${NAME}"
+  DATASET_ID=$( catalog.py create_dataset name:${NAME} )
+  declare DATASET_ID
+  @ catalog.py -t add_dataset_annotation ${DATASET_ID} ${ANNOTATIONS}
+  @ catalog.py -t add_dataset_acl ${DATASET_ID} rosborn user "r"
+fi
+rm ${TMPFILE}
+
+# Convert to array
+T=${TAGGED}
+unset TAGGED
+typeset -ga TAGGED
+TAGGED=( ${=T} )
 
 annotate_nxs()
 # NXS is in PWD
 {
-  NXS=$1
-  print "Annotating member: ${NXS}"
+  LABEL=$1
+  NXS=$2
 
+  FILE=${DIR}/${LABEL}/${NXS}
+  FILE=${FILE:a} # Canonicalize path
+  NXS_BASE=${NXS:t} # ZSH basename
+
+  # Reverse associated array lookup
+  if [[ ${TAGGED[(i)${LABEL}/${NXS_BASE}]} != ${UNTAGGED} ]]
+  then
+    print "Already tagged: ${NXS_BASE}"
+    return
+  fi
+
+  print "Annotating member: ${NXS}"
   TEMPERATURE=$( ${DE_HOME}/nexus/bin/nexus-temperature.py ${NXS} )
   DATE=$( stat ${NXS} | awk '$1 == "Modify:" { print $2 " " $3 }' )
   DATE=${DATE/.[0-9]*/} # Chop off subsecond resolution
-  FILE=${DIR}/${LABEL}/${NXS}
-  FILE=${FILE:a} # Clean up path
-  NXS_BASE=${NXS:t} # ZSH basename
-
   ANNOTATIONS=(
     # Text
     "date:${DATE}"
     label:${LABEL}
     path:${FILE}
     host:nxrs.msd.anl.gov
-    # Float
-    temperature_K:${TEMPERATURE}
   )
+  if [[ ${TEMPERATURE} != "nan" ]]
+  then
+    # Float
+    ANNOTATIONS+=temperature_K:${TEMPERATURE}
+  fi
 
   print -l $ANNOTATIONS
   print
 
-  # MEMBER_ID=$( catalog.py -t create_members ${DATASET_ID} file ${NXS_BASE} )
-  MEMBER_ID=67
-  @ catalog.py -t add_member_annotation ${DATASET_ID} ${MEMBER_ID} ${ANNOTATIONS}
+  print "Creating member: ${LABEL}/${NXS_BASE}"
+  if ! MEMBER_ID=$( catalog.py -t create_members ${DATASET_ID} \
+                                  file ${LABEL}/${NXS_BASE} )
+  then
+    print "Error adding member!"
+    print ${MEMBER_ID} # May contain error message
+    exit 1
+  fi
+  # MEMBER_ID=67
+  value MEMBER_ID
+  catalog.py -t add_member_annotation ${DATASET_ID} ${MEMBER_ID} ${ANNOTATIONS}
 }
 
-LABELS=( db*(/) )
+LABELS=( *(/) )
 for LABEL in ${LABELS}
 do
   push ${LABEL}
-  printf "Looking for *.nxs in: ${PWD}\n\n"
+  printf "Looking for *.nxs in: ${PWD}\n"
   NXS_LIST=( *.nxs )
   foreach NXS in ${NXS_LIST}
   do
-    annotate_nxs ${NXS}
+    annotate_nxs ${LABEL} ${NXS}
+    print
   done
   pop
 done
 
 print "Done with ${NAME}."
+print

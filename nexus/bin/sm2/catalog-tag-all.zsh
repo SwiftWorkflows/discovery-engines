@@ -1,4 +1,5 @@
-#!/bin/zsh -eu
+#!/bin/zsh
+set -eu
 
 CREATE_DEFS=1
 zparseopts -D -E d=d
@@ -29,9 +30,10 @@ then
   exit 1
 fi
 
-# TAGGED_NXS=${PWD}/tagged.txt
-${DE_HOME}/nexus/bin/catalog-list-files | scan TAGGED
-UNTAGGED=$(( ${#TAGGED} + 1 ))
+${DE_HOME}/nexus/bin/catalog-list-files | scan P
+UNTAGGED=$(( ${#P} + 1 )) # Indicates not found
+TAGGED=${P}
+export TAGGED UNTAGGED
 
 if (( CREATE_DEFS ))
 then
@@ -66,9 +68,13 @@ fi
 
 CATALOG_TAG=${THIS}/catalog-tag-dataset.zsh
 
-set -x
 for D in ${DIRS}
 do
+  if [[ ! -d ${D} ]]
+  then
+    print "No such directory: ${D}"
+    exit 1
+  fi
   push ${D}
   ${CATALOG_TAG} ${D}
   pop
