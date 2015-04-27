@@ -13,8 +13,8 @@ DIRL=${DIRP:h} # ZSH dirname: Parent: sample/label
 DIRS=${DIRL:h} # ZSH dirname: Parent: sample
 
 F=${DIRC:h}      # f1 or f2
-TEMPK=${DIRP:t}  # E.g., 300K
-TEMP=${TEMPK%K}  # E.g., 300
+TEMPERATURE_K=${DIRP:t}  # E.g., 300K
+TEMPERATURE=${TEMPERATURE_K%K}  # E.g., 300
 LABEL=${DIRL:h}  # E.g., jv000_12
 SAMPLE=${DIRS:h} # E.g., nav2o500
 
@@ -41,15 +41,8 @@ then
 else
   set -x
   LOG=${o[2]%.nxs}.log
-  print ${NXSTACK} ${ARGS} >& ${LOG}
-  # nxsetup -s ${D} -l jv0004_3 ${d} -t 300 -f f1 f2 f3
-  print nxsetup -s ${SAMPLE} -l ${LABEL} ${d} -t ${TEMP} -f f1 f2 f3
-  # nxlink -s nav2o5_04 -l jv0004_3 -d align -t 300 -f f1 -m f1_mask.nxs
-  print nxlink -s ${SAMPLE} -l ${LABEL} ${d} -f ${F} -m ${F}_mask.nxs
-  print catalog-tag-dataset.zsh ${DIRS}
-  # nxmax -d nav2o5_04/jv0004_3 -f nav2o5_04_align.nxs -p f1/data
-  print nxmax -d ${SAMPLE}/${LABEL} -f ${OUTPUT} -p ${F}/data
-  # nxfind -d nav2o5_04/jv0004_3 -f nav2o5_04_align.nxs -p f1/data
-  print nxfind -d ${SAMPLE}/${LABEL} -f ${OUTPUT} -p ${F}/data
-  # chmod a+r ${OUTPUT}
+
+  # nxwork -s sm2ru3ge5 -l db0073b-1 -d 120K -t 120 -f f1 f2 f3 -p sm2ru3ge5_100K.nxs
+  nxwork -s ${SAMPLE} -l ${LABEL} -d ${TEMPERATURE_K} 
+
 fi
