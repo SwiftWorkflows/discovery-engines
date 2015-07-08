@@ -2,7 +2,7 @@
 /**
    MERGE-CBFS.SWIFT
 
-   Run this from the top-level directory.
+   Work with absolute paths
 */
 
 import files;
@@ -22,11 +22,11 @@ main
   data = argv("data");
   printf("merge-cbfs.swift in %s", data);
 
-  file labels[] = glob(data/"db*");
+  file label_dirs[] = glob(data/"*");
 
-  foreach label in labels
+  foreach label in label_dirs
   {
-    printf("label: %s", filename(label));
+    printf("label directory: %s", filename(label));
     file temperatures[] = glob(filename(label)/"*K");
     foreach temperature in temperatures
     {
