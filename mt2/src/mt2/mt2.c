@@ -86,8 +86,8 @@ init_output(int x, int y, int z, char* filename,
   dims[2] = x;
   hsize_t  cdims[3];
   cdims[0] = 1;
-  cdims[1] = 100;
-  cdims[2] = 100;
+  cdims[1] = 1000;
+  cdims[2] = 1000;
   
   *dataspace_id = H5Screate_simple(3, dims, NULL);
   check_msg(dataspace_id > 0, "H5Screate_simple failed.");
@@ -168,8 +168,8 @@ write_hdf(int x, int y, int k,
 
   hsize_t dimsm[3];
   dimsm[0] = 1;
-  dimsm[1] = x;
-  dimsm[2] = y;
+  dimsm[1] = y;
+  dimsm[2] = x;
   hid_t memspace_id = H5Screate_simple(3, dimsm, NULL);
 
   herr_t status;
@@ -235,6 +235,8 @@ main(int argc, char* argv[])
 
   close_all(file_id, dataset_id, dataspace_id);
 
+
+  printf("done.\n");
   return EXIT_SUCCESS;
 }
 
