@@ -10,6 +10,9 @@
 
 #define MAX_FILENAME (64*1024)
 
+#define pixel int32_t
+  // uint32_t
+
 void
 usage(void)
 {
@@ -81,13 +84,23 @@ init_output(int x, int y, int z, char* filename,
   dims[0] = z;
   dims[1] = y;
   dims[2] = x;
+  hsize_t  cdims[3];
+  cdims[0] = 1;
+  cdims[1] = 100;
+  cdims[2] = 100;
+  
   *dataspace_id = H5Screate_simple(3, dims, NULL);
-  check_msg(dataspace_id > 0, "H5Screate_simple failed.")
+  check_msg(dataspace_id > 0, "H5Screate_simple failed.");
 
-  *dataset_id = H5Dcreate2(*file_id, "/entry", H5T_STD_U16LE,
+  hid_t plist = H5Pcreate(H5P_DATASET_CREATE);
+  H5Pset_chunk(plist, 3, cdims);
+  H5Pset_deflate(plist, 1);
+    
+  *dataset_id = H5Dcreate2(*file_id, "/entry", H5T_STD_I32LE,
                            *dataspace_id,
-                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  check_msg(dataspace_id > 0, "H5Screate2 failed.")
+                           H5P_DEFAULT, plist, H5P_DEFAULT);
+  check_msg(dataspace_id > 0, "H5Screate2 failed.");
+  H5Pclose(plist);
   return true;
 }
 
@@ -110,32 +123,37 @@ next_file(char* filename)
 }
 
 static bool
-read_tiff(char* filename, int x, int y, int k, uint16_t* data)
+read_tiff(char* filename, int x, int y, int k, pixel* data)
 {
+  TIFFSetWarningHandler(NULL);
   TIFF* tiff = TIFFOpen(filename, "r");
   check_msg(tiff != NULL, "could not open: %s", filename);
 
   int width, height;
 
-  TIFFGetField(tiff, TIFFTAG_IMAGEWIDTH, &width);
+  TIFFGetField(tiff, TIFFTAG_IMAGEWIDTH,  &width);
   TIFFGetField(tiff, TIFFTAG_IMAGELENGTH, &height);
-  check_msg(width == x, "TIFF width(%d) != x(%d)", width, x);
-  check_msg(width == x, "TIFF height(%d) != y(%d)", height, y);
+  check_msg(width  == x, "TIFF width(%d) != x(%d)",  width,  x);
+  check_msg(height == y, "TIFF height(%d) != y(%d)", height, y);
 
   int size = TIFFScanlineSize(tiff);
-  check_msg(size == y*sizeof(uint16_t), "scanlize size error!");
+  // printf("scanline size: %i\n", size); 
+  check_msg(size == x*sizeof(pixel), "scanlize size error!");
 
-  uint16_t* p = data;
-  for (int j = 0; j < y; j++, p += y)
-    TIFFReadScanline(tiff, p, j, 0);
-
+  pixel* p = data;
+  for (uint32 j = 0; j < y; j++, p += x)
+  {
+    int rc = TIFFReadScanline(tiff, p, j, 0);
+    check_msg(rc == 1, "TIFFReadScanline error!");
+  }
+  
   TIFFClose(tiff);
   return true;
 }
 
 static bool
 write_hdf(int x, int y, int k,
-          hid_t dataset_id, hid_t dataspace_id, uint16_t* data)
+          hid_t dataset_id, hid_t dataspace_id, pixel* data)
 {
   hsize_t count[3];
   count[0] = 1;
@@ -150,15 +168,15 @@ write_hdf(int x, int y, int k,
 
   hsize_t dimsm[3];
   dimsm[0] = 1;
-  dimsm[1] = y;
-  dimsm[2] = x;
+  dimsm[1] = x;
+  dimsm[2] = y;
   hid_t memspace_id = H5Screate_simple(3, dimsm, NULL);
 
   herr_t status;
   status = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET,
                                offset, stride, count, block);
   check_msg(status >= 0, "H5Sselect_hyperslab() failed.")
-  status = H5Dwrite(dataset_id, H5T_STD_U16LE, memspace_id,
+  status = H5Dwrite(dataset_id, H5T_STD_I32LE, memspace_id,
                     dataspace_id, H5P_DEFAULT, data);
   check_msg(status >= 0, "H5Dwrite() failed.")
   return true;
@@ -168,7 +186,7 @@ static bool
 rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
 {
   char current_nxs[MAX_FILENAME];
-  uint16_t* data = malloc(x*y * sizeof(uint16_t));
+  pixel* data = malloc(x*y * sizeof(pixel));
   int k = 0;
   while (true)
   {
@@ -176,6 +194,7 @@ rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
     bool rc = next_file(current_nxs);
     if (!rc) break;
     printf("reading: %s ...\n", current_nxs);
+    fflush(stdout);
     read_tiff(current_nxs, x, y, k, data);
     write_hdf(x, y, k, dataset_id, dataspace_id, data);
     k++;
