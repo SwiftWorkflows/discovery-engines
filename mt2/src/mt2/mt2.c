@@ -63,37 +63,12 @@ check_msg_impl(const char* format, ...)
     return false; \
 }
 
-bool
-scan_args(int argc, char** argv,
-          int* x, int* y, int* z, char** output_filename)
-{
-  if (argc != 5)
-  {
-    usage();
-    return false;
-  }
-
-  int n;
-  n = sscanf(argv[1], "%d", x);
-  if (n != 1) report_bad_int(argv[1]);
-  sscanf(argv[2], "%d", y);
-  if (n != 1) report_bad_int(argv[2]);
-  sscanf(argv[3], "%d", z);
-  if (n != 1) report_bad_int(argv[3]);
-
-  printf("dimensions: %d %d %d\n", *x, *y, *z);
-
-  *output_filename = argv[4];
-  return true;
-}
-
 static bool
 init_output(int x, int y, int z, char* filename,
-            hid_t* file_id, hid_t* dataset_id, hid_t* dataspace_id)
+            hid_t* file_id, hid_t* dataset_id, hid_t* dataspace_id,
+            bool use_existing_ds)
 {
-  printf("opening: %s ...\n", filename);
-  *file_id = H5Fcreate(filename, H5F_ACC_TRUNC,
-                       H5P_DEFAULT, H5P_DEFAULT);
+  printf("opening output file: %s\n", filename);
 
   hsize_t dims[3];
   dims[0] = z;
@@ -103,19 +78,38 @@ init_output(int x, int y, int z, char* filename,
   cdims[0] = 1;
   cdims[1] = 1000;
   cdims[2] = 1000;
-  
-  *dataspace_id = H5Screate_simple(3, dims, NULL);
-  check_msg(dataspace_id > 0, "H5Screate_simple failed.");
 
-  hid_t plist = H5Pcreate(H5P_DATASET_CREATE);
-  H5Pset_chunk(plist, 3, cdims);
-  H5Pset_deflate(plist, 1);
+  if (! use_existing_ds)
+  {
+    *file_id = H5Fcreate(filename, H5F_ACC_TRUNC,
+                         H5P_DEFAULT, H5P_DEFAULT);
+    check_msg(file_id > 0, "H5Fcreate failed: %s", filename);
     
-  *dataset_id = H5Dcreate2(*file_id, dataset_name, H5T_STD_I32LE,
-                           *dataspace_id,
-                           H5P_DEFAULT, plist, H5P_DEFAULT);
-  check_msg(dataspace_id > 0, "H5Screate2 failed.");
-  H5Pclose(plist);
+    *dataspace_id = H5Screate_simple(3, dims, NULL);
+    check_msg(dataspace_id > 0, "H5Screate_simple failed.");
+
+    hid_t plist = H5Pcreate(H5P_DATASET_CREATE);
+    H5Pset_chunk(plist, 3, cdims);
+    H5Pset_deflate(plist, 1);
+    
+    *dataset_id = H5Dcreate2(*file_id, dataset_name, H5T_STD_I32LE,
+                             *dataspace_id,
+                             H5P_DEFAULT, plist, H5P_DEFAULT);
+    check_msg(dataspace_id > 0, "H5Screate2 failed.");
+    H5Pclose(plist);
+  }
+  else // Using existing dataset
+  {
+    *file_id = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+    check_msg(file_id > 0, "H5Fopen failed: %s", filename);
+      
+    *dataspace_id = H5Screate_simple(3, dims, NULL);
+    check_msg(dataspace_id > 0, "H5Screate_simple failed.");
+
+    *dataset_id = H5Dopen2(*file_id, dataset_name, H5P_DEFAULT);
+    check_msg(dataspace_id > 0, "H5Screate2 failed.");
+  }
+
   return true;
 }
 
@@ -252,11 +246,43 @@ scan_opts(int argc, char** argv,
       case 'u':
         *use_existing_ds = true;
         break;
-      case 't':
+      case 'd':
         strcpy(dataset_name, optarg);
+        printf("dataset_name: %s\n", dataset_name);
+        break;
+      case '?':
+        exit(1);
         break;
     }
   }
+  return true;
+}
+
+bool
+scan_args(int optind, int argc, char** argv,
+          int* x, int* y, int* z, char** output_filename)
+{
+  if (argc-optind != 4)
+  {
+    usage();
+    return false;
+  }
+
+  int n;
+  char* t;
+  t = argv[optind];
+  n = sscanf(t, "%d", x);
+  if (n != 1) report_bad_int(t);
+  t = argv[optind+1];
+  n = sscanf(t, "%d", y);
+  if (n != 1) report_bad_int(t);
+  t = argv[optind+2];
+  n = sscanf(t, "%d", z);
+  if (n != 1) report_bad_int(t);
+
+  printf("dimensions: %d %d %d\n", *x, *y, *z);
+
+  *output_filename = argv[optind+3];
   return true;
 }
 
@@ -272,12 +298,13 @@ main(int argc, char* argv[])
   bool rc;
   bool use_existing_ds;
   rc = scan_opts(argc, argv, &use_existing_ds);
-  check_msg(rc, "error in arguments!");
-  rc = scan_args(argc, argv, &x, &y, &z, &output_filename);
+  check_msg(rc, "error in options!");
+  rc = scan_args(optind, argc, argv, &x, &y, &z, &output_filename);
   check_msg(rc, "error in arguments!");
 
   rc = init_output(x, y, z, output_filename,
-                   &file_id, &dataset_id, &dataspace_id);
+                   &file_id, &dataset_id, &dataspace_id,
+                   use_existing_ds);
   check_msg(rc, "could not write to: %s\n", output_filename);
 
   rc = rw_loop(x, y, z, dataset_id, dataspace_id);
