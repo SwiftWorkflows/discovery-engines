@@ -3,6 +3,8 @@
 # Creates directories and links in APS FS that point back to DAQ
 
 import os, stat, shutil, sys
+import os, stat, sys
+
 
 def usage():
     print "usage: <source directory (DAQ)> <destination directory (APS)>"
