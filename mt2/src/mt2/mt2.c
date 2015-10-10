@@ -8,10 +8,15 @@
 #include <hdf5.h>
 #include <tiffio.h>
 
+#include "util.h"
+
 #define MAX_FILENAME (64*1024)
 
 #define pixel int32_t
   // uint32_t
+
+double profile_read  = 0;
+double profile_write = 0;
 
 void
 usage(void)
@@ -185,6 +190,7 @@ write_hdf(int x, int y, int k,
 static bool
 rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
 {
+  double start, stop;
   char current_nxs[MAX_FILENAME];
   pixel* data = malloc(x*y * sizeof(pixel));
   int k = 0;
@@ -195,8 +201,14 @@ rw_loop(int x, int y, int z, hid_t dataset_id, hid_t dataspace_id)
     if (!rc) break;
     printf("reading: %s ...\n", current_nxs);
     fflush(stdout);
+    start = time_double();
     read_tiff(current_nxs, x, y, k, data);
+    stop = time_double();
+    profile_read += stop-start;
+    start = time_double();
     write_hdf(x, y, k, dataset_id, dataspace_id, data);
+    stop = time_double();
+    profile_write += stop-start;
     k++;
   }
   free(data);
@@ -235,8 +247,9 @@ main(int argc, char* argv[])
 
   close_all(file_id, dataset_id, dataspace_id);
 
-
   printf("done.\n");
+  printf("profile_read:  %0.3f\n", profile_read);
+  printf("profile_write: %0.3f\n", profile_write);
   return EXIT_SUCCESS;
 }
 
