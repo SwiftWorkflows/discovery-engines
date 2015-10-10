@@ -1,5 +1,5 @@
 
-CFLAGS += -std=gnu99 -g -Wall
+CFLAGS += -std=gnu99 -g -Wall -O3
 
 HDF = /usr
 # HDF = $(HOME)/sfw/hdf5-1.8.11
