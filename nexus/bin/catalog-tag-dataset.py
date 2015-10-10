@@ -20,5 +20,3 @@ token_file = os.getenv('HOME','')+"/.ssh/gotoken.txt"
 wrap = CatalogWrapper(token_file=token_file)
 
 L = wrap.catalogClient.get_catalogs()
-
-

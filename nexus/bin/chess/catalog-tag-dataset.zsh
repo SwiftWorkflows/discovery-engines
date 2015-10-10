@@ -91,8 +91,8 @@ annotate_nxs()
   fi
 
   print "Annotating member: ${NXS}"
-  # TEMPERATURE=$( ${DE_HOME}/nexus/bin/nexus-temperature ${NXS} )
-  TEMPERATURE=100
+  TEMPERATURE=$( ${DE_HOME}/nexus/bin/nexus-temperature ${NXS} )
+  # TEMPERATURE=100
   DATE=$( stat ${NXS} | awk '$1 == "Modify:" { print $2 " " $3 }' )
   DATE=${DATE/.[0-9]*/} # Chop off subsecond resolution
   ANNOTATIONS=(

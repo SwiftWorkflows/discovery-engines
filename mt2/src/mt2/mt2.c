@@ -4,13 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <hdf5.h>
 #include <tiffio.h>
 
 #include "util.h"
 
-#define MAX_FILENAME (64*1024)
+#define MAX_NAME     (64*1024)
+#define MAX_FILENAME MAX_NAME
 
 #define pixel int32_t
   // uint32_t
@@ -18,10 +20,18 @@
 double profile_read  = 0;
 double profile_write = 0;
 
+char dataset_name[MAX_NAME];
+
 void
 usage(void)
 {
   printf("usage: mt2 x y z output_file < input_file\n");
+}
+
+static void
+set_defaults(void)
+{
+  strcpy(dataset_name, "/entry");
 }
 
 static void
@@ -101,7 +111,7 @@ init_output(int x, int y, int z, char* filename,
   H5Pset_chunk(plist, 3, cdims);
   H5Pset_deflate(plist, 1);
     
-  *dataset_id = H5Dcreate2(*file_id, "/entry", H5T_STD_I32LE,
+  *dataset_id = H5Dcreate2(*file_id, dataset_name, H5T_STD_I32LE,
                            *dataspace_id,
                            H5P_DEFAULT, plist, H5P_DEFAULT);
   check_msg(dataspace_id > 0, "H5Screate2 failed.");
@@ -227,6 +237,29 @@ close_all(hid_t file_id, hid_t dataset_id, hid_t dataspace_id)
   check_msg(status >= 0, "could not H5Dclose() file");
 }
 
+static bool
+scan_opts(int argc, char** argv,
+          bool* use_existing_ds)
+{
+  // Defaults:
+  *use_existing_ds = false;
+
+  int opt;
+  while ((opt = getopt(argc, argv, "ud:")) != -1)
+  {
+    switch (opt)
+    {
+      case 'u':
+        *use_existing_ds = true;
+        break;
+      case 't':
+        strcpy(dataset_name, optarg);
+        break;
+    }
+  }
+  return true;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -234,8 +267,12 @@ main(int argc, char* argv[])
   int x, y, z;
   hid_t file_id, dataset_id, dataspace_id;
 
+  set_defaults();
+  
   bool rc;
-
+  bool use_existing_ds;
+  rc = scan_opts(argc, argv, &use_existing_ds);
+  check_msg(rc, "error in arguments!");
   rc = scan_args(argc, argv, &x, &y, &z, &output_filename);
   check_msg(rc, "error in arguments!");
 

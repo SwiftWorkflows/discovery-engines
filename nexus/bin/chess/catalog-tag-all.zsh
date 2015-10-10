@@ -39,7 +39,7 @@ if (( CREATE_DEFS ))
 then
   # Text
   KEYS=( "name" "PI" "host" "path" "size_human" "sample" \
-    "beamline" )
+    "beamline" "status" )
   for KEY in ${KEYS}
   do
     # This fails if the annotation exists

@@ -2,7 +2,7 @@
 # MK-LINKS
 # Creates directories and links in APS FS that point back to DAQ
 
-import os, sys
+import os, stat, shutil, sys
 
 def usage():
     print "usage: <source directory (DAQ)> <destination directory (APS)>"
@@ -45,7 +45,12 @@ for root,dirs,files in os.walk(src, followlinks=True):
         # print prefix
         subpath = "/".join(tokens)
         source    = prefix+"daq/current/a2/rosenkranz-311-1/"+subpath+"/"+f
-        link_name = dst+"/rosenkranz-311-1/"+subpath+"/"+f
-        if not os.path.islink(link_name):
-            print ("ln " + source + " " + link_name)
-            os.symlink(source, link_name)
+        copy_name = dst+"/rosenkranz-311-1/"+subpath+"/"+f
+        if f.endswith(".nxs"):
+            if not os.path.isfile(copy_name):
+                shutil.copyfile(source, copy_name)
+                os.chmod(copy_name, perms)
+        else:
+            if not os.path.islink(copy_name):
+                print ("ln " + source + " " + copy_name)
+                os.symlink(source, copy_name)
