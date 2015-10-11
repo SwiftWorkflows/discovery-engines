@@ -1,0 +1,18 @@
+#!/usr/bin/env tclsh
+
+lappend auto_path /home/wozniak/mcs/ShellTools/tcl
+package require woztools 0.0
+
+set template "/home/wozniak/proj/d-e/nexus/bin/chess/sge.sh.m4"
+
+set dir     [ head argv ]
+set jobname [ head argv ]
+set env(JOBNAME) $jobname
+set env(COMMAND) $argv
+
+cd $dir
+exec m4 < $template > $jobname.sh
+
+set output [ exec qsub $jobname.sh ]
+set job_id [ lindex $output 2 ]
+show job_id
