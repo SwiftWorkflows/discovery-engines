@@ -2,10 +2,11 @@
 *.o
 *.hdf
 *project
-# Emacs Tramp garbage: 
-*sshx*
 *.kml
+*.pyc
 *.swiftx
 *.tic
 logs
 turbine-directory.txt
+# Emacs Tramp garbage: 
+*sshx
