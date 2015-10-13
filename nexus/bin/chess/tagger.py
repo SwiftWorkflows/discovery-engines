@@ -30,7 +30,7 @@ while True:
 
     # Initialize our data structures for sorting
     not_stacked = dict()
-    for i in range(1,4):
+    for i in range(1,101):
         not_stacked["f"+str(i)] = []
 
     # Look for scan.log files without a corresponding NXS file
@@ -38,6 +38,7 @@ while True:
     for scan_log in scan_logs:
         fn_dir = os.path.dirname(scan_log)
         fn = os.path.basename(fn_dir) # f1,2,3
+        if fn == "ceria": continue
         tokens = fn_dir.split("/")
         n = len(tokens)
         tokens = tokens[6:n]
@@ -47,7 +48,7 @@ while True:
             print "Found NXS:  " + nxs_file
         else:
             print "Found WORK: " + scan_log
-            not_stacked[fn].append(scan_log)
+            not_stacked[fn]+=[scan_log]
 
     # Print statistics
     msg = "status:"
