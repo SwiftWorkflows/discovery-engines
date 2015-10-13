@@ -47,5 +47,5 @@ foreach i in [0:S-1]
 
 wait deep (A)
 {
-  cctw_merge(getenv("PWD"), "cctw-merge.zsh", out_file);
+  cctw_merge(getenv("PWD"), "cctw-merge", "cctw-merge.zsh "+out_file);
 }
