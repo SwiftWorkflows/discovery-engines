@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 # MK-LINKS
 # Creates directories and links in APS FS that point back to DAQ
