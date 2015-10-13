@@ -1,8 +1,9 @@
 #!/bin/zsh
 
-if [[ ${#*} != 2 ]]
+if [[ ${#*} != 3 ]]
 then
     print "usage: <OUTPUT_FILE> <OUTPUT_ENTRY> <SUBSETS>"
+    print "given: ${*}"
     return 1
 fi
 
