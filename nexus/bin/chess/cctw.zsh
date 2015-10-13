@@ -11,12 +11,20 @@ fi
 SCRIPT=$1
 INPUT_FILE=$2
 INPUT_ENTRY=$3
-OUTPUT_FILE=$2
-OUTPUT_ENTRY=$3
+OUTPUT_FILE=$4
+OUTPUT_ENTRY=$5
 shift 5
+
+# Optional arguments (-j <threads>, -S i/n subsets)
 A=${*}
 
-echo cctw transform --script ${SCRIPT}     \
+# Print a header
+print "CCTW.ZSH"
+date "+%m/%d/%Y %I:%M%p"
+print
+
+set -x
+cctw transform --script ${SCRIPT}     \
      ${INPUT_FILE}\#${INPUT_ENTRY}         \
      -o ${OUTPUT_FILE}\#${OUTPUT_ENTRY}    \
      ${=A} \
