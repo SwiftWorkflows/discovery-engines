@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+set -eu
+
 if [[ ${#*} != 3 ]]
 then
     print "usage: <OUTPUT_FILE> <OUTPUT_ENTRY> <SUBSETS>"
@@ -13,7 +15,11 @@ SUBSETS=$3
 
 S=$((SUBSETS-1))
 
-INPUTS=$( eval print "${OUTPUT_FILE%.nxs}-{0..${S}}.nxs" ) 
+INPUTS=()
+for (( i=0 ; i<S ; i++ ))
+do
+  INPUTS+="${OUTPUT_FILE%.nxs}-${i}.nxs"\#${OUTPUT_ENTRY}
+done
 
-echo cctw merge ${^INPUTS}\#${OUTPUT_ENTRY} \
+cctw merge ${INPUTS} \
      -o ${OUTPUT_FILE}\#${OUTPUT_ENTRY}
