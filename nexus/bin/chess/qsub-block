@@ -3,27 +3,53 @@
 lappend auto_path /home/wozniak/mcs/ShellTools/tcl
 package require woztools 0.0
 
+# Defaults
+set cores 1
+
+arrays A P
+getopts A P "j:" $argv
+if [ info exists A(j) ] { set cores $A(j) }
+head $optind argv
+
+show argv
+
 set template "/home/wozniak/proj/d-e/nexus/bin/chess/sge.sh.m4"
 
-set env(X) 3
+set directory [ head argv ]
+set jobname   [ head argv ]
 
-set dir     [ head argv ]
-set jobname [ head argv ]
-set env(JOBNAME) $jobname
-set env(COMMAND) $argv
+puts "argv: $argv"
 
-cd $dir
-exec m4 < $template > $jobname.sh
+set command ""
+foreach a $argv {
+    set command "$command $a"
+}
 
-set output [ exec qsub $jobname.sh ]
+set env(DIRECTORY) $directory 
+set env(JOBNAME)   $jobname
+set env(COMMAND)   $command
+set env(CORES)     $cores
+
+set start [ clock seconds ] 
+
+file mkdir $directory/jobs
+cd $directory
+exec m4 < $template > jobs/$jobname.sh
+
+set output [ exec qsub jobs/$jobname.sh ]
 set job_id [ lindex $output 2 ]
 show job_id
 
-set max_delay 20
+set max_delay 60
 set delay 5
 while true {
     after [ expr $delay * 1000 ]
     set output [ exec qstat ]
     if { [ string first $job_id $output ] < 0 } break
     if { $delay < $max_delay } { incr delay }
+    set stop [ clock seconds ]
+    printf "time: %0i" [ expr $stop - $start ]
 }
+
+set stop [ clock seconds ]
+printf "total duration: %i" [ expr $stop - $start ]

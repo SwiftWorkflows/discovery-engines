@@ -3,16 +3,26 @@
 lappend auto_path /home/wozniak/mcs/ShellTools/tcl
 package require woztools 0.0
 
+# Defaults
+set cores 1
+
+arrays A P
+getopts A P "j" $argv
+if [ info exists A(j) ] { set cores $A(j) }
+
 set template "/home/wozniak/proj/d-e/nexus/bin/chess/sge.sh.m4"
 
-set dir     [ head argv ]
-set jobname [ head argv ]
-set env(JOBNAME) $jobname
-set env(COMMAND) $argv
+set directory [ head argv ]
+set jobname   [ head argv ]
+set env(DIRECTORY) $directory 
+set env(JOBNAME)   $jobname
+set env(COMMAND)   $argv
+set env(CORES)     $cores
 
-cd $dir
-exec m4 < $template > $jobname.sh
+file mkdir $directory/jobs
+cd $directory
+exec m4 < $template > jobs/$jobname.sh
 
-set output [ exec qsub $jobname.sh ]
+set output [ exec qsub jobs/$jobname.sh ]
 set job_id [ lindex $output 2 ]
 show job_id
