@@ -9,3 +9,7 @@
 *.tic
 logs
 turbine-directory.txt
+cfg.sh
+TAGS
+data-root
+*.tgz
