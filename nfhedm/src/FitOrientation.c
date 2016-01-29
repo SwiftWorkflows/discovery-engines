@@ -259,7 +259,7 @@ double **SpotsMat = NULL;
 // END CACHED DATA
 
 static inline void
-Init_FitOrientation(const char *ParamFN, const char *MicrostructureFN)
+Init_FitOrientation(const char *ParamFN)
 {
     if (fit_orientation_initialized)
         return;
@@ -289,7 +289,7 @@ static bool ReadOrientations(const char *DataDirectory, int NrOrientations,
 
 static bool ReadSpots(const char *DataDirectory, int TotalDiffrSpots, double ***SpotsMat);
 
-int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureFN)
+int FitOrientationAll(const char *ParamFN, int rown, char *MicrostructureData)
 {
     LOG("FitOrientationAll(rown=%i)", rown);
 
@@ -370,6 +370,7 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
         // exit(0);
     }
 
+    double result[5];
     int rc = FitOrientation_Calc(rown, gs, params.px, params.tx, params.ty, params.tz,
                                  /*7*/params.nLayers, params.Lsd, XY, NrOrientations,
                                  /*11*/NrSpots, OrientationMatrix, SpotsMat,
@@ -377,7 +378,10 @@ int FitOrientationAll(const char *ParamFN, int rown, const char *MicrostructureF
                                  /*18*/params.ybc, params.zbc, ObsSpotsInfo, params.minFracOverlap,
                                  /*22*/params.LatticeConstant, params.Wavelength, params.SpaceGroup, params.ExcludePoleAngle,
                                  /*26*/params.OmegaRanges, params.NoOfOmegaRanges, params.BoxSizes,
-                                 params.tol, TotalDiffrSpots, xs, ys, MaxTtheta);
+                                 params.tol, TotalDiffrSpots, xs, ys, MaxTtheta,
+                                 result);
+
+    dbls2string(result, 5, MicrostructureData);
 
     assert(rc == 1);
 
@@ -540,7 +544,8 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
                         double LatticeConstant[6], double Wavelength, int SpaceGroup, double ExcludePoleAngle,
                         double OmegaRanges[MAX_N_OMEGA_RANGES][2], int NoOfOmegaRanges,
                         double BoxSizes[MAX_N_OMEGA_RANGES][4],
-                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta)
+                        double tol, int TotalDiffrSpots, double xs, double ys, double MaxTtheta,
+                        double* result)
 {
     // Go through each orientation and compare with observed spots.
 
@@ -700,12 +705,12 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
     //FreeMemMatrix(OrientMatrix,MAX_POINTS_GRID_GOOD);
     LOG("%d %d %f %f %f %f %f %f\n",rown, OrientationGoodID,
            xs, ys, BestEuler[0],BestEuler[1],BestEuler[2],BestFrac);
-    double result[5];
     result[0] = (double) rown;
     result[1] = BestEuler[0];
     result[2] = BestEuler[1];
     result[3] = BestEuler[2];
     result[4] = BestFrac;
+    /*
     // fwrite(result, sizeof(double), 5, result_fd);
     DEBUG("FitOrientation_Calc() pwrite: rown=%i",rown-1);
     int rc;
@@ -722,6 +727,7 @@ int FitOrientation_Calc(int rown, double gs, double px, double tx, double ty, do
         exit(EXIT_FAILURE);
     }
     PROFILE_END(p1);
+    */
     LOG("FitOrientation_Calc() done.");
 
     return 1;
