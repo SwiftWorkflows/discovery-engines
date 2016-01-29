@@ -15,4 +15,11 @@ if __name__ == "__main__":
     queries = Queries(client, catalog_id)
     files = queries.list_files(catalog_id)
     for f in files:
-        print f
+        print f, files[f]
+        dataset_id = files[f][1]
+        member_id = files[f][1]
+        print member_id
+        annotations = queries.list_member_annotations(catalog_id,
+                                                      dataset_id,
+                                                      member_id)
+        print annotations
