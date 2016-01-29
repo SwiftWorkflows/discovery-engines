@@ -8,6 +8,6 @@
 #ifndef SWIFT_BINDINGS_H_
 #define SWIFT_BINDINGS_H_
 
-int FitOrientation_Swift(const char *ParameterFileName, int rown, const char *MicrostructureFN);
+int FitOrientation_Swift(const char *ParameterFileName, int rown, char *MicrostructureData);
 
 #endif /* SWIFT_BINDINGS_H_ */

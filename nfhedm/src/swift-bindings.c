@@ -9,7 +9,7 @@
 
 #include "swift-bindings.h"
 
-int FitOrientation_Swift(const char *ParameterFileName, int rown, const char *MicrostructureFN)
+int FitOrientation_Swift(const char *ParameterFileName, int rown, char *MicrostructureData)
 {
-    return FitOrientationAll(ParameterFileName, rown, MicrostructureFN);
+    return FitOrientationAll(ParameterFileName, rown, MicrostructureData);
 }
