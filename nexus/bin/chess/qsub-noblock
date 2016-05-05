@@ -12,6 +12,15 @@ if [ info exists A(j) ] { set cores $A(j) }
 
 set template "/home/wozniak/proj/d-e/nexus/bin/chess/sge.sh.m4"
 
+proc usage { } { 
+  puts "usage: qsub-noblock <directory> <jobname> <command...>"
+}
+
+if { [ llength $argv ] < 2 } { 
+  usage 
+  exit 1
+}
+
 set directory [ head argv ]
 set jobname   [ head argv ]
 set env(DIRECTORY) $directory 
