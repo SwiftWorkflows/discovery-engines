@@ -1,0 +1,56 @@
+#!/bin/zsh
+
+set -eu
+
+SRC=/nfs/chess/daq/2015-3/a2/rosenkranz-311-1
+DST=/nfs/chess/aps/rosenkranz-311-1
+
+MT2=${HOME}/proj/d-e/mt2/bin/mt2
+MK_LINKS=${HOME}/proj/d-e/nexus/bin/chess/mk-links.py
+
+LIST=$( mktemp /tmp/wozniak-list-XXX.txt )
+
+LAST_STAMP=0
+while true
+do
+  cd ${SRC}
+
+  python ${MK_LINKS} \
+         $( readlink ~/rosenkranz-311-1 ) \
+         $( readlink ~/aps )
+  
+  NOT_STACKED=()
+  foreach SD in **/scan*.log
+  do
+    D=$( dirname ${SD} )
+    NXS=${DST}/${D}.nxs
+    if [[ ! -f ${NXS} ]]
+    then
+        print "Found WORK: ${SD}"
+        NOT_STACKED+=${SD}
+    else
+      print "Found NXS:  ${NXS}"
+    fi
+  done
+  
+  if [[ ${#NOT_STACKED} == 0 ]]
+  then
+    print sleep
+    sleep 60
+    continue
+  fi
+  LATEST=$( ls -t ${NOT_STACKED} | tail -1 )
+  d LATEST
+  D=$( dirname ${LATEST} )
+  cd ${DST}
+  print -l ${DST}/${D}/*.tiff | sort > ${LIST}
+  d LIST D
+  @ time nice ${MT2} 2463 2527 3700 ${DST}/${D}.nxs < ${LIST}
+  chmod ag+rw ${DST}/${D}.nxs 
+  print
+  if [[ -f ~/tagger.stop ]]
+  then
+      print "Found tagger.stop!"
+      exit
+  fi
+done |& tee ~/tagger.log
