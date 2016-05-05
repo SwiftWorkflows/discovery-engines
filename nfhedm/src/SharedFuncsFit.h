@@ -260,4 +260,9 @@ static inline int min_integer(int a, int b)
         return b;
 }
 
+/**
+   Stick double data in space-separated string (good for Tcl)
+ */
+void dbls2string(double* data, int count, char* output);
+
 #endif

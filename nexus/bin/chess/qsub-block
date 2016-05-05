@@ -11,14 +11,10 @@ getopts A P "j:" $argv
 if [ info exists A(j) ] { set cores $A(j) }
 head $optind argv
 
-show argv
-
 set template "/home/wozniak/proj/d-e/nexus/bin/chess/sge.sh.m4"
 
 set directory [ head argv ]
 set jobname   [ head argv ]
-
-puts "argv: $argv"
 
 set command ""
 foreach a $argv {
@@ -41,14 +37,14 @@ set job_id [ lindex $output 2 ]
 show job_id
 
 set max_delay 60
-set delay 5
+set delay 20
 while true {
     after [ expr $delay * 1000 ]
     set output [ exec qstat ]
     if { [ string first $job_id $output ] < 0 } break
     if { $delay < $max_delay } { incr delay }
     set stop [ clock seconds ]
-    printf "time: %0i" [ expr $stop - $start ]
+    # printf "time: %0i" [ expr $stop - $start ]
 }
 
 set stop [ clock seconds ]

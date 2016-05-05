@@ -23,6 +23,10 @@ cctw_merge(string directory, string jobname, string a)
   "qsub-block" "-j" 1 directory jobname a;
 }
 
+c = clock_seconds() %% 10000;
+user = getenv("USER");
+jobname = "cctw-xform-%s-%i" % (user,c);
+
 S = 8; // Number of partial CCTWs
 threads = 12;
 
@@ -38,10 +42,9 @@ foreach i in [0:S-1]
                         out_file_n, out_entry,
                         "-S", subset_arg,
                         "-j", toString(threads) ];
-  
-  void o = cctw_xform(getenv("PWD"), "cctw-%i"%i,
-                      command,
-                      threads);
+
+  void o = cctw_xform(getenv("PWD"), "%s-%i"%(jobname,i),
+                      command, threads);
   o => A[i] = 0;
 }
 

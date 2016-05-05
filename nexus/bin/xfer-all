@@ -1,0 +1,35 @@
+#!/usr/bin/env tclsh
+
+package require woztools 0.0
+
+# Use find to generate file.list
+set usage "usage: <file.list>"
+argc 1
+set list_file $argv
+
+set L [ slurp $list_file ]
+
+set GO     "cli.globusonline.org"
+set classe "wozniak\\#classe-wozniak/~/nfs/chess/aps/rosenkranz-311-1"
+set nxrs   "wozniak\\#nxrswozniak/~/data2/chess-2015-1"
+
+#show classe
+#exit
+
+foreach f $L {
+    # scp -s 1 == sync on file size (cf. GO scp -h) 
+    set command "ssh $GO transfer -s 1 --" $classe/$f $nxrs/$f"
+    # set command "echo hi echo hi"
+    show command
+    if [ catch { set output [ exec {*}$command ] } e ] { 
+	puts ""
+	puts "Transfer failed!"
+	puts ""
+	show command
+	puts ""
+	puts $e
+	exit 1
+    } 
+    show output
+    after 30000
+}

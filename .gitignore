@@ -8,5 +8,9 @@
 *.tic
 logs
 turbine-directory.txt
-# Emacs Tramp garbage: 
+# Emacs Tramp garbage:
 *sshx
+cfg.sh
+TAGS
+data-root
+*.tgz

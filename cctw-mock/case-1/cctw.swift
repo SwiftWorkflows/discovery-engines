@@ -38,13 +38,14 @@ global const int N = 10;
 
 main
 {
-  file nxs = input(argv("nxs"));
+  file init_nxs = input(argv("init"));
+  file final_nxs<argv("final")>;
   int tasks =  M*N;
   file chunks[];
   foreach i in [0:tasks-1]
   {
-    file chunk<"chunks/%i.nxs"%i> = transform_sh(nxs, i);
+    file chunk<"chunks/%i.nxs"%i> = transform_sh(init_nxs, i);
     chunks[i] = chunk;
   }
-  file final<"final.nxs"> = merge(chunks, 0, tasks-1);
+  final_nxs = merge(chunks, 0, tasks-1);
 }

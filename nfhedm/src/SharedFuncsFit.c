@@ -929,3 +929,11 @@ ntoh_Float32s(float32_t *data, int count) {
     }
 }
 
+void
+dbls2string(double* data, int count, char* output)
+{
+    char* p = &output[0];
+    for (int i = 0; i < count; i++)
+        p += sprintf(p, "%f", data[i]);
+    p = '\0';
+}

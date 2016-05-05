@@ -30,6 +30,7 @@ do
   NOT_STACKED=()
   
   foreach SD in **/spec.done 
+  # foreach SD in **/scan*.log
   do
     D=$( dirname ${SD} )
     NXS=${DST}/${D}.nxs
@@ -54,6 +55,12 @@ do
   cd ${DST}
   print -l ${DST}/${D}/*.tiff | sort > ${LIST}
   d LIST D
-  @ nice ${MT2} 2463 2527 3700 ${DST}/${D}.nxs < ${LIST}
+  @ time nice ${MT2} 2463 2527 3700 ${DST}/${D}.nxs < ${LIST}
+  chmod ag+rw ${DST}/${D}.nxs 
   print
+  if [[ -f ~/tagger.stop ]]
+  then
+      print "Found tagger.stop!"
+      exit
+  fi
 done |& tee ~/tagger.log
