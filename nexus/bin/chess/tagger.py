@@ -39,6 +39,8 @@ while True:
         fn_dir = os.path.dirname(scan_log)
         fn = os.path.basename(fn_dir) # f1,2,3
         if fn == "ceria": continue
+        if "test" in scan_log: continue
+        if "macros" in scan_log: continue
         tokens = fn_dir.split("/")
         n = len(tokens)
         tokens = tokens[6:n]
@@ -89,6 +91,7 @@ while True:
     # Create the TIFF list file
     tiffs = find_extension(fn_dir, ".tiff")
     tiffs.sort()
+    nxs_file = temperature_dir+"/"+fn+".nxs"
     list_txt = "/tmp/wozniak-tagger-list.txt"
     with open(list_txt, "w") as fd:
         for tiff in tiffs:
@@ -97,7 +100,6 @@ while True:
     # Issue the mt2 command
     params = " 2463 2527 3700 "
     stack_out = fn_dir+"/stack.out"
-    nxs_file = temperature_dir+"/"+fn+".nxs"
     command = mt2 + params + nxs_file + \
               " < " + list_txt +        \
               " > " + stack_out
