@@ -1,5 +1,10 @@
 #!/bin/zsh
 
+# Print a header
+print "CCTW-SPLIT.ZSH"
+date "+%b %d %I:%M%p"
+print
+
 if [[ ${#*} < 5 ]]
 then
     print "usage: <SCRIPT> <INPUT_FILE> <INPUT_ENTRY>"
@@ -7,6 +12,12 @@ then
     print "       <OTHER ARGS>*"
     return 1
 fi
+
+grep "model name" /proc/cpuinfo | head -1
+grep mips /proc/cpuinfo | head -1
+print
+
+print "CCTW:"
 
 SCRIPT=$1
 INPUT_FILE=$2
@@ -18,10 +29,7 @@ shift 5
 # Optional arguments (-j <threads>, -S i/n subsets)
 A=${*}
 
-# Print a header
-print "CCTW.ZSH"
-date "+%m/%d/%Y %I:%M%p"
-print
+START=$( date +%s )
 
 set -x
 cctw transform --script ${SCRIPT}     \
@@ -29,3 +37,7 @@ cctw transform --script ${SCRIPT}     \
      -o ${OUTPUT_FILE}\#${OUTPUT_ENTRY}    \
      ${=A} \
      --normalization 0
+set +x >& /dev/null
+
+STOP=$( date +%s )
+print "TIME:" $(( STOP-START ))
