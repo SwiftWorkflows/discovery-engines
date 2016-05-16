@@ -7,6 +7,9 @@ zparseopts -D -E d=d
 
 DIRS=( ${*} )
 
+path+=~/.local.bak/bin
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HOME}/Public/sfw/Python-2.7.10/lib
+
 if [[ -z ${GCAT_DEFAULT_CATALOG_ID} ]]
 then
   print "Set GCAT_DEFAULT_CATALOG_ID"
@@ -39,7 +42,7 @@ if (( CREATE_DEFS ))
 then
   # Text
   KEYS=( "name" "PI" "host" "path" "size_human" "sample" \
-    "beamline" "status" )
+    "beamline" "status" "temperature" )
   for KEY in ${KEYS}
   do
     # This fails if the annotation exists
@@ -55,7 +58,7 @@ then
   done
 
   # Floats
-  KEYS=( "fraction" "temperature_K" )
+  KEYS=( "fraction" )
   for KEY in ${KEYS}
   do
     # This fails if the annotation exists

@@ -3,83 +3,85 @@
 # MK-LINKS
 # Creates directories and links in APS FS that point back to DAQ
 
-import os, stat, shutil, sys, time
+import os, stat, shutil, sys, time, glob, re
+
 
 class mk_links:
 
-    def __init__(self):
+    def __init__(self, src, dst):
         self.perms = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | \
                      stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP
         self.count = 0
-    
+        self.src = src
+        self.dst = dst
+
     def usage(self):
         print "usage: <source directory (DAQ)> " + \
-                     "<destination directory (APS)>"
+                     "<destination directory (APS)>" + \
+                     "<subpath (sample/label/temperature)>"
 
-    """ Create n directory up-links""" 
+    """ Create n directory up-links """
     def mk_ups(self, n):
         result = ""
         for i in range(0,n-1):
             result = result + "../"
         return result
 
-    def go(self, src, dst):
-        for root,dirs,files in os.walk(src, followlinks=True):
-            # print "root:", root
-            tokens = root.split("/")
-            #  print tokens
-            n = len(tokens)
-            tokens = tokens[7:n]
-            # print tokens
-            subpath = "/".join(tokens)
-            newdir = dst+"/rosenkranz-311-1/"+subpath
-            # print "newdir:",newdir
-            if not os.path.exists(newdir):
-                print "mkdir:", newdir
-                os.mkdir(newdir)
-                os.chmod(newdir, self.perms)
-            self.copy_files(dst, files, tokens, n)
+    def go(self, parent, subpath, nxs_files, tiff_files):
+        newdir = self.dst+subpath
+        newdir = re.sub("data[12]/", "", newdir)
+        print "newdir:",newdir
+        if not os.path.exists(newdir):
+            print "mkdir:", newdir
+            os.makedirs(newdir)
+            os.chmod(newdir, self.perms)
+            self.copy_files(parent, subpath, nxs_files, tiff_files)
+        return True
 
-    def copy_files(self, dst, files, tokens, n):
-        daq = "daq/current/a2/rosenkranz-311-1/"
-        for f in files:
-            # print "f:",f
-            prefix = self.mk_ups(n-4)
-            # print prefix
-            # print tokens
-            subpath = "/".join(tokens)
-            # print "subpath:", subpath
-            copy_name = dst+"/rosenkranz-311-1/"+subpath+"/"+f
-            # print copy_name
-            self.count += 1
-            # if self.count == 10:
-            #    sys.exit(0)
-            # print ""
-            if f.endswith(".nxs"):
-                if not os.path.isfile(copy_name):
-                    source_abs = "/nfs/chess/"+daq+subpath+"/"+f
-                    print "f:",f
-                    print "prefix:",prefix
-                    print "tokens:",tokens
-                    print "subpath:", subpath
-                    print ("cp " + source_abs + "\n   " + copy_name)
-                    # time.sleep(1)
-                    shutil.copyfile(source_abs, copy_name)
-                    os.chmod(copy_name, self.perms)
+    def copy_files(self, parent, subpath, nxs_files, tiff_files):
+        print "copy_files: subpath:", subpath
+
+        for f in nxs_files:
+            source_abs = f
+            copy_name  = self.dst+parent+"/"+os.path.basename(f)
+            copy_name = re.sub("data[12]/", "", copy_name)
+            if not os.path.isfile(copy_name):
+                print ("cp " + source_abs + "\n   " + copy_name)
+                # time.sleep(1)
+                shutil.copyfile(source_abs, copy_name)
+                os.chmod(copy_name, self.perms)
             else:
-                if not os.path.islink(copy_name):
-                    source_rel = prefix+daq+subpath+"/"+f
-                    # time.sleep(1)
-                    print ("ln " + source_rel + "\n   " + copy_name)
-                    os.symlink(source_rel, copy_name)
-                
+                # print "exists:", copy_name
+                pass
+
+        for f in tiff_files:
+            source_abs = self.src+subpath+"/"+f
+            # print "source_abs:", source_abs
+
+            copy_name = self.dst+subpath+"/"+f
+            copy_name = re.sub("data[12]/", "", copy_name)
+            copy_name = copy_name.replace(".tmp", "")
+
+            if not os.path.islink(copy_name):
+                # time.sleep(1) ; sys.stdout.flush()
+                # print ("ln " + source_abs + "\n   " + copy_name)
+                os.symlink(source_abs, copy_name)
+
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        usage()
+    if len(sys.argv) != 4:
+        mk_links().usage()
         sys.exit(1)
     src = sys.argv[1]
     dst = sys.argv[2]
-    ml = mk_links()
-    ml.go(src,dst)
-    print "count:", ml.count
-    
+    subpath = sys.argv[3]
+
+    parent = os.path.dirname(subpath)
+    parent = os.path.dirname(parent)
+    parent = os.path.dirname(parent)
+
+    pattern = src+parent+"/*.nxs"
+    nxs_files = glob.glob(pattern)
+
+    tiff_files = os.listdir(src+subpath)
+    tiff_files.sort()
+    mk_links(src,dst).go(parent, subpath, nxs_files, tiff_files)

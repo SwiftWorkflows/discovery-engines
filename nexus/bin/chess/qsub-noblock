@@ -5,10 +5,13 @@ package require woztools 0.0
 
 # Defaults
 set cores 1
+set job_out ""
 
 arrays A P
-getopts A P "j" $argv
-if [ info exists A(j) ] { set cores $A(j) }
+getopts A P "jo:" $argv
+if [ info exists A(j) ] { set cores   $A(j) }
+if [ info exists A(o) ] { set job_out $A(o) }
+head $optind argv
 
 set template "/home/wozniak/proj/d-e/nexus/bin/chess/sge.sh.m4"
 
@@ -23,15 +26,25 @@ if { [ llength $argv ] < 2 } {
 
 set directory [ head argv ]
 set jobname   [ head argv ]
-set env(DIRECTORY) $directory 
-set env(JOBNAME)   $jobname
+
+set jobs_dir /home/$env(USER)/jobs
+set job_script $jobs_dir/$jobname.sh
+
+if { $job_out eq "" } {
+  set job_out $jobs_dir/$jobname.out
+}
+
+set env(DIRECTORY) $directory
+set env(JOBS_DIR)  $jobs_dir
+set env(JOB_NAME)  $jobname
+set env(JOB_OUT)   $job_out
 set env(COMMAND)   $argv
 set env(CORES)     $cores
 
-file mkdir $directory/jobs
+file mkdir $jobs_dir
 cd $directory
-exec m4 < $template > jobs/$jobname.sh
+exec m4 < $template > $job_script
 
-set output [ exec qsub jobs/$jobname.sh ]
+set output [ exec qsub $job_script ]
 set job_id [ lindex $output 2 ]
 show job_id

@@ -1,6 +1,9 @@
 #!/bin/zsh
 set -eu
 
+path+=~/.local.bak/bin
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HOME}/Public/sfw/Python-2.7.10/lib
+
 if [[ -z ${GCAT_DEFAULT_CATALOG_ID} ]]
 then
   print "Set GCAT_DEFAULT_CATALOG_ID"
@@ -18,7 +21,8 @@ then
   exit 1
 fi
 
-DIR=$1
+NAME=$1
+declare NAME
 
 DE_HOME=$( cd $( dirname $0 )/../../.. && /bin/pwd )
 [[ ${?} != 0 || ${DE_HOME} == "" ]] && crash "Could not find DE_HOME!"
@@ -26,13 +30,8 @@ DE_HOME=$( cd $( dirname $0 )/../../.. && /bin/pwd )
 source ${DE_HOME}/lib/helpers.zsh || \
   crash "Could not source helpers.zsh!"
 
-cd ${DIR}
-
-# Get absolute path
+# Get absolute path: Should be in sample directory
 DIR=$( /bin/pwd )
-
-NAME=$( basename ${DIR} )
-declare NAME
 
 SAMPLE=${NAME%_*}
 # FRACTION=${SAMPLE#}
@@ -41,13 +40,14 @@ ANNOTATIONS=(
   # Text
   name:${NAME}
   PI:"Ray Osborn"
-  beamline:"ANL APS Sector 11"
+  beamline:"CHESS A2"
   sample:${SAMPLE}
-  host:nxrs.msd.anl.gov
+  # host:nxrs.msd.anl.gov
+  host:lnx201.classe.cornell.edu
   path:${DIR}
   # Int8s
-  year:2015
-  month:04
+  year:2016
+  month:05
   # Float
   # fraction:${FRACTION}
 )
@@ -79,6 +79,7 @@ annotate_nxs()
   LABEL=$1
   NXS=$2
 
+  REALDIR=${DIR:a}
   FILE=${DIR}/${LABEL}/${NXS}
   FILE=${FILE:a} # Canonicalize path
   NXS_BASE=${NXS:t} # ZSH basename
@@ -91,8 +92,11 @@ annotate_nxs()
   fi
 
   print "Annotating member: ${NXS}"
-  TEMPERATURE=$( ${DE_HOME}/nexus/bin/nexus-temperature ${NXS} )
+  # TEMPERATURE=$( ${DE_HOME}/nexus/bin/nexus-temperature ${NXS} )
   # TEMPERATURE=100
+  t=${NXS%.nxs}
+
+  TEMPERATURE=${t#${NAME}_} # Pull out temperature path component
   DATE=$( stat ${NXS} | awk '$1 == "Modify:" { print $2 " " $3 }' )
   DATE=${DATE/.[0-9]*/} # Chop off subsecond resolution
   ANNOTATIONS=(
@@ -105,8 +109,7 @@ annotate_nxs()
   )
   if [[ ${TEMPERATURE} != "nan" ]]
   then
-    # Float
-    ANNOTATIONS+=temperature_K:${TEMPERATURE}
+    ANNOTATIONS+=temperature:${TEMPERATURE}
   fi
 
   print -l $ANNOTATIONS
