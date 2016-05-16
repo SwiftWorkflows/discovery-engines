@@ -3,16 +3,19 @@
 # from tifffile import *
 import tifffile as tiff
 
-import argparse, glob, os, random, subprocess
+import argparse, glob, os, random, subprocess, sys
 import numpy as np
 
 from nexusformat.nexus import *
 from nexusformat import nexus as nx
 
 """
+Checks random points in given NeXus file against values in 
+TIFF file directory.
+
 usage: 
 nxv = NXValidator()
-nxv.setup(...) or nxv.parse_args()
+nxv.setup(...) or nxv.parse_args(...)
 nxv.validate()
 """
 class NXValidator:
@@ -24,10 +27,10 @@ class NXValidator:
         if self.verbose:
             print msg
 
-    def parse_args(self):
-        parser = argparse.ArgumentParser(
-            description="Perform validation for NeXus file " + \
-                        "created from scan tiffs")
+    def setup_parser(self, argv):
+        parser = argparse.ArgumentParser(argv, 
+                 description="Perform validation for NeXus file " + \
+                             "created from scan tiffs")
         parser.add_argument('-s', '--sample', help='sample name')
         parser.add_argument('-l', '--label', help='sample label')
         parser.add_argument('-t', '--temperature',
@@ -35,6 +38,15 @@ class NXValidator:
         parser.add_argument('-f', '--f', help='f directory')
         parser.add_argument('-d', '--directory', default='',
                             help='scan directory containing tiffs')
+        parser.add_argument('-p', '--points', default='10',
+                            help='number of points to check')
+        parser.add_argument('-v', '--verbose', action='store_true',
+                            help='enable verbose output')
+        return parser
+            
+    def parse_args(self, argv=sys.argv):
+
+        parser = self.setup_parser(argv)
         args = parser.parse_args()
         
         directory   = args.directory.rstrip('/')
@@ -42,21 +54,21 @@ class NXValidator:
         label       = args.label
         temperature = args.temperature
         f           = args.f
-        points      = 10
-        verbose     = True
+        points      = int(args.points)
+        verbose     = args.verbose
         self.setup(directory, sample, label, temperature, f, \
                    points, verbose)
         
     def setup(self, directory, sample, label, temperature, f, \
               points, verbose):
         
-        self.directory = directory
-        self.sample = sample
-        self.label = label
+        self.directory   = directory
+        self.sample      = sample
+        self.label       = label
         self.temperature = temperature
-        self.f = f
-        self.points = points
-        self.verbose = verbose
+        self.f           = f
+        self.points      = points
+        self.verbose     = verbose
         
         if self.sample is None and self.label is None and \
            self.temperature is None:
@@ -68,17 +80,17 @@ class NXValidator:
 
         self.nxs_file = "/".join([self.sample,self.label]) + "/" + \
         self.sample + "_" + self.temperature + ".nxs"
-        self.out("NeXus file:" + self.nxs_file)
+        self.out("NeXus file: " + self.nxs_file)
         components = [self.sample, self.label, self.temperature]
         if not self.f == None:
             components += [self.f]
-        # print components
         scan_dir = "/".join(components)
         pattern = scan_dir+"/*.tiff"
-        self.out("tiff search:" + pattern)
+        self.out("tiff search: " + pattern)
         self.tiff_files = glob.glob(pattern)
-        self.out("Processing sample '%s', label '%s', temperature '%s'" % \
-                      (self.sample, self.label, self.temperature))
+        self.out("Processing: " + \
+                 "sample '%s', label '%s', temperature '%s'\n" % \
+                 (self.sample, self.label, self.temperature))
 
     def main(self):
         self.parse_args()
@@ -95,42 +107,23 @@ class NXValidator:
         random.seed(seed)
         tree = nxload(self.nxs_file)
         A = tree.f1.data.data
-
         X, Y, Z = A.shape
 
         for i in range(0,self.points):
            x = random.randint(0,X-1)
            y = random.randint(0,Y-1)
            z = random.randint(0,Z-1)
-           print x, y, z, A[x,y,z]
 
+           self.out("check: " + str((x,y,z)))
            tiff_file = self.tiff_files[x]
-           print tiff_file
+           self.out("TIFF file: " + tiff_file)
 
            t = tiff.imread(tiff_file)
-           # print t
+           self.out("compare: NeXus: " + str(A[x,y,z]._value) + \
+                             " TIFF: " + str(t[y,z]) + "\n")
 
-           # print A[x,0,0], t[0,0]
-           # print A[x,2,0], t[0,2]
-           # print A[x,0,2], t[2,0]
-           self.out("check: " + str((x,y,z, A[x,y,z], t[y,z])))
-
-           # print A[x,y,z].__dict__
-
-           # print A[x,y,z].__class__, t[y,z].__class__
            if not A[x,y,z]._value == t[y,z]:
                raise NXValidationException(nxs_file, x, y, z)
-           # with TiffFile(tiff_files[z]) as tiff:
-           #     # images = tiff.asarray()
-           #     # image = images[0]
-           #     # print image
-           #     for page in tiff:
-           #         print '\nPAGE\n'
-           #         for tag in page.tags.values():
-           #             t = tag.name, tag.value
-           #             print t
-           #         image = page.asarray()
-           #         print image
 
 class NXValidationException(Exception):
     def __init__(self, nxs_file, x, y, z):
