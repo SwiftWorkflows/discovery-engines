@@ -13,6 +13,9 @@ from nexusformat import nexus as nx
 Checks random points in given NeXus file against values in 
 TIFF file directory.
 
+command line usage: 
+use nxvalidate -h
+
 usage: 
 nxv = NXValidator()
 nxv.setup(...) or nxv.parse_args(...)
