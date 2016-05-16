@@ -16,7 +16,7 @@ TIFF file directory.
 command line usage: 
 use nxvalidate -h
 
-usage: 
+Python usage: 
 nxv = NXValidator()
 nxv.setup(...) or nxv.parse_args(...)
 nxv.validate()
