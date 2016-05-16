@@ -20,6 +20,7 @@ Python usage:
 nxv = NXValidator()
 nxv.setup(...) or nxv.parse_args(...)
 nxv.validate()
+Returns nothing, raises NXValidationException on mismatch
 """
 class NXValidator:
 
