@@ -22,11 +22,13 @@ class NXValidator:
 
     def __init__(self):
         self.nxs_file = None
-    
+
+    """Verbose output"""
     def out(self, msg):
         if self.verbose:
             print msg
 
+    """Internal method: construct and return an ArgumentParser"""
     def setup_parser(self, argv):
         parser = argparse.ArgumentParser(argv, 
                  description="Perform validation for NeXus file " + \
@@ -43,7 +45,8 @@ class NXValidator:
         parser.add_argument('-v', '--verbose', action='store_true',
                             help='enable verbose output')
         return parser
-            
+
+    """Set up the Validator with a command line string"""
     def parse_args(self, argv=sys.argv):
 
         parser = self.setup_parser(argv)
@@ -58,7 +61,8 @@ class NXValidator:
         verbose     = args.verbose
         self.setup(directory, sample, label, temperature, f, \
                    points, verbose)
-        
+
+    """Set up the Validator with particular settings"""
     def setup(self, directory, sample, label, temperature, f, \
               points, verbose):
         
@@ -92,6 +96,7 @@ class NXValidator:
                  "sample '%s', label '%s', temperature '%s'\n" % \
                  (self.sample, self.label, self.temperature))
 
+    """Implement the command line interface"""
     def main(self):
         self.parse_args()
         try:
@@ -101,6 +106,7 @@ class NXValidator:
             exit(1)
         self.out("Validation succeeded.")
 
+    """Run the validation"""
     def validate(self):
 
         seed = hash(self.nxs_file)
