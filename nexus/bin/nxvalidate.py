@@ -103,7 +103,7 @@ class NXValidator:
             self.validate()
         except NXValidationException as e:
             print str(e)
-            exit(1)
+            sys.exit(1)
         self.out("Validation succeeded.")
 
     """Run the validation"""
@@ -116,20 +116,20 @@ class NXValidator:
         X, Y, Z = A.shape
 
         for i in range(0,self.points):
-           x = random.randint(0,X-1)
-           y = random.randint(0,Y-1)
-           z = random.randint(0,Z-1)
+            x = random.randint(0,X-1)
+            y = random.randint(0,Y-1)
+            z = random.randint(0,Z-1)
 
-           self.out("check: " + str((x,y,z)))
-           tiff_file = self.tiff_files[x]
-           self.out("TIFF file: " + tiff_file)
+            self.out("check: " + str((x,y,z)))
+            tiff_file = self.tiff_files[x]
+            self.out("TIFF file: " + tiff_file)
 
-           t = tiff.imread(tiff_file)
-           self.out("compare: NeXus: " + str(A[x,y,z]._value) + \
-                             " TIFF: " + str(t[y,z]) + "\n")
+            t = tiff.imread(tiff_file)
+            self.out("compare: NeXus: " + str(A[x,y,z]._value) + \
+                              " TIFF: " + str(t[y,z]) + "\n")
 
-           if not A[x,y,z]._value == t[y,z]:
-               raise NXValidationException(nxs_file, x, y, z)
+            if not A[x,y,z]._value == t[y,z]:
+                raise NXValidationException(nxs_file, x, y, z)
 
 class NXValidationException(Exception):
     def __init__(self, nxs_file, x, y, z):
