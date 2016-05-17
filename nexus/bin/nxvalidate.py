@@ -30,6 +30,7 @@ class NXValidator:
     def out(self, msg):
         if self.verbose:
             print msg
+            sys.stdout.flush()
 
     """Internal method: construct and return an ArgumentParser"""
     def setup_parser(self, argv):
