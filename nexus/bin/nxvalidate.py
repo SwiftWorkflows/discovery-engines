@@ -111,8 +111,7 @@ class NXValidator:
         try:
             self.validate()
         except NXValidationException as e:
-            msg = str(e)
-            print msg
+            print str(e)
             sys.exit(1)
         self.out("Validation succeeded.")
 
