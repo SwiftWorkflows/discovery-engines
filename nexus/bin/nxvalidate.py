@@ -38,8 +38,9 @@ class NXValidator:
                  description="Perform validation for NeXus file " + \
                              "created from scan tiffs",
                  epilog="Runs until given number of points have " + \
-                        "been checked or number of nonzeros have " + \
-                        "been checked.  Here, nonzero means > 0."
+                        "been checked or number of nontrivials " + \
+                        "have been checked.  " + \
+                        "Here, nontrivial means > 0."
         )
         parser.add_argument('-s', '--sample', help='sample name')
         parser.add_argument('-l', '--label', help='sample label')
@@ -48,10 +49,10 @@ class NXValidator:
         parser.add_argument('-f', '--f', help='f directory')
         parser.add_argument('-d', '--directory', default='',
                             help='scan directory containing tiffs')
-        parser.add_argument('-n', '--nonzeros', default='-1',
-                            help='minimum number of nonzero points ' +
-                            'to check; if -1, check all points. ' +
-                            'Default -1')
+        parser.add_argument('-n', '--nontrivials', default='-1',
+                            help='minimum number of nontrivial ' +
+                            'points to check; if -1, check all ' +
+                            'points.  Default -1')
         parser.add_argument('-p', '--points', default='-1',
                             help='number of points to check; ' +
                             'if -1, check X*Y*Z points.  Default -1')
@@ -68,12 +69,12 @@ class NXValidator:
         self.setup(args.directory.rstrip('/'),
                    args.sample, args.label,
                    args.temperature, args.f,
-                   int(args.points), int(args.nonzeros),
+                   int(args.points), int(args.nontrivials),
                    args.verbose)
 
     """Set up the Validator with particular settings"""
     def setup(self, directory, sample, label, temperature, f, \
-              points, nonzeros, verbose):
+              points, nontrivials, verbose):
         
         self.directory   = directory
         self.sample      = sample
@@ -81,7 +82,7 @@ class NXValidator:
         self.temperature = temperature
         self.f           = f
         self.points      = points
-        self.nonzeros    = nonzeros
+        self.nontrivials = nontrivials
         self.verbose     = verbose
         
         if self.sample is None and self.label is None and \
@@ -130,7 +131,7 @@ class NXValidator:
         self.out("X,Y,Z: " + str((X, Y, Z)) + "\n")
             
         count     = 0 # Number of correct points
-        nz_count  = 0 # Number of correct nonzeros
+        nz_count  = 0 # Number of correct nontrivials
         x = y = z = 0 # Random sample
         while True:
             x = random.randint(0,X-1)
@@ -154,10 +155,10 @@ class NXValidator:
             if t[y,z] > 0: nz_count += 1
             if count == self.points:
                 break # Success!
-            if self.nonzeros >= 0 and nz_count == self.nonzeros:
+            if self.nontrivials >= 0 and nz_count == self.nontrivials:
                 break # Success!
 
-        self.out("nonzeros matched: " + str(nz_count))
+        self.out("nontrivials matched: " + str(nz_count))
 
 class NXValidationException(Exception):
     def __init__(self, nxs_file, x, y, z):
