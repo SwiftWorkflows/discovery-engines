@@ -1,11 +1,13 @@
 
 subroutine compute_I_sro(a_o1v1, a_o2v2, a_o1v2, &
                          mu1, mu2, mu3, &
+                         l, m, n, &
                          h10, h20, h30, h11, h21, h31, h1n, h2n, h3n, &
                          intensity)
 
   real*8,  intent(in) :: a_o1v1, a_o2v2, a_o1v2
   real*8,  intent(in) :: mu1, mu2, mu3
+  intent(in)          :: l, m, n
   real*8,  intent(in) :: h10, h20, h30 ! Lower boundary of h1,2,3
   real*8,  intent(in) :: h11, h21, h31 ! Upper boundary of h1,2,3
   integer, intent(in) :: h1n, h2n, h3n ! Discretization of h1,2,3
