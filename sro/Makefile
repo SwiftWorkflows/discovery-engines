@@ -1,7 +1,10 @@
 
 FFLAGS = -fimplicit-none
 
-all: sro.o
+all: sro
 
-sro.o: sro.f90
+%.o: %.f90
 	gfortran -c -g $(FFLAGS) $(<)
+
+sro: main.o sro.o
+	gfortran -o $(@) $(^)
