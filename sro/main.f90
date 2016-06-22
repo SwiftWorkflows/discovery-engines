@@ -101,8 +101,6 @@ subroutine write_intensity(p, intensity, output_file)
   dims(2) = p%h2n
   dims(3) = p%h3n
 
-  print *, intensity(1,1,1)
-
   ! Open output file
   call h5open_f(hdferr)
   call h5_error_check(hdferr)
