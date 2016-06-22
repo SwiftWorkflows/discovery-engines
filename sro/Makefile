@@ -1,10 +1,12 @@
 
-FFLAGS = -fimplicit-none
+FFLAGS = -fimplicit-none -ffree-form
 
 all: sro
 
 %.o: %.f90
-	gfortran -c -g $(FFLAGS) $(<)
+	h5fc -c -g $(FFLAGS) $(<)
+
+main.o: sro.o # Module dependency
 
 sro: main.o sro.o
-	gfortran -o $(@) $(^)
+	h5fc -o $(@) $(^)
