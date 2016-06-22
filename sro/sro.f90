@@ -24,11 +24,8 @@ module SRO
       h2step = (p%h21 - p%h20) / p%h2n
       h3step = (p%h31 - p%h10) / p%h3n
 
-      ! print *, h1step, h2step, h3step
-
       do k = 1,p%h3n
          h3 = p%h30 + k * h3step
-         ! print *,  h3
          do j = 1, p%h2n
             h2 = p%h20 + j * h2step
             do i = 1, p%h1n
@@ -37,7 +34,7 @@ module SRO
                I1  = p%a_o1v1 * cos(a)
                I2  = p%a_o2v2 * cos(a)
                I12 = p%a_o1v2 * cos(a)
-               intensity(i,j,k) = p%mu1*I1 + p%mu2*I2 + p%mu3*I12
+               intensity(i,j,k) = p%mu1 * I1 + p%mu2 * I2 + p%mu3 * I12
             end do
          end do
       end do

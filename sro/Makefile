@@ -1,5 +1,5 @@
 
-FFLAGS = -fimplicit-none -ffree-form
+FFLAGS = -fimplicit-none
 
 all: sro
 
@@ -10,3 +10,6 @@ main.o: sro.o # Module dependency
 
 sro: main.o sro.o
 	h5fc -o $(@) $(^)
+
+clean:
+	rm -fv sro *.o

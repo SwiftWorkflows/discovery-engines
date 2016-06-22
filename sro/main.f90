@@ -94,7 +94,6 @@ subroutine write_intensity(p, intensity, output_file)
   integer(hsize_t), dimension(1:3) :: dims
 
   print *, "writing to: ", trim(output_file)
-  print *, p%h1n, p%h2n, p%h3n
 
   hdf_path = "intensity"
   dims(1) = p%h1n
