@@ -8,6 +8,7 @@ program main
   character (len=1024) output_file
 
   real*8, allocatable :: intensity(:,:,:)
+  real*8, allocatable :: mu1(:,:), mu2(:,:), mu12(:,:)
 
   call scan_command_line(p%l, p%m, p%n, output_file)
 
@@ -19,31 +20,38 @@ program main
   p%h21 = 10
   p%h31 = 10
 
-  p%h1n = 100
-  p%h2n = 100
-  p%h3n = 100
+  p%h1n = 10
+  p%h2n = 10
+  p%h3n = 10
 
   allocate(intensity(p%h1n, p%h2n, p%h3n))
+  allocate(mu1 (p%h1n, p%h2n))
+  allocate(mu2 (p%h1n, p%h2n))
+  allocate(mu12(p%h1n, p%h2n))
 
-  p%a_o1v1 = 1
-  p%a_o2v2 = 1
-  p%a_o1v2 = 1
+  p%a_o1v1 = -0.25
+  p%a_o2v2 = -0.25
+  p%a_o1v2 = -0.2260175
 
-  p%mu1 = 1
-  p%mu2 = 1
-  p%mu3 = 1
+  call compute_mu(p, mu1, mu2, mu12)
+  call compute_I( p, mu1, mu2, mu12, intensity)
 
-  call compute_I(p, intensity)
+  call write_mu(p, mu1,  "mu1.txt")
+  call write_mu(p, mu2,  "mu2.txt")
+  call write_mu(p, mu12, "mu12.txt")
 
   call write_intensity(p, intensity, output_file)
 
   deallocate(intensity)
+  deallocate(mu1)
+  deallocate(mu2)
+  deallocate(mu12)
 
 end program
 
 subroutine scan_command_line(l, m, n, output_file)
 
-  real*8, intent(out) :: l, m, n
+  real*8,            intent(out) :: l, m, n
   character (len=*), intent(out) :: output_file
 
   integer status, required_arguments
@@ -84,13 +92,13 @@ subroutine write_intensity(p, intensity, output_file)
   use HDF5
   use SRO
 
-  type(problem), intent(in) :: p
+  type(problem),     intent(in) :: p
   character (len=*), intent(in) :: output_file
-  real*8 :: intensity(p%h1n,p%h2n,p%h3n)
+  real*8,            intent(in) :: intensity(p%h1n,p%h2n,p%h3n)
 
-  integer file_id,space_id,dset_id
+  integer file_id,space_id, dset_id
   character (len=1024) :: hdf_path
-  integer hdferr             ! Error code for HDF5
+  integer hdferr
   integer(hsize_t), dimension(1:3) :: dims
 
   print *, "writing to: ", trim(output_file)
@@ -120,8 +128,29 @@ subroutine write_intensity(p, intensity, output_file)
 
 end subroutine
 
+subroutine write_mu(p, mu, output_file)
+  use SRO
+
+  type(problem),     intent(in) :: p
+  character (len=*), intent(in) :: output_file
+  real*8,            intent(in) :: mu(p%h1n,p%h2n)
+
+  integer i, j
+
+  open(unit=11, file=output_file)
+  do i = 1, p%h1n
+     do j = 1, p%h2n
+        write (11,1100,advance="no"), mu(i,j)
+     end do
+     write (11,*) ""
+  end do
+1100 format(F15.8)
+  close(11)
+
+end subroutine
+
 subroutine h5_error_check(hdferr)
-  integer hdferr
+  integer, intent(in) :: hdferr
   if (hdferr < 0) then
      write (*,*) 'Some HDF operation failed'
      call exit(1)
@@ -129,7 +158,7 @@ subroutine h5_error_check(hdferr)
 end subroutine
 
 subroutine crash(message)
-  character(len=*) :: message
+  character(len=*), intent(in) :: message
   write (*,*) trim(message)
   call exit(1)
 end subroutine
