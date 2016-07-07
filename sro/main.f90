@@ -20,9 +20,9 @@ program main
   p%h21 = 10
   p%h31 = 10
 
-  p%h1n = 10
-  p%h2n = 10
-  p%h3n = 10
+  p%h1n = 1000
+  p%h2n = 1000
+  p%h3n = 100
 
   allocate(intensity(p%h1n, p%h2n, p%h3n))
   allocate(mu1 (p%h1n, p%h2n))
@@ -40,7 +40,11 @@ program main
   call write_mu(p, mu2,  "mu2.txt")
   call write_mu(p, mu12, "mu12.txt")
 
-  call write_intensity(p, intensity, output_file)
+  call write_mu_hdf(p, mu1,  "mu1.h5")
+  call write_mu_hdf(p, mu2,  "mu2.h5")
+  call write_mu_hdf(p, mu12, "mu12.h5")
+
+  call write_intensity_hdf(p, intensity, output_file)
 
   deallocate(intensity)
   deallocate(mu1)
@@ -61,7 +65,7 @@ subroutine scan_command_line(l, m, n, output_file)
   required_arguments = 4
   if (command_argument_count() /= required_arguments) then
      write(message, '(A,I2)') &
-          'Required arguments:', required_arguments
+           'Required arguments:', required_arguments
      call crash(message)
   endif
 
@@ -87,7 +91,46 @@ subroutine scan_command_line(l, m, n, output_file)
 
 end subroutine
 
-subroutine write_intensity(p, intensity, output_file)
+subroutine write_mu_hdf(p, mu, output_file)
+
+  use HDF5
+  use SRO
+
+  type(problem),     intent(in) :: p
+  character (len=*), intent(in) :: output_file
+  real*8,            intent(in) :: mu(p%h1n,p%h2n)
+
+  integer file_id,space_id, dset_id
+  character (len=1024) :: hdf_path
+  integer hdferr
+  integer(hsize_t), dimension(1:2) :: dims
+
+  print *, "writing to: ", trim(output_file)
+
+  hdf_path = "mu"
+  dims(1) = p%h1n
+  dims(2) = p%h2n
+
+  ! Open output file
+  call h5open_f(hdferr)
+  call h5_error_check(hdferr)
+  call h5fcreate_f(output_file, H5F_ACC_TRUNC_F, file_id, hdferr, &
+       H5P_DEFAULT_F, H5P_DEFAULT_F)
+  call h5_error_check(hdferr)
+  ! Create HDF path
+  call h5screate_simple_f(2, dims, space_id, hdferr)
+  call h5_error_check(hdferr)
+  call h5dcreate_f(file_id, hdf_path, H5T_IEEE_F64LE, space_id, &
+       dset_id, hdferr)
+  call h5_error_check(hdferr)
+
+  call h5dwrite_f(dset_id, H5T_IEEE_F64LE, mu, dims, hdferr)
+  call h5_error_check(hdferr)
+  print *, 'write done.'
+
+end subroutine
+
+subroutine write_intensity_hdf(p, intensity, output_file)
 
   use HDF5
   use SRO
