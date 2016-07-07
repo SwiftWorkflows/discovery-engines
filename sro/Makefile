@@ -1,5 +1,9 @@
 
-FFLAGS = -fimplicit-none
+FFLAGS = -fimplicit-none -Wall -Wuninitialized -pedantic
+
+ifeq ($(FAST),1)
+	FFLAGS += -O3
+endif
 
 all: sro
 
