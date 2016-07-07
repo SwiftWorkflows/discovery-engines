@@ -12,17 +12,17 @@ program main
 
   call scan_command_line(p%l, p%m, p%n, output_file)
 
-  p%h10 = -10
-  p%h20 = -10
-  p%h30 = -10
+  p%h10 = -5
+  p%h20 = -5
+  p%h30 = -5
 
-  p%h11 = 10
-  p%h21 = 10
-  p%h31 = 10
+  p%h11 = 5
+  p%h21 = 5
+  p%h31 = 5
 
   p%h1n = 1000
   p%h2n = 1000
-  p%h3n = 100
+  p%h3n = 10
 
   allocate(intensity(p%h1n, p%h2n, p%h3n))
   allocate(mu1 (p%h1n, p%h2n))
@@ -34,7 +34,7 @@ program main
   p%a_o1v2 = -0.2260175
 
   call compute_mu(p, mu1, mu2, mu12)
-  call compute_I( p, mu1, mu2, mu12, intensity)
+  ! call compute_I( p, mu1, mu2, mu12, intensity)
 
   call write_mu(p, mu1,  "mu1.txt")
   call write_mu(p, mu2,  "mu2.txt")
@@ -44,7 +44,7 @@ program main
   call write_mu_hdf(p, mu2,  "mu2.h5")
   call write_mu_hdf(p, mu12, "mu12.h5")
 
-  call write_intensity_hdf(p, intensity, output_file)
+  ! call write_intensity_hdf(p, intensity, output_file)
 
   deallocate(intensity)
   deallocate(mu1)
@@ -100,7 +100,7 @@ subroutine write_mu_hdf(p, mu, output_file)
   character (len=*), intent(in) :: output_file
   real*8,            intent(in) :: mu(p%h1n,p%h2n)
 
-  integer file_id,space_id, dset_id
+  integer file_id, space_id, dset_id
   character (len=1024) :: hdf_path
   integer hdferr
   integer(hsize_t), dimension(1:2) :: dims
@@ -115,17 +115,27 @@ subroutine write_mu_hdf(p, mu, output_file)
   call h5open_f(hdferr)
   call h5_error_check(hdferr)
   call h5fcreate_f(output_file, H5F_ACC_TRUNC_F, file_id, hdferr, &
-       H5P_DEFAULT_F, H5P_DEFAULT_F)
+                   H5P_DEFAULT_F, H5P_DEFAULT_F)
   call h5_error_check(hdferr)
   ! Create HDF path
   call h5screate_simple_f(2, dims, space_id, hdferr)
   call h5_error_check(hdferr)
   call h5dcreate_f(file_id, hdf_path, H5T_IEEE_F64LE, space_id, &
-       dset_id, hdferr)
+                   dset_id, hdferr)
   call h5_error_check(hdferr)
 
+  ! Write
   call h5dwrite_f(dset_id, H5T_IEEE_F64LE, mu, dims, hdferr)
   call h5_error_check(hdferr)
+
+  ! Clean up
+  call h5dclose_f(dset_id, hdferr)
+  call h5_error_check(hdferr)
+  call h5sclose_f(space_id, hdferr)
+  call h5_error_check(hdferr)
+  call h5fclose_f(file_id, hdferr)
+  call h5_error_check(hdferr)
+
   print *, 'write done.'
 
 end subroutine
@@ -164,9 +174,19 @@ subroutine write_intensity_hdf(p, intensity, output_file)
        dset_id, hdferr)
   call h5_error_check(hdferr)
 
+  ! Write
   call h5dwrite_f(dset_id, H5T_IEEE_F64LE, intensity, dims, &
        hdferr)
   call h5_error_check(hdferr)
+
+  ! Clean up
+  call h5dclose_f(dset_id, hdferr)
+  call h5_error_check(hdferr)
+  call h5sclose_f(space_id, hdferr)
+  call h5_error_check(hdferr)
+  call h5fclose_f(file_id, hdferr)
+  call h5_error_check(hdferr)
+
   print *, 'write done.'
 
 end subroutine
@@ -183,7 +203,7 @@ subroutine write_mu(p, mu, output_file)
   open(unit=11, file=output_file)
   do i = 1, p%h1n
      do j = 1, p%h2n
-        write (11,1100,advance="no"), mu(i,j)
+        write (11,1100,advance="no") mu(i,j)
      end do
      write (11,*) ""
   end do
