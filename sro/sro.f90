@@ -58,7 +58,7 @@ module SRO
       real*8 :: xOs1, yOs1, xO2, yO2, xT2, yT2, xTs2, yTs2
       real*8 :: xOs2, yOs2
       real*8 :: FO1, FO2, FV1, FV2
-      real*8  :: h1, h2, h1step, h2step
+      real*8 :: h1, h2, h1step, h2step
       integer i, j
 
       ! scattering factors for oxygen and aluminum,
@@ -75,6 +75,21 @@ module SRO
       xOs1 = 0.0502
       yOs1 = 0.0499
 
+      ! fractional atomic coordinates of relevant sites
+      ! relative to O2 (oxygen atom at (0.0,0.5,0.5)
+
+      ! note that, as per Welberry and Butler's paper,
+      ! I just inverted the x axis from the O1 positions
+
+      xO2  =  xO1
+      yO2  = -yO1
+      xT2  =  xT1
+      yT2  = -yT1
+      xTs2 =  xTs1
+      yTs2 = -yTs1
+      xOs2 =  xOs1
+      yOs2 = -yOs1
+
       h1step = (p%h11 - p%h10) / p%h1n
       h2step = (p%h21 - p%h20) / p%h2n
 
@@ -89,37 +104,16 @@ module SRO
                   2 * falu * cos(2*pi*(xTs1*h1+yTs1*h2)) - &
                   2 * foxy * cos(2*pi*(xO1 *h1+yO1 *h2))
             mu1(i,j) = 0.8 * 0.2 * (FO1-FV1)**2
-         end do
-      end do
-
-      ! fractional atomic coordinates of relevant sites
-      ! relative to O2 (oxygen atom at (0.0,0.5,0.5)
-
-      ! note that, as per Welberry and Butler's paper,
-      ! I just inverted the x axis from the O1 positions
-
-      xO2  =  xO1
-      yO2  = -yO1
-      xT2  =  xT2
-      yT2  = -yT2
-      xTs2 =  xTs1
-      yTs2 = -yTs1
-      xOs2 =  xOs1
-      yOs2 = -yOs1
-
-      do j = 1, p%h2n
-         h2 = p%h20 + j * h2step
-         do i = 1, p%h1n
-            h1 = p%h10 + i * h1step
 
             FO2 = foxy +                                   &
-                  2 * falu * cos(2*pi*(xT2 *H1+yT2 *H2))
-            FV2 = 2 * foxy * cos(2*pi*(xOs2*H1+yOs2*H2)) + &
-                  2 * falu * cos(2*pi*(xTs2*H1+yTs2*H2)) - &
-                  2 * foxy * cos(2*pi*(xO2 *H1+yO2 *H2))
+                  2 * falu * cos(2*pi*(xT2 *h1+yT2 *h2))
+            FV2 = 2 * foxy * cos(2*pi*(xOs2*h1+yOs2*h2)) + &
+                  2 * falu * cos(2*pi*(xTs2*h1+yTs2*h2)) - &
+                  2 * foxy * cos(2*pi*(xO2 *h1+yO2 *h2))
 
             mu2 (i,j) =     0.8 * 0.2 * (FO2-FV2)**2
             mu12(i,j) = 2 * 0.8 * 0.2 * (FO1-FV1)*(FO2-FV2)
+
          end do
       end do
 
