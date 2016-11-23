@@ -1,29 +1,31 @@
 
+#include "defns.h"
+
 module SRO
 
   type problem
-     real*8  :: a_o1v1, a_o2v2, a_o1v2
-     real*8  :: l, m, n
-     real*8  :: h10, h20, h30 ! Lower boundary of h1,2,3
-     real*8  :: h11, h21, h31 ! Upper boundary of h1,2,3
+     REAL    :: a_o1v1, a_o2v2, a_o1v2
+     REAL    :: l, m, n
+     REAL    :: h10, h20, h30 ! Lower boundary of h1,2,3
+     REAL    :: h11, h21, h31 ! Upper boundary of h1,2,3
      integer :: h1n, h2n, h3n ! Discretization of h1,2,3
   end type
 
-  real*8, parameter :: pi = 3.14159265359
+  REAL, parameter :: pi = 3.14159265359
 
   contains
 
     subroutine compute_I(p, mu1, mu2, mu12, intensity)
 
       type(problem), intent(in) :: p
-      real*8, intent(in) :: mu1(p%h1n,p%h2n), &
+      REAL, intent(in) :: mu1(p%h1n,p%h2n), &
                             mu2(p%h1n,p%h2n), &
                             mu12(p%h1n,p%h2n)
-      real*8, intent(out) :: intensity(p%h1n,p%h2n,p%h3n)
+      REAL, intent(out) :: intensity(p%h1n,p%h2n,p%h3n)
 
-      real*8  :: I1, I2, I12
+      REAL    :: I1, I2, I12
       integer :: i, j, k
-      real*8  :: h1step, h2step, h3step, h1, h2, h3, a
+      REAL    :: h1step, h2step, h3step, h1, h2, h3, a
 
       h1step = (p%h11 - p%h10) / p%h1n
       h2step = (p%h21 - p%h20) / p%h2n
@@ -50,15 +52,15 @@ module SRO
     subroutine compute_mu(p, mu1, mu2, mu12)
 
       type(problem), intent(in) :: p
-      real*8, intent(out) :: mu1(p%h1n,p%h2n), &
+      REAL, intent(out) :: mu1(p%h1n,p%h2n), &
                              mu2(p%h1n,p%h2n), &
                              mu12(p%h1n,p%h2n)
 
-      real*8 :: foxy, falu, xO1, yO1, xT1, yT1, xTs1, yTs1
-      real*8 :: xOs1, yOs1, xO2, yO2, xT2, yT2, xTs2, yTs2
-      real*8 :: xOs2, yOs2
-      real*8 :: FO1, FO2, FV1, FV2
-      real*8 :: h1, h2, h1step, h2step
+      REAL   :: foxy, falu, xO1, yO1, xT1, yT1, xTs1, yTs1
+      REAL   :: xOs1, yOs1, xO2, yO2, xT2, yT2, xTs2, yTs2
+      REAL   :: xOs2, yOs2
+      REAL   :: FO1, FO2, FV1, FV2
+      REAL   :: h1, h2, h1step, h2step
       integer i, j
 
       ! scattering factors for oxygen and aluminum,

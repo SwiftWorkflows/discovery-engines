@@ -1,4 +1,6 @@
 
+#include "defns.h"
+
 program main
 
   use SRO
@@ -7,8 +9,8 @@ program main
 
   character (len=1024) output_file
 
-  real*8, allocatable :: intensity(:,:,:)
-  real*8, allocatable :: mu1(:,:), mu2(:,:), mu12(:,:)
+  REAL, allocatable :: intensity(:,:,:)
+  REAL, allocatable :: mu1(:,:), mu2(:,:), mu12(:,:)
 
   call scan_command_line(p%l, p%m, p%n, output_file)
 
@@ -55,7 +57,7 @@ end program
 
 subroutine scan_command_line(l, m, n, output_file)
 
-  real*8,            intent(out) :: l, m, n
+  REAL,              intent(out) :: l, m, n
   character (len=*), intent(out) :: output_file
 
   integer status, required_arguments
@@ -98,7 +100,7 @@ subroutine write_mu_hdf(p, mu, output_file)
 
   type(problem),     intent(in) :: p
   character (len=*), intent(in) :: output_file
-  real*8,            intent(in) :: mu(p%h1n,p%h2n)
+  REAL,              intent(in) :: mu(p%h1n,p%h2n)
 
   integer file_id, space_id, dset_id
   character (len=1024) :: hdf_path
@@ -120,12 +122,12 @@ subroutine write_mu_hdf(p, mu, output_file)
   ! Create HDF path
   call h5screate_simple_f(2, dims, space_id, hdferr)
   call h5_error_check(hdferr)
-  call h5dcreate_f(file_id, hdf_path, H5T_IEEE_F64LE, space_id, &
+  call h5dcreate_f(file_id, hdf_path, REAL_HDF, space_id, &
                    dset_id, hdferr)
   call h5_error_check(hdferr)
 
   ! Write
-  call h5dwrite_f(dset_id, H5T_IEEE_F64LE, mu, dims, hdferr)
+  call h5dwrite_f(dset_id, REAL_HDF, mu, dims, hdferr)
   call h5_error_check(hdferr)
 
   ! Clean up
@@ -147,7 +149,7 @@ subroutine write_intensity_hdf(p, intensity, output_file)
 
   type(problem),     intent(in) :: p
   character (len=*), intent(in) :: output_file
-  real*8,            intent(in) :: intensity(p%h1n,p%h2n,p%h3n)
+  REAL,              intent(in) :: intensity(p%h1n,p%h2n,p%h3n)
 
   integer file_id,space_id, dset_id
   character (len=1024) :: hdf_path
@@ -170,12 +172,12 @@ subroutine write_intensity_hdf(p, intensity, output_file)
   ! Create HDF path
   call h5screate_simple_f(3, dims, space_id, hdferr)
   call h5_error_check(hdferr)
-  call h5dcreate_f(file_id, hdf_path, H5T_IEEE_F64LE, space_id, &
+  call h5dcreate_f(file_id, hdf_path, REAL_HDF, space_id, &
        dset_id, hdferr)
   call h5_error_check(hdferr)
 
   ! Write
-  call h5dwrite_f(dset_id, H5T_IEEE_F64LE, intensity, dims, &
+  call h5dwrite_f(dset_id, REAL_HDF, intensity, dims, &
        hdferr)
   call h5_error_check(hdferr)
 
@@ -196,7 +198,7 @@ subroutine write_mu(p, mu, output_file)
 
   type(problem),     intent(in) :: p
   character (len=*), intent(in) :: output_file
-  real*8,            intent(in) :: mu(p%h1n,p%h2n)
+  REAL,            intent(in) :: mu(p%h1n,p%h2n)
 
   integer i, j
 
