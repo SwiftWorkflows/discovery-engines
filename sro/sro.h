@@ -20,3 +20,5 @@ void problem_set(void* ptr,
                  REAL h10, REAL h20, REAL h30,
                  REAL h11, REAL h21, REAL h31,
                  int h1n, int h2n, int h3n);
+
+void problem_free(void* ptr);

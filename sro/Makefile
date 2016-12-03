@@ -37,4 +37,4 @@ _pysro.so: sro_wrap.o sro-helpers.o sro.o
 		-l gfortran
 
 clean:
-	rm -fv sro *.o
+	rm -fv sro *.o *_wrap.c

@@ -1,0 +1,37 @@
+
+{
+  py-1
+  Memcheck:Addr4
+  fun:PyObject_Free
+  ...
+}
+
+
+
+{
+  py-3
+  Memcheck:Addr8
+  fun:PyObject_Free
+  ...
+}
+
+{
+  py-2
+  Memcheck:Cond
+  fun:PyObject_Free
+  ...
+}
+
+{
+   py-4
+   Memcheck:Value8
+   fun:PyObject_Free
+   ...
+}
+
+{
+   py-5
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   ...
+}
