@@ -125,10 +125,10 @@ module SRO
      print *, "Fortran OK"
    end subroutine test_c
 
-   function make_problem_c() result(p)
+   function problem_make_c() result(p)
      type(problem), pointer :: p
      allocate(p)
-   end function make_problem_c
+   end function problem_make_c
 
    subroutine problem_set_c(p, a_o1v1, a_o2v2, a_o1v2, l, m, n, &
         h10, h20, h30, h11, h21, h31, h1n, h2n, h3n)
@@ -144,9 +144,9 @@ module SRO
      print *, p%a_o1v1
    end subroutine problem_set_c
 
-   subroutine free_problem_c(p)
+   subroutine problem_free_c(p)
      type(problem), pointer :: p
      print *, p%a_o1v1
      deallocate(p)
-   end subroutine free_problem_c
+   end subroutine problem_free_c
 end module

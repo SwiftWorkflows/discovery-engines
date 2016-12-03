@@ -1,6 +1,12 @@
 
 #include "sro.h"
 
+void*
+problem_make()
+{
+  return __sro_MOD_problem_make_c();
+}
+
 void
 problem_set(void* ptr,
             REAL a_o1v1, REAL a_o2v2, REAL a_o1v2,
@@ -19,5 +25,5 @@ problem_set(void* ptr,
 void
 problem_free(void* ptr)
 {
-  __sro_MOD_free_problem_c(&ptr);
+  __sro_MOD_problem_free_c(&ptr);
 }

@@ -10,7 +10,7 @@ main()
   __sro_MOD_test_c();
 
   void* ptr;
-  ptr = __sro_MOD_make_problem_c();
+  ptr = __sro_MOD_problem_make_c();
   printf("ptr: %p\n", ptr);
 
   #if 0
@@ -25,7 +25,7 @@ main()
                           &h10, &h20, &h30,
                           &h11, &h21, &h31,
                           &h1n, &h2n, &h3n);
-  __sro_MOD_free_problem_c(&ptr);
+  __sro_MOD_problem_free_c(&ptr);
   #endif
 
   return 0;
