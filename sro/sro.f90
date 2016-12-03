@@ -15,6 +15,20 @@ module SRO
 
   contains
 
+    function compute_diff(p) result(c)
+      type(problem), intent(in) :: p
+      REAL :: mu1(p%h1n,p%h2n), &
+              mu2(p%h1n,p%h2n), &
+              mu12(p%h1n,p%h2n)
+      REAL :: intensity(p%h1n,p%h2n,p%h3n)
+      REAL :: c
+
+      call compute_mu(p, mu1, mu2, mu12)
+      call compute_I(p, mu1, mu2, mu12, intensity)
+      c = sum(intensity)
+
+    end function compute_diff
+
     subroutine compute_I(p, mu1, mu2, mu12, intensity)
 
       type(problem), intent(in) :: p
@@ -130,7 +144,8 @@ module SRO
      allocate(p)
    end function problem_make_c
 
-   subroutine problem_set_c(p, a_o1v1, a_o2v2, a_o1v2, l, m, n, &
+   subroutine problem_set_c(p, &
+        a_o1v1, a_o2v2, a_o1v2, l, m, n, &
         h10, h20, h30, h11, h21, h31, h1n, h2n, h3n)
      type(problem), pointer :: p
      REAL    :: a_o1v1, a_o2v2, a_o1v2
@@ -138,15 +153,25 @@ module SRO
      REAL    :: h10, h20, h30 ! Lower boundary of h1,2,3
      REAL    :: h11, h21, h31 ! Upper boundary of h1,2,3
      integer :: h1n, h2n, h3n ! Discretization of h1,2,3
-     !p = problem(a_o1v1, a_o2v2, a_o1v2, l, m, n, &
-     !     h10, h20, h30, h11, h21, h31, h1n, h2n, h3n)
      p%a_o1v1 = a_o1v1
-     print *, p%a_o1v1
+     p%a_o2v2 = a_o2v2
+     p%a_o1v2 = a_o1v2
+     p%l = l
+     p%m = m
+     p%n = n
+     p%h10 = h10
+     p%h20 = h20
+     p%h30 = h30
+     p%h11 = h11
+     p%h21 = h21
+     p%h31 = h31
+     p%h1n = h1n
+     p%h2n = h2n
+     p%h3n = h3n
    end subroutine problem_set_c
 
    subroutine problem_free_c(p)
      type(problem), pointer :: p
-     print *, p%a_o1v1
      deallocate(p)
    end subroutine problem_free_c
 end module

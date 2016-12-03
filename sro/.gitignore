@@ -6,5 +6,5 @@ sro
 *.png
 *.txt
 *.x
-pysro.py
+libpysro.py
 *_wrap.c

@@ -1,5 +1,5 @@
 
-%module pysro
+%module libpysro
 
 %include "defns.h"
 %include "sro.h"

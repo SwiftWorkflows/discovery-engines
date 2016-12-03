@@ -27,3 +27,9 @@ problem_free(void* ptr)
 {
   __sro_MOD_problem_free_c(&ptr);
 }
+
+REAL
+compute_diff(void* p)
+{
+  return __sro_MOD_compute_diff(p);
+}
