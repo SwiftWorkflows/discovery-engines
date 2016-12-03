@@ -1,7 +1,10 @@
 sro
+*.so
 *.mod
 *.h5
 *.data
 *.png
 *.txt
 *.x
+pysro.py
+*_wrap.c

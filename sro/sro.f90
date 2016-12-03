@@ -123,5 +123,28 @@ module SRO
 
    subroutine test_c()
      print *, "Fortran OK"
-   end subroutine
+   end subroutine test_c
+
+   subroutine make_problem_c(p)
+     type(problem), pointer :: p
+     allocate(p)
+   end subroutine make_problem_c
+
+   subroutine problem_set_c(p, a_o1v1, a_o2v2, a_o1v2, l, m, n, &
+        h10, h20, h30, h11, h21, h31, h1n, h2n, h3n)
+     type(problem), pointer :: p
+     REAL    :: a_o1v1, a_o2v2, a_o1v2
+     REAL    :: l, m, n
+     REAL    :: h10, h20, h30 ! Lower boundary of h1,2,3
+     REAL    :: h11, h21, h31 ! Upper boundary of h1,2,3
+     integer :: h1n, h2n, h3n ! Discretization of h1,2,3
+     p = problem(a_o1v1, a_o2v2, a_o1v2, l, m, n, &
+          h10, h20, h30, h11, h21, h31, h1n, h2n, h3n)
+   end subroutine problem_set_c
+
+   subroutine free_problem_c(p)
+     type(problem), pointer :: p
+     print *, p%a_o1v1
+     deallocate(p)
+   end subroutine free_problem_c
 end module
