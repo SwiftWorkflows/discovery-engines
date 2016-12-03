@@ -31,7 +31,7 @@ test-c-sro.x: test-c-sro.o sro.o
 sro_wrap.c: sro.i sro.h
 	swig -python $(<)
 
-_pysro.so: sro_wrap.o sro.o
+_pysro.so: sro_wrap.o sro-helpers.o sro.o
 	gcc -shared -o $(@) $(^) \
 		-L /usr/lib/x86_64-linux-gnu -l python2.7 \
 		-l gfortran

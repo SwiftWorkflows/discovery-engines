@@ -125,10 +125,10 @@ module SRO
      print *, "Fortran OK"
    end subroutine test_c
 
-   subroutine make_problem_c(p)
+   function make_problem_c() result(p)
      type(problem), pointer :: p
      allocate(p)
-   end subroutine make_problem_c
+   end function make_problem_c
 
    subroutine problem_set_c(p, a_o1v1, a_o2v2, a_o1v2, l, m, n, &
         h10, h20, h30, h11, h21, h31, h1n, h2n, h3n)
@@ -140,6 +140,7 @@ module SRO
      integer :: h1n, h2n, h3n ! Discretization of h1,2,3
      p = problem(a_o1v1, a_o2v2, a_o1v2, l, m, n, &
           h10, h20, h30, h11, h21, h31, h1n, h2n, h3n)
+     print *, p%a_o1v1
    end subroutine problem_set_c
 
    subroutine free_problem_c(p)

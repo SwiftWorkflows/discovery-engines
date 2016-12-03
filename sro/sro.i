@@ -1,6 +1,7 @@
 
 %module pysro
 
+%include "defns.h"
 %include "sro.h"
 
 %{
