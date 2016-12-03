@@ -121,4 +121,7 @@ module SRO
 
    end subroutine compute_mu
 
+   subroutine test_c()
+     print *, "Fortran OK"
+   end subroutine
 end module

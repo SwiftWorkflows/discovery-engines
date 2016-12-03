@@ -23,8 +23,8 @@ main.o: sro.o # Module dependency
 sro: main.o sro.o
 	h5fc -o $(@) $(^)
 
-test-c-sro.x: test-c-sro.o
-	$(CC) -o $(@) $(^)
+test-c-sro.x: test-c-sro.o sro.o
+	$(CC) -o $(@) $(^) -lgfortran
 
 clean:
 	rm -fv sro *.o
