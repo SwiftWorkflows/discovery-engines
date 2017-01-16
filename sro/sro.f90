@@ -174,4 +174,11 @@ module SRO
      type(problem), pointer :: p
      deallocate(p)
    end subroutine problem_free_c
+
+   subroutine crash(message)
+     character(len=*), intent(in) :: message
+     write (*,*) trim(message)
+     call exit(1)
+   end subroutine crash
+
 end module
