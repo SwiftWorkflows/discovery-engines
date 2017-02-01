@@ -39,13 +39,13 @@ program main
   call compute_mu(p, mu1, mu2, mu12)
   ! call compute_I( p, mu1, mu2, mu12, intensity)
 
-  call write_mu(p, mu1,  "mu1.txt")
-  call write_mu(p, mu2,  "mu2.txt")
-  call write_mu(p, mu12, "mu12.txt")
+  call mu_write(p, mu1,  "mu1.txt")
+  call mu_write(p, mu2,  "mu2.txt")
+  call mu_write(p, mu12, "mu12.txt")
 
-  call write_mu_hdf(p, mu1,  "mu1.h5")
-  call write_mu_hdf(p, mu2,  "mu2.h5")
-  call write_mu_hdf(p, mu12, "mu12.h5")
+  call mu_hdf_write(p, mu1,  "mu1.h5")
+  call mu_hdf_write(p, mu2,  "mu2.h5")
+  call mu_hdf_write(p, mu12, "mu12.h5")
 
   ! call write_intensity_hdf(p, intensity, output_file)
 

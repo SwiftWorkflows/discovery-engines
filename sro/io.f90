@@ -4,7 +4,7 @@
 module IO
 contains
 
-  subroutine read_intensity_hdf(p, input_file, intensity)
+  subroutine intensity_hdf_read(p, input_file, intensity)
 
     use HDF5
     use SRO
@@ -53,9 +53,9 @@ contains
 
     print *, 'read done.'
 
-  end subroutine read_intensity_hdf
+  end subroutine
 
-  subroutine write_intensity_hdf(p, intensity, output_file)
+  subroutine intensity_hdf_write(p, intensity, output_file)
 
     use HDF5
     use SRO
@@ -104,9 +104,9 @@ contains
 
     print *, 'write done.'
 
-  end subroutine write_intensity_hdf
+  end subroutine
 
-  subroutine write_mu(p, mu, output_file)
+  subroutine mu_write(p, mu, output_file)
     use SRO
 
     type(problem),     intent(in) :: p
@@ -125,9 +125,9 @@ contains
 1100 format(F15.8)
     close(11)
 
-  end subroutine write_mu
+  end subroutine
 
-  subroutine write_mu_hdf(p, mu, output_file)
+  subroutine mu_hdf_write(p, mu, output_file)
 
     use HDF5
     use SRO
@@ -160,6 +160,8 @@ contains
          dset_id, hdferr)
     call h5_error_check(hdferr)
 
+
+
     ! Write
     call h5dwrite_f(dset_id, REAL_HDF, mu, dims, hdferr)
     call h5_error_check(hdferr)
@@ -174,14 +176,15 @@ contains
 
     print *, 'write done.'
 
-  end subroutine write_mu_hdf
+  end subroutine
 
   subroutine h5_error_check(hdferr)
     integer, intent(in) :: hdferr
+    write (*,*) "error check: ", hdferr
     if (hdferr < 0) then
-       write (*,*) 'Some HDF operation failed'
+       write (*,*) "Some HDF operation failed"
        call exit(1)
     end if
-  end subroutine h5_error_check
+  end subroutine
 
 end module
