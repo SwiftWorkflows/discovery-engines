@@ -58,6 +58,8 @@ end program
 
 subroutine scan_command_line(l, m, n, output_file)
 
+  use SRO
+
   REAL,              intent(out) :: l, m, n
   character (len=*), intent(out) :: output_file
 
