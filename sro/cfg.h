@@ -1,4 +1,8 @@
 
+/* CFG.H
+ * Compile-time configuration
+ */
+
 #pragma once
 
 #ifdef __GFORTRAN__
@@ -11,4 +15,9 @@
 */
 #else
 #define REAL float
+#endif
+
+#ifndef FILENAME_MAX
+// This is set to 4096 by GNU stdio_lim.h
+#define FILENAME_MAX 1024
 #endif

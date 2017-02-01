@@ -1,7 +1,7 @@
 
 %module libpysro
 
-%include "defns.h"
+%include "cfg.h"
 %include "sro.h"
 
 %{

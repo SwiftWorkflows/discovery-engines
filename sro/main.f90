@@ -1,16 +1,17 @@
 
-#include "defns.h"
+#include "cfg.h"
 
 program main
 
   use IO
-  use SRO
+  use SRO_CALC
+  use SRO_DEFN
 
   type(problem) :: p
 
   character (len=1024) output_file
 
-  REAL, allocatable :: intensity(:,:,:)
+  REAL, allocatable :: theory(:,:,:)
   REAL, allocatable :: mu1(:,:), mu2(:,:), mu12(:,:)
 
   call scan_command_line(p%l, p%m, p%n, output_file)
@@ -27,7 +28,7 @@ program main
   p%h2n = 1000
   p%h3n = 10
 
-  allocate(intensity(p%h1n, p%h2n, p%h3n))
+  allocate(theory(p%h1n, p%h2n, p%h3n))
   allocate(mu1 (p%h1n, p%h2n))
   allocate(mu2 (p%h1n, p%h2n))
   allocate(mu12(p%h1n, p%h2n))
@@ -37,7 +38,7 @@ program main
   p%a_o1v2 = -0.2260175
 
   call compute_mu(p, mu1, mu2, mu12)
-  ! call compute_I( p, mu1, mu2, mu12, intensity)
+  ! call compute_I( p, mu1, mu2, mu12, theory)
 
   call mu_write(p, mu1,  "mu1.txt")
   call mu_write(p, mu2,  "mu2.txt")
@@ -47,9 +48,9 @@ program main
   call mu_hdf_write(p, mu2,  "mu2.h5")
   call mu_hdf_write(p, mu12, "mu12.h5")
 
-  ! call write_intensity_hdf(p, intensity, output_file)
+  ! call write_theory_hdf(p, theory, output_file)
 
-  deallocate(intensity)
+  deallocate(theory)
   deallocate(mu1)
   deallocate(mu2)
   deallocate(mu12)
@@ -58,7 +59,7 @@ end program
 
 subroutine scan_command_line(l, m, n, output_file)
 
-  use SRO
+  use SRO_DEFN
 
   REAL,              intent(out) :: l, m, n
   character (len=*), intent(out) :: output_file

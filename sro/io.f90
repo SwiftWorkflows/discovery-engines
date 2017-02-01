@@ -1,5 +1,5 @@
 
-#include "defns.h"
+#include "cfg.h"
 
 module IO
 contains
@@ -7,7 +7,7 @@ contains
   subroutine intensity_hdf_read(p, input_file, intensity)
 
     use HDF5
-    use SRO
+    use SRO_DEFN
 
     type(problem),     intent(in)  :: p
     character (len=*), intent(in)  :: input_file
@@ -58,7 +58,7 @@ contains
   subroutine intensity_hdf_write(p, intensity, output_file)
 
     use HDF5
-    use SRO
+    use SRO_DEFN
 
     type(problem),     intent(in) :: p
     character (len=*), intent(in) :: output_file
@@ -107,7 +107,7 @@ contains
   end subroutine
 
   subroutine mu_write(p, mu, output_file)
-    use SRO
+    use SRO_DEFN
 
     type(problem),     intent(in) :: p
     character (len=*), intent(in) :: output_file
@@ -130,7 +130,7 @@ contains
   subroutine mu_hdf_write(p, mu, output_file)
 
     use HDF5
-    use SRO
+    use SRO_DEFN
 
     type(problem),     intent(in) :: p
     character (len=*), intent(in) :: output_file
@@ -180,7 +180,6 @@ contains
 
   subroutine h5_error_check(hdferr)
     integer, intent(in) :: hdferr
-    write (*,*) "error check: ", hdferr
     if (hdferr < 0) then
        write (*,*) "Some HDF operation failed"
        call exit(1)

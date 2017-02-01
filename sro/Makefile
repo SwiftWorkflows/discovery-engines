@@ -1,6 +1,7 @@
 
 CC = h5cc
 FLAGS = -Wall -g
+INCLUDES = -I .
 
 ifeq ($(FAST),1)
 	FLAGS += -O3
@@ -26,21 +27,23 @@ py: _libpysro.so
 	h5fc -c -o $(@) $(<) \
 		$(FFLAGS)
 
-main.o: io.o sro.o # Module dependencies
+# Module dependencies
+main.o: sro-calc.o
+sro-calc.o: io.o
+io.o: sro-defn.o
 
-sro: main.o sro.o io.o
+OBJS = sro-calc.o io.o sro-defn.o
+
+sro: main.o $(OBJS)
 	h5fc -o $(@) $(^)
 
-# Pure ordering dependency
-io.o: sro.o
-
-test-c-sro.x: test-c-sro.o io.o sro.o
+test-c-sro.x: test-c-sro.o $(OBJS)
 	$(CC) -o $(@) $(^) -lgfortran
 
 sro_wrap.c: sro.i sro.h
 	swig -python $(<)
 
-_libpysro.so: sro_wrap.o sro-helpers.o io.o sro.o
+_libpysro.so: sro_wrap.o sro-helpers.o $(OBJS)
 	gcc -shared -o $(@) $(^) \
 		-L /usr/lib/x86_64-linux-gnu -l python2.7 \
 		-l gfortran \

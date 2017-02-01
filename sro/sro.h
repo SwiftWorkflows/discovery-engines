@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "defns.h"
+#include "cfg.h"
 
 // FORTRAN
 

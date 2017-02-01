@@ -8,7 +8,7 @@ program test_read
   character (len=32) message
 
   type(problem) :: p
-  character (len=128) input_file
+  character (len=FILENAME_MAX) input_file
 
   REAL, allocatable :: intensity(:,:,:)
 
