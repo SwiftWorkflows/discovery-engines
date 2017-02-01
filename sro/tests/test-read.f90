@@ -4,8 +4,7 @@ program test_read
   use IO
   use SRO
 
-  integer status, required_arguments
-  character (len=32) s
+  integer required_arguments
   character (len=32) message
 
   type(problem) :: p
@@ -15,36 +14,23 @@ program test_read
 
   print *, "test-read"
 
-  required_arguments = 4
+  required_arguments = 1
   if (command_argument_count() /= required_arguments) then
      write(message, '(A,I2)') &
            'Required arguments:', required_arguments
      call crash(message)
   endif
 
-  call get_command_argument(1, s)
-  read(s, *, iostat=status) p%l
-  if (status > 0) then
-     call crash("Bad argument for l: " // s)
-  endif
-  call get_command_argument(2, s)
-  read(s, *, iostat=status) p%m
-  if (status > 0) then
-     call crash("Bad argument for m: " // s)
-  endif
-  call get_command_argument(3, s)
-  read(s, *, iostat=status) p%n
-  if (status > 0) then
-     call crash("Bad argument for n: " // s)
-  endif
+  p%h1n = 801
+  p%h2n = 901
+  p%h3n = 100
 
-  call get_command_argument(4, input_file)
+  call get_command_argument(1, input_file)
 
-  print *, "reading: ", input_file
+  print *, "allocating: ", p%h1n*p%h2n*p%h3n*8/(1024*1024)
 
   allocate(intensity(p%h1n, p%h2n, p%h3n))
 
   call intensity_hdf_read(p, input_file, intensity)
-
 
 end program
