@@ -11,7 +11,6 @@ program main
 
   character (len=1024) output_file
 
-  REAL, allocatable :: theory(:,:,:)
   REAL, allocatable :: mu1(:,:), mu2(:,:), mu12(:,:)
 
   call scan_command_line(p%l, p%m, p%n, output_file)
@@ -28,7 +27,6 @@ program main
   p%h2n = 1000
   p%h3n = 10
 
-  allocate(theory(p%h1n, p%h2n, p%h3n))
   allocate(mu1 (p%h1n, p%h2n))
   allocate(mu2 (p%h1n, p%h2n))
   allocate(mu12(p%h1n, p%h2n))
@@ -50,7 +48,6 @@ program main
 
   ! call write_theory_hdf(p, theory, output_file)
 
-  deallocate(theory)
   deallocate(mu1)
   deallocate(mu2)
   deallocate(mu12)

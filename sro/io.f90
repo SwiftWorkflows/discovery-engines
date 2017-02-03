@@ -4,23 +4,23 @@
 module IO
 contains
 
-  subroutine intensity_hdf_read(p, input_file, intensity)
+  subroutine exprmnt_hdf_read(p, input_file, exprmnt)
 
     use HDF5
     use SRO_DEFN
 
     type(problem),     intent(in)  :: p
     character (len=*), intent(in)  :: input_file
-    REAL,              intent(out) :: intensity(p%h1n,p%h2n,p%h3n)
+    REAL,              intent(out) :: exprmnt(p%h1n,p%h2n,p%h3n)
 
-    integer file_id,space_id, dset_id
+    integer file_id, dset_id
     character (len=1024) :: hdf_path
     integer hdferr
     integer(hsize_t), dimension(1:3) :: dims
 
     print *, "reading from: ", trim(input_file)
 
-    hdf_path = "intensity"
+    hdf_path = "/entry/data/v/f"
     dims(1) = p%h1n
     dims(2) = p%h2n
     dims(3) = p%h3n
@@ -28,25 +28,19 @@ contains
     ! Open output file
     call h5open_f(hdferr)
     call h5_error_check(hdferr)
-    call h5fcreate_f(input_file, H5F_ACC_TRUNC_F, file_id, hdferr, &
-         H5P_DEFAULT_F, H5P_DEFAULT_F)
+    call h5fopen_f(input_file, H5F_ACC_RDONLY_F, file_id, hdferr)
     call h5_error_check(hdferr)
-    ! Create HDF path
-    call h5screate_simple_f(3, dims, space_id, hdferr)
-    call h5_error_check(hdferr)
-    call h5dcreate_f(file_id, hdf_path, REAL_HDF, space_id, &
-         dset_id, hdferr)
+
+    ! Open HDF path
+    call h5dopen_f(file_id, hdf_path, dset_id, hdferr)
     call h5_error_check(hdferr)
 
     ! Read
-    call h5dread_f(dset_id, REAL_HDF, intensity, dims, &
-         hdferr)
+    call h5dread_f(dset_id, REAL_HDF, exprmnt, dims, hdferr)
     call h5_error_check(hdferr)
 
     ! Clean up
     call h5dclose_f(dset_id, hdferr)
-    call h5_error_check(hdferr)
-    call h5sclose_f(space_id, hdferr)
     call h5_error_check(hdferr)
     call h5fclose_f(file_id, hdferr)
     call h5_error_check(hdferr)
@@ -160,8 +154,6 @@ contains
          dset_id, hdferr)
     call h5_error_check(hdferr)
 
-
-
     ! Write
     call h5dwrite_f(dset_id, REAL_HDF, mu, dims, hdferr)
     call h5_error_check(hdferr)
@@ -180,6 +172,7 @@ contains
 
   subroutine h5_error_check(hdferr)
     integer, intent(in) :: hdferr
+    ! print *, "error_check: ", hdferr
     if (hdferr < 0) then
        write (*,*) "Some HDF operation failed"
        call exit(1)

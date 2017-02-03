@@ -18,6 +18,6 @@
 #endif
 
 #ifndef FILENAME_MAX
-// This is set to 4096 by GNU stdio_lim.h
+/* This is set to 4096 by GNU stdio_lim.h */
 #define FILENAME_MAX 1024
 #endif

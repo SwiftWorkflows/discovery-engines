@@ -4,10 +4,11 @@
 module SRO_CALC
 
   REAL, allocatable :: exprmnt(:,:,:)
+  REAL, allocatable :: theory(:,:,:)
 
-  contains
+contains
 
-  subroutine read_experiment(p, exprmnt_file)
+  subroutine exprmnt_setup(p, exprmnt_file)
 
     use SRO_DEFN
     use IO
@@ -16,22 +17,27 @@ module SRO_CALC
     character (len=FILENAME_MAX) exprmnt_file
 
     if (allocated(exprmnt)) then
+       print *, 'already allocated!'
        return
     end if
 
-    p%h1n = 801
-    p%h2n = 901
-    p%h3n = 100
+    p%h1n = 10
+    p%h2n = 10
+    p%h3n = 10
 
     print *, "allocating: ", p%h1n*p%h2n*p%h3n*8/(1024*1024)
 
     allocate(exprmnt(p%h1n, p%h2n, p%h3n))
+    allocate(theory(p%h1n, p%h2n, p%h3n))
 
-    call intensity_hdf_read(p, exprmnt_file, exprmnt)
+    call exprmnt_hdf_read(p, exprmnt_file, exprmnt)
+
+    print *, exprmnt(1,1,1)
+    print *, exprmnt(10,10,10)
 
   end subroutine
 
-  function compute_diff(p) result(c)
+  function compute_diff(p, exprmnt_file) result(c)
 
     use SRO_DEFN
 
@@ -39,21 +45,34 @@ module SRO_CALC
     REAL :: mu1(p%h1n,p%h2n), &
             mu2(p%h1n,p%h2n), &
             mu12(p%h1n,p%h2n)
-    REAL :: theory(p%h1n,p%h2n,p%h3n)
 
-    REAL :: diffnc(p%h1n,p%h2n,p%h3n)
+    integer i, j, k
     REAL :: c
 
-    call compute_mu(p, mu1, mu2, mu12)
-    call compute_theory(p, mu1, mu2, mu12, theory)
+    character (len=FILENAME_MAX) exprmnt_file
 
-    diffnc = theory - exprmnt
+    call exprmnt_setup(p, exprmnt_file)
 
-    c = sum(diffnc)
+    print *, p%h1n
+
+    ! call compute_mu(p, mu1, mu2, mu12)
+    ! call compute_theory(p, mu1, mu2, mu12, theory)
+
+    theory(1,1,1) = 0
+    theory = 0
+
+    c = 0
+    do k=1,p%h3n
+       do j=1,p%h2n
+          do i=1,p%h1n
+             c = c + (theory(i,j,k) - exprmnt(i,j,k)) ** 2
+          end do
+       end do
+    end do
 
   end function
 
-  subroutine compute_theory(p, mu1, mu2, mu12, theory)
+  subroutine compute_theory(p, mu1, mu2, mu12)
 
     use SRO_DEFN
 
@@ -61,7 +80,7 @@ module SRO_CALC
     REAL, intent(in) :: mu1(p%h1n,p%h2n), &
                         mu2(p%h1n,p%h2n), &
                         mu12(p%h1n,p%h2n)
-    REAL, intent(out) :: theory(p%h1n,p%h2n,p%h3n)
+!    REAL, intent(out) :: theory(p%h1n,p%h2n,p%h3n)
 
     REAL    :: I1, I2, I12
     integer :: i, j, k
@@ -165,7 +184,7 @@ module SRO_CALC
 
   subroutine test_c()
     print *, "Fortran OK"
-  end subroutine test_c
+  end subroutine
 
   function problem_make_c() result(p)
 
