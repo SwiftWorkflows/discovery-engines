@@ -33,6 +33,7 @@ py: $(LIBPY)
 include src/module.mk
 include bin/module.mk
 include lib/module.mk
+include mods/module.mk
 include py/module.mk
 include tests/module.mk
 
