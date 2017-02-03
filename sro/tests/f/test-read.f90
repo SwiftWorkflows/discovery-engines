@@ -1,8 +1,10 @@
 
+#include <cfg.h>
+
 program test_read
 
+  use SRO_DEFN
   use IO
-  use SRO
 
   integer required_arguments
   character (len=32) message
@@ -31,6 +33,6 @@ program test_read
 
   allocate(intensity(p%h1n, p%h2n, p%h3n))
 
-  call intensity_hdf_read(p, input_file, intensity)
+  call exprmnt_hdf_read(p, input_file, intensity)
 
 end program

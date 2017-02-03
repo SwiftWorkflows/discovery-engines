@@ -1,7 +1,7 @@
 
 #include <string.h>
 
-#include "sro.h"
+#include "src/c/sro.h"
 
 void*
 problem_make()

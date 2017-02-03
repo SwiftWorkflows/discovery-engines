@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+THIS=$( dirname $0 )
+
+$THIS/test-sro-py.sh $*

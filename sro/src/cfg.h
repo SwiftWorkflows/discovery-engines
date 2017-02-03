@@ -1,6 +1,7 @@
 
 /* CFG.H
  * Compile-time configuration
+ * This is included by both Fortran and C source files
  */
 
 #pragma once
