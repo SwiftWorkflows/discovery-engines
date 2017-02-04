@@ -4,6 +4,13 @@ import sys
 import h5py
 import numpy as np
 
+def usage():
+    print "create-data.py <filename> <group>"
+
+if len(sys.argv) != 3:
+    usage()
+    sys.exit(1)
+
 filename = sys.argv[1]
 group    = sys.argv[2]
 
@@ -16,3 +23,5 @@ f = h5py.File(filename, 'w')
 g = f.create_group(group)
 d = g.create_dataset('f', (10,10,10))
 d[:,:,:] = A[:,:,:]
+
+print "wrote:", filename
