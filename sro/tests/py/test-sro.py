@@ -18,7 +18,7 @@ _libpysro.problem_set(p,
                   10, 10, 10,     # l, m, n
                   -5, -5, -5,     # hx0
                    5,  5,  5,     # hx1
-                  1000, 1000, 10) # hxn
+                  10, 10, 10) # hxn
 
 c = _libpysro.compute_diff(p, exprmnt_file)
 print("c: " + str(c))
