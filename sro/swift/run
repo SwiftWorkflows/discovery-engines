@@ -1,8 +1,0 @@
-#!/bin/sh
-set -eu
-
-THIS=$( dirname $0 )
-SRO_HOME=$( cd $THIS/.. ; /bin/pwd )
-export PYTHONPATH=$PYTHONPATH:$SRO_HOME
-
-swift-t -p $*

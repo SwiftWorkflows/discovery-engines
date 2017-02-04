@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+THIS=$( dirname $0 )
+SRO_HOME=$( cd $THIS/../.. ; /bin/pwd )
+export PYTHONPATH=${PYTHONPATH:-}:$SRO_HOME/lib:$SRO_HOME/py
+
+SCRIPT=$1
+shift
+
+# echo $PYTHONPATH
+
+if ! swift-t -p $THIS/$SCRIPT $*
+then
+  echo "FAILED!"
+  exit 1
+fi

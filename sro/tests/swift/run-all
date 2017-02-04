@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+THIS=$( dirname $0 )
+
+TESTS="test-python.swift test-sro-import.swift test-sro-problem.swift"
+for T in $TESTS
+do
+  echo RUNNING: $T
+  if $THIS/run $T
+  then
+    echo TEST: OK
+  else
+    echo TEST: FAILED!
+  fi
+  echo
+done

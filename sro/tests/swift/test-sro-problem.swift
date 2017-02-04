@@ -2,8 +2,8 @@ import io;
 import python;
 
 printf(python_persist("""
-import libpysro
-p = libpysro.problem_make()
+import _libpysro
+p = _libpysro.problem_make()
 print "p is: " + str(p)
 """,
 "\"ok\""));
