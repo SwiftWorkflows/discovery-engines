@@ -8,6 +8,16 @@ module SRO_CALC
 
 contains
 
+  subroutine allocate_theory(p)
+
+    use SRO_DEFN
+
+    type(problem) :: p
+
+    allocate(theory(p%h1n, p%h2n, p%h3n))
+
+  end subroutine allocate_theory
+
   subroutine exprmnt_setup(p, exprmnt_file)
 
     use SRO_DEFN
@@ -80,7 +90,6 @@ contains
     REAL, intent(in) :: mu1(p%h1n,p%h2n), &
                         mu2(p%h1n,p%h2n), &
                         mu12(p%h1n,p%h2n)
-!    REAL, intent(out) :: theory(p%h1n,p%h2n,p%h3n)
 
     REAL    :: I1, I2, I12
     integer :: i, j, k

@@ -23,8 +23,8 @@ program main
   p%h21 = 5
   p%h31 = 5
 
-  p%h1n = 1000
-  p%h2n = 1000
+  p%h1n = 10
+  p%h2n = 10
   p%h3n = 10
 
   allocate(mu1 (p%h1n, p%h2n))
@@ -36,17 +36,18 @@ program main
   p%a_o1v2 = -0.2260175
 
   call compute_mu(p, mu1, mu2, mu12)
-  ! call compute_I( p, mu1, mu2, mu12, theory)
+  call allocate_theory(p)
+  call compute_theory(p, mu1, mu2, mu12)
 
-  call mu_write(p, mu1,  "mu1.txt")
-  call mu_write(p, mu2,  "mu2.txt")
-  call mu_write(p, mu12, "mu12.txt")
+  ! call mu_write(p, mu1,  "mu1.txt")
+  ! call mu_write(p, mu2,  "mu2.txt")
+  ! call mu_write(p, mu12, "mu12.txt")
 
-  call mu_hdf_write(p, mu1,  "mu1.h5")
-  call mu_hdf_write(p, mu2,  "mu2.h5")
-  call mu_hdf_write(p, mu12, "mu12.h5")
+  ! call mu_hdf_write(p, mu1,  "mu1.h5")
+  ! call mu_hdf_write(p, mu2,  "mu2.h5")
+  ! call mu_hdf_write(p, mu12, "mu12.h5")
 
-  ! call write_theory_hdf(p, theory, output_file)
+  call intensity_hdf_write(p, theory, output_file)
 
   deallocate(mu1)
   deallocate(mu2)
