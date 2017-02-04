@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+THIS=$( dirname $0 )
+
+make bin/sro
+make tests-f
+
+if ! [ -f tmp.h5 ]
+then
+   bin/create-data.py tmp.h5 /entry/data/v
+fi
+bin/sro 2 2 2 theory.h5
