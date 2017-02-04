@@ -7,4 +7,6 @@ export PYTHONPATH=$SRO_HOME/lib:$SRO_HOME/py
 
 echo $PYTHONPATH
 
-python $THIS/test-sro.py $*
+SCRIPT=$1
+shift
+python $THIS/$SCRIPT $*

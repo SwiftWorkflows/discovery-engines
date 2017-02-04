@@ -14,6 +14,8 @@ void __sro_calc_MOD_problem_set_c(void* p,
                                   REAL* h10, REAL* h20, REAL* h30,
                                   REAL* h11, REAL* h21, REAL* h31,
                                   int* h1n, int* h2n, int* h3n);
+void __sro_calc_MOD_problem_set_lmn_c(void* p,
+                                      REAL* l, REAL* m, REAL* n);
 void __sro_calc_MOD_problem_free_c(void* p);
 REAL __sro_calc_MOD_compute_diff(void* p, char* filename);
 // void __sro_calc_MOD_exprmnt_setup(void* p, char* filename);
@@ -29,6 +31,9 @@ void problem_set(void* p,
                  REAL h10, REAL h20, REAL h30,
                  REAL h11, REAL h21, REAL h31,
                  int h1n, int h2n, int h3n);
+
+void problem_set_lmn(void* p,
+                     REAL l, REAL m, REAL n);
 
 void problem_free(void* p);
 

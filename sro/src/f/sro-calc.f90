@@ -35,15 +35,15 @@ contains
     p%h2n = 10
     p%h3n = 10
 
-    print *, "allocating: ", p%h1n*p%h2n*p%h3n*8/(1024*1024)
+    print *, "allocating: ", p%h1n*p%h2n*p%h3n*8/(1024*1024), "MB"
 
     allocate(exprmnt(p%h1n, p%h2n, p%h3n))
-    allocate(theory(p%h1n, p%h2n, p%h3n))
+    call allocate_theory(p)
 
     call exprmnt_hdf_read(p, exprmnt_file, exprmnt)
 
-    print *, exprmnt(1,1,1)
-    print *, exprmnt(10,10,10)
+    ! print *, exprmnt(1,1,1)
+    ! print *, exprmnt(10,10,10)
 
   end subroutine
 
@@ -61,15 +61,9 @@ contains
 
     character (len=FILENAME_MAX) exprmnt_file
 
-    call exprmnt_setup(p, exprmnt_file)
-
-    print *, p%h1n
-
-    ! call compute_mu(p, mu1, mu2, mu12)
-    ! call compute_theory(p, mu1, mu2, mu12, theory)
-
-    theory(1,1,1) = 0
-    theory = 0
+    call exprmnt_setup( p, exprmnt_file)
+    call compute_mu(    p, mu1, mu2, mu12)
+    call compute_theory(p, mu1, mu2, mu12)
 
     c = 0
     do k=1,p%h3n
@@ -95,6 +89,8 @@ contains
     integer :: i, j, k
     REAL    :: h1step, h2step, h3step, h1, h2, h3, a
 
+    print *, "compute_theory()..."
+
     h1step = (p%h11 - p%h10) / p%h1n
     h2step = (p%h21 - p%h20) / p%h2n
     h3step = (p%h31 - p%h10) / p%h3n
@@ -115,6 +111,9 @@ contains
           end do
        end do
     end do
+
+    print *, "compute_theory() done."
+
   end subroutine
 
   subroutine compute_mu(p, mu1, mu2, mu12)
@@ -132,6 +131,8 @@ contains
     REAL :: FO1, FO2, FV1, FV2
     REAL :: h1, h2, h1step, h2step
     integer i, j
+
+    print *, "compute_mu()..."
 
     ! scattering factors for oxygen and aluminum,
     ! assuming we're sufficiently far from any absorption edges
@@ -189,6 +190,8 @@ contains
        end do
     end do
 
+    print *, "compute_mu() done."
+
   end subroutine
 
   subroutine test_c()
@@ -231,6 +234,18 @@ contains
     p%h1n = h1n
     p%h2n = h2n
     p%h3n = h3n
+  end subroutine
+
+  subroutine problem_set_lmn_c(p, l, m, n)
+    use SRO_DEFN
+
+    type(problem), pointer :: p
+    REAL    :: l, m, n
+
+    p%l = l
+    p%m = m
+    p%n = n
+
   end subroutine
 
   subroutine problem_free_c(p)

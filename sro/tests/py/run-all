@@ -3,4 +3,5 @@ set -eu
 
 THIS=$( dirname $0 )
 
-$THIS/test-sro-py.sh $*
+$THIS/test-sro-py.sh test-sro-1.py $*
+$THIS/test-sro-py.sh test-sro-2.py $*

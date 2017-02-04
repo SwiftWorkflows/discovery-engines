@@ -25,6 +25,13 @@ problem_set(void* ptr,
                                &h1n, &h2n, &h3n);
 }
 
+void problem_set_lmn(void* ptr,
+                     REAL l, REAL m, REAL n)
+{
+    __sro_calc_MOD_problem_set_lmn_c(&ptr,
+                                     &l, &m, &n);
+}
+
 void
 problem_free(void* ptr)
 {
