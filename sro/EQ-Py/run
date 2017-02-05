@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+
+# RUN
+# Runs the DEAP workflow
+
+PROCS=${PROCS:-3}
+
+THIS=$( cd $( dirname $0 ) ; /bin/pwd )
+export SRO_HOME=$( cd $THIS/.. ; /bin/pwd )
+EQP=$SRO_HOME/EQ-Py
+
+set -x
+
+export PYTHONPATH=${PYTHONPATH:-}:$SRO_HOME/lib:$SRO_HOME/py:$SRO_HOME/EQ-Py
+
+export TURBINE_RESIDENT_WORK_WORKERS=1
+export RESIDENT_WORK_RANKS=$(( PROCS - 2 ))
+# export SWIFT_PATH=$T_PROJECT_ROOT/Tcl/Tcl-Task
+
+which swift-t
+
+set -x
+swift-t -n $PROCS -p -I $EQP -r $EQP $SRO_HOME/EQ-Py/workflow.swift $*
