@@ -1,0 +1,244 @@
+Submodule submodules/cctw-code contains modified content
+diff --git a/submodules/cctw-code/cctw-code.pro b/submodules/cctw-code/cctw-code.pro
+index 914a98d..ed69103 100644
+--- a/submodules/cctw-code/cctw-code.pro
++++ b/submodules/cctw-code/cctw-code.pro
+@@ -1,5 +1,7 @@
+ TEMPLATE = subdirs
+ 
++INCLUDEPATH += -I/nfs/chess/opt/nexpy/condas/miniconda-2023-02-17/include
++
+ exists(cctw-version.pri) {
+   include(cctw-version.pri)
+   VERSION = $${CCTW_VERSION}
+@@ -22,9 +24,9 @@ exists(cctwlib) {
+ win32 {
+ } else:macx {
+ } else:unix {
+-  exists(cctwmpi) {
+-    SUBDIRS += cctwmpi
+-  }
++  # exists(cctwmpi) {
++  #   SUBDIRS += cctwmpi
++  # }
+ 
+   exists(cctwthreaded) {
+     SUBDIRS += cctwthreaded
+diff --git a/submodules/cctw-code/cctw/cctw-files.pri b/submodules/cctw-code/cctw/cctw-files.pri
+index 74b5578..39300bb 100644
+--- a/submodules/cctw-code/cctw/cctw-files.pri
++++ b/submodules/cctw-code/cctw/cctw-files.pri
+@@ -1,4 +1,5 @@
+ INCLUDEPATH += $$PWD
++LIBS += -L/usr/lib -lX11 -lXext
+ 
+ SOURCES += \
+   $$PWD/cctw.cpp
+@@ -12,4 +13,3 @@ RESOURCES +=
+ DISTFILES +=
+ 
+ OTHER_FILES += \
+-
+diff --git a/submodules/cctw-code/cctwbase/cctwbase.inc.pri b/submodules/cctw-code/cctwbase/cctwbase.inc.pri
+index 6b3ec2e..f41e1a2 100644
+--- a/submodules/cctw-code/cctwbase/cctwbase.inc.pri
++++ b/submodules/cctw-code/cctwbase/cctwbase.inc.pri
+@@ -1,6 +1,7 @@
+ INCLUDEPATH += $$PWD
++INCLUDEPATH += /nfs/chess/opt/nexpy/condas/miniconda-2023-02-17/include
+ 
+-LIBS += -lhdf5
++LIBS += -L/nfs/chess/opt/nexpy/condas/miniconda-2023-02-17/lib -lhdf5
+ 
+ SOURCES += \
+   $$PWD/cctwbaseangleparameters.cpp \
+@@ -89,4 +90,3 @@ HEADERS += \
+   $$PWD/cctwbaseutils.h \
+   $$PWD/cctwbasevector3d.h \
+   $$PWD/cctwbaseweightsitem.h
+-
+diff --git a/submodules/cctw-code/cctwlib/cctwlib-include.pri b/submodules/cctw-code/cctwlib/cctwlib-include.pri
+index 986938b..48657e0 100644
+--- a/submodules/cctw-code/cctwlib/cctwlib-include.pri
++++ b/submodules/cctw-code/cctwlib/cctwlib-include.pri
+@@ -1,3 +1,3 @@
+-INCLUDEPATH += $$PWD $$PWD/../cctwutil/ $$PWD/../cctwbase/
+-
++INCLUDEPATH += $$PWD $$PWD/../cctwutil/ $$PWD/../cctwbase/ /nfs/chess/opt/nexpy/sfw/libzip-1.9.2/include
++LIBS += -L/nfs/chess/opt/nexpy/sfw/libzip-1.9.2/lib64
+ include(../cctw-version.pri)
+diff --git a/submodules/cctw-code/cctwmpi/cctwmpi.inc.pri b/submodules/cctw-code/cctwmpi/cctwmpi.inc.pri
+index db4f7a0..6a80328 100644
+--- a/submodules/cctw-code/cctwmpi/cctwmpi.inc.pri
++++ b/submodules/cctw-code/cctwmpi/cctwmpi.inc.pri
+@@ -1,4 +1,5 @@
+ INLCUDEPATH += $$PWD
++INCLUDEPATH += /nfs/chess/opt/nexpy/condas/miniconda-2023-02-17/include
+ 
+ SOURCES += \
+  $$PWD/cctwmpi.cpp \
+diff --git a/submodules/cctw-code/cctwmpi/cctwmpi.pro b/submodules/cctw-code/cctwmpi/cctwmpi.pro
+index 76c1540..05c05ff 100644
+--- a/submodules/cctw-code/cctwmpi/cctwmpi.pro
++++ b/submodules/cctw-code/cctwmpi/cctwmpi.pro
+@@ -14,11 +14,11 @@ RPMREQUIRES      = mpich, hdf5, hdf5-mpich
+ include(../../qceplib-code/tools/config-app.pri)
+ 
+ # MPI Settings
+-QMAKE_CXX = /usr/lib64/mpich/bin/mpicxx
++QMAKE_CXX = mpicxx # /usr/lib64/mpich/bin/mpicxx
+ QMAKE_CXX_RELEASE = $$QMAKE_CXX
+ QMAKE_CXX_DEBUG = $$QMAKE_CXX
+ QMAKE_LINK = $$QMAKE_CXX
+-QMAKE_CC = /usr/lib64/mpich/bin/mpicc
++QMAKE_CC = mpicc # /usr/lib64/mpich/bin/mpicc
+ 
+ QMAKE_CFLAGS += -g
+ QMAKE_CXXFLAGS += -g
+diff --git a/submodules/cctw-code/cctwthreaded/cctwthreaded.inc.pri b/submodules/cctw-code/cctwthreaded/cctwthreaded.inc.pri
+index 811ce7f..94e9817 100644
+--- a/submodules/cctw-code/cctwthreaded/cctwthreaded.inc.pri
++++ b/submodules/cctw-code/cctwthreaded/cctwthreaded.inc.pri
+@@ -1,4 +1,5 @@
+ INCLUDEPATH += $$PWD
++INCLUDEPATH += /nfs/chess/opt/nexpy/condas/miniconda-2023-02-17/include
+ 
+ SOURCES += \
+   $$PWD/cctwthreaded.cpp \
+Submodule submodules/qceplib-code contains modified content
+diff --git a/submodules/qceplib-code/qceplib-base/qceplib-tiff/qceplib-tiff-include.pri b/submodules/qceplib-code/qceplib-base/qceplib-tiff/qceplib-tiff-include.pri
+index 2e27e43e..10ffc505 100644
+--- a/submodules/qceplib-code/qceplib-base/qceplib-tiff/qceplib-tiff-include.pri
++++ b/submodules/qceplib-code/qceplib-base/qceplib-tiff/qceplib-tiff-include.pri
+@@ -3,7 +3,7 @@ macx {
+ } else:win32 {
+   include("$$PWD/tiffconfig-$${QCEPLIB_TIFF_VERSION}/qt-libtiff-win32-include.pri")
+ } else {
+-  LIBS += -ltiff -ltiffxx
++  LIBS += -L/nfs/chess/sw/nexpy/condas/miniconda-2023-02-17/lib -ltiff -ltiffxx
+ }
+ 
+ INCLUDEPATH += $$PWD
+diff --git a/submodules/qceplib-code/qceplib-compress/qceplib-compress-include.pri b/submodules/qceplib-code/qceplib-compress/qceplib-compress-include.pri
+index 64e86418..4074e62b 100644
+--- a/submodules/qceplib-code/qceplib-compress/qceplib-compress-include.pri
++++ b/submodules/qceplib-code/qceplib-compress/qceplib-compress-include.pri
+@@ -1,4 +1,4 @@
+-INCLUDEPATH += $$PWD
++INCLUDEPATH += $$PWD /nfs/chess/opt/nexpy/sfw/libzip-1.9.2/include
+ 
+ include(../qceplib-version.pri)
+ include(qceplib-compress-version.pri)
+diff --git a/submodules/qceplib-code/qceplib-compress/qceplib-compress-libs.pri b/submodules/qceplib-code/qceplib-compress/qceplib-compress-libs.pri
+index 568f8e65..65fb5c31 100644
+--- a/submodules/qceplib-code/qceplib-compress/qceplib-compress-libs.pri
++++ b/submodules/qceplib-code/qceplib-compress/qceplib-compress-libs.pri
+@@ -6,5 +6,6 @@ win32:CONFIG(debug, debug|release) {
+ #    LIBS += -F$${LIBDESTDIR} -framework qceplib-compress
+     LIBS += -L$${LIBDESTDIR}/ -lqceplib-compress
+ } else {
++    LIBS += -L/nfs/chess/opt/nexpy/sfw/libzip-1.9.2/lib64 -lzip
+     LIBS += -L$${LIBDESTDIR}/ -lqceplib-compress
+ }
+diff --git a/submodules/qceplib-code/qceplib-compress/qceplib-libzip/qceplib-libzip-include.pri b/submodules/qceplib-code/qceplib-compress/qceplib-libzip/qceplib-libzip-include.pri
+index ecb84f06..acb481d6 100644
+--- a/submodules/qceplib-code/qceplib-compress/qceplib-libzip/qceplib-libzip-include.pri
++++ b/submodules/qceplib-code/qceplib-compress/qceplib-libzip/qceplib-libzip-include.pri
+@@ -3,7 +3,8 @@ macx {
+   LIBZIPCONF = $$PWD/libzip-config-$${QCEPLIB_LIBZIP_VERSION}/macx/
+   INCLUDEPATH += $${LIBZIPBASE} $${LIBZIPCONF}
+ } else:unix {
+-  LIBS += -lzip
++  INCLUDEPATH += /nfs/chess/opt/nexpy/sfw/libzip-1.9.2
++  LIBS += -L/nfs/chess/opt/nexpy/sfw/libzip-1.9.2/lib64 -lzip
+ } else:win32 {
+   LIBZIPBASE = $$PWD/libzip-$${QCEPLIB_LIBZIP_VERSION}/lib/
+   contains(QT_ARCH, x86_64) {
+diff --git a/submodules/qceplib-code/qceplib-compress/qceplib-szip/szip-2.1.1/src/SZconfig.h.in~ b/submodules/qceplib-code/qceplib-compress/qceplib-szip/szip-2.1.1/src/SZconfig.h.in~
+deleted file mode 100644
+index b925a04d..00000000
+--- a/submodules/qceplib-code/qceplib-compress/qceplib-szip/szip-2.1.1/src/SZconfig.h.in~
++++ /dev/null
+@@ -1,82 +0,0 @@
+-/* src/SZconfig.h.in.  Generated from configure.ac by autoheader.  */
+-
+-/* Define to 1 if you have the <dlfcn.h> header file. */
+-#undef HAVE_DLFCN_H
+-
+-/* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
+-#undef HAVE_DOPRNT
+-
+-/* Define if encoding is enabled */
+-#undef HAVE_ENCODING
+-
+-/* Define to 1 if you have the <fcntl.h> header file. */
+-#undef HAVE_FCNTL_H
+-
+-/* Define to 1 if you have the <inttypes.h> header file. */
+-#undef HAVE_INTTYPES_H
+-
+-/* Define to 1 if you have the <memory.h> header file. */
+-#undef HAVE_MEMORY_H
+-
+-/* Define to 1 if you have the `memset' function. */
+-#undef HAVE_MEMSET
+-
+-/* Define to 1 if you have the <stdint.h> header file. */
+-#undef HAVE_STDINT_H
+-
+-/* Define to 1 if you have the <stdlib.h> header file. */
+-#undef HAVE_STDLIB_H
+-
+-/* Define to 1 if you have the <strings.h> header file. */
+-#undef HAVE_STRINGS_H
+-
+-/* Define to 1 if you have the <string.h> header file. */
+-#undef HAVE_STRING_H
+-
+-/* Define to 1 if you have the <sys/stat.h> header file. */
+-#undef HAVE_SYS_STAT_H
+-
+-/* Define to 1 if you have the <sys/types.h> header file. */
+-#undef HAVE_SYS_TYPES_H
+-
+-/* Define to 1 if you have the <unistd.h> header file. */
+-#undef HAVE_UNISTD_H
+-
+-/* Define to 1 if you have the `vprintf' function. */
+-#undef HAVE_VPRINTF
+-
+-/* Define to the sub-directory where libtool stores uninstalled libraries. */
+-#undef LT_OBJDIR
+-
+-/* Name of package */
+-#undef PACKAGE
+-
+-/* Define to the address where bug reports for this package should be sent. */
+-#undef PACKAGE_BUGREPORT
+-
+-/* Define to the full name of this package. */
+-#undef PACKAGE_NAME
+-
+-/* Define to the full name and version of this package. */
+-#undef PACKAGE_STRING
+-
+-/* Define to the one symbol short name of this package. */
+-#undef PACKAGE_TARNAME
+-
+-/* Define to the home page for this package. */
+-#undef PACKAGE_URL
+-
+-/* Define to the version of this package. */
+-#undef PACKAGE_VERSION
+-
+-/* Define to 1 if you have the ANSI C header files. */
+-#undef STDC_HEADERS
+-
+-/* Version number of package */
+-#undef VERSION
+-
+-/* Define to empty if `const' does not conform to ANSI C. */
+-#undef const
+-
+-/* Define to `unsigned int' if <sys/types.h> does not define. */
+-#undef size_t
